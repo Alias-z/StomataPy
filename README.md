@@ -6,7 +6,7 @@
  Everyone could run the models in Google Colab or locally for automatic stomatal segmentations.  <br>
 
  **We call for the contribution from the stomata community for a stomata 'ImageNet'**  <br>
- **If you want to contribute or request a function, please contact me at: hongyuan.zhang@usys.ethz.ch**
+ **If you want to contribute or request a function, please submit an issue or contact me at: hongyuan.zhang@usys.ethz.ch**
 
  # Functions showcase
 
