@@ -1,5 +1,5 @@
 # StomataPy
- Stomata segmentation tools for the phenotyping era
+State of the art stomata segmentation tools for the phenotyping era
 
  # Aim
  We are about to release pre-trained stomata segmentation models that are powered by a large dataset of fine-granular annotated images.
