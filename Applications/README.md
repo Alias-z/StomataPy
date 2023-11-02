@@ -1,5 +1,8 @@
 # This folder stores model configuration files and weights
 
---Applications
-----Configs
-----Weights
+Folder structure:
+```text
+Applications
+├── Configs
+├── Weights
+```
