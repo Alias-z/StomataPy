@@ -55,20 +55,21 @@ class StomataPyData:
         self.fetter2019_dir = 'Datasets//Fetter2019//Original'  # directory of Fetter2019
         self.vofely2019_dir = 'Datasets//Vofely2019//Original'  # directory of Vofely2019
         self.casadogarcia2020_dir = 'Datasets//Casado-Garcia2020//Original'  # directory of Casado-Garcia2020
-        self.meeus2020_dir = 'Datasets//2020 Meeus et al//Original'  # directory of Meeus2020
+        self.meeus2020_dir = 'Datasets//Meeus2020//Original'  # directory of Meeus2020
         self.aono2021_dir = 'Datasets//Aono2021//Original'   # directory of Aono2021
         self.ferguson2021_dir = 'Datasets//2021 Ferguson et al//Original'  # directory of Ferguson2021
         self.sultana2021_dir = 'Datasets//Sultana2021//Original'  # directory of Sultana2021
         self.sun2021_dir = 'Datasets//2021 Sun et al//Original'  # directory of Sun2021
         self.thathapalliprakash2021_dir = 'Datasets//ThathapalliPrakash2021//Original'  # directory of ThathapalliPrakash2021
-        self.toda2021_dir = 'Datasets//2021 Toda et al//Original'  # directory of Toda2021
+        self.toda2021_dir = 'Datasets//Toda2021//Original'  # directory of Toda2021
         self.xie2021_dir = 'Datasets//2021 Xie et al//Original'  # directory of Xie2021
-        self.yang2021_dir = 'Datasets//2021 Yang et al//Original'  # directory of Yang2021
+        self.yang2021_dir = 'Datasets//Yang2021//Original'  # directory of Yang2021
         self.liang2022_dir = 'Datasets//2022 Liang et al//Original'  # directory of Liang2022
+        self.zhu2021_dir = 'Datasets//Zhu2021//Original'  # directory of Zhu2021
         self.dey2023_dir = 'Datasets//2023 Dey et al//Original'  # directory of Dey2023
         self.li2023_dir = 'Datasets//2023 Li et al//Original'  # directory of Li2023
-        self.meng2023_dir = 'Datasets//2023 Meng et al//Original'  # directory of Meng2023
-        self.pathoumthong2023_dir = 'Datasets//2023 Pathoumthong et al//Original'  # directory of Pathoumthong2023
+        self.meng2023_dir = 'Datasets//Meng2023//Original'  # directory of Meng2023
+        self.pathoumthong2023_dir = 'Datasets//Pathoumthong2023//Original'  # directory of Pathoumthong2023
         self.sun2023_dir = 'Datasets//2023 Sun et al//Original'  # directory of Sun2023
         self.takagi2023_dir = 'Datasets//2023 Takagi et al//Original'  # directory of Takagi2023
         self.wangrenninger2023_dir = 'Datasets//2023 Wang and Renninger//Original'  # directory of WangRenninger2023
@@ -916,7 +917,7 @@ class Meeus2020(StomataPyData):
     You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
     No additional restrictions — You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.
 
-    2020 Meeus et al
+    Meeus2020
     ├── Original
         ├── data
             ├── Carapa procera_CBMFO M3-53_leaf1-field1_BR0000013004071.jpg
@@ -1566,7 +1567,7 @@ class Toda2021(StomataPyData):
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 
-    2021 Toda et al
+    Toda2021
     ├── Original
         ├── test
             ├── 20200904_135153__0.jpg
@@ -1792,7 +1793,7 @@ class Yang2021(StomataPyData):
     GNU General Public License for more details.
 
 
-    2021 Yang et al
+    Yang2021
     ├── Original
         ├── maize_20x
             ├── U-103-1.tif
@@ -1965,6 +1966,86 @@ class Liang2022(StomataPyData):
                         masks = SAMHQ.isolate_masks(prompt_masks + auto_masks)  # filter redundant masks
                 else:
                     masks = SAMHQ.isolate_masks(auto_masks)  # filter redundant masks
+                if visualize:
+                    visual_masks = [mask['segmentation'] for mask in masks]  # get only bool masks
+                    SAMHQ.show_masks(image, visual_masks, random_color=random_color)  # visualize bool masks
+                if len(masks) > 0:
+                    Anything2ISAT.from_samhq(masks, image, image_path, catergory=catergory)  # export the ISAT json file
+            except ValueError:
+                pass
+        return None
+
+
+class Zhu2021(StomataPyData):
+    """
+    Zhu et al., 2021   https://doi.org/10.3389/fpls.2021.716784
+    Dataset source: https://github.com/WeizhenLiuBioinform/stomatal_index/releases/tag/wheat1.0
+
+    Rights and permissions:
+    BSD 3-Clause "New" or "Revised" License (https://github.com/WeizhenLiuBioinform/stomatal_index/blob/master/LICENSE).
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+    1. Redistributions of source code must retain the above copyright notice, this
+    list of conditions and the following disclaimer.
+
+    2. Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions and the following disclaimer in the documentation
+    and/or other materials provided with the distribution.
+
+    3. Neither the name of the copyright holder nor the names of its
+    contributors may be used to endorse or promote products derived from
+    this software without specific prior written permission.
+
+    Zhu2021
+    ├── Original
+        ├── wheat10x
+            ├── images
+                ├── 10026.jpg
+                ...
+                ├── 12783.jpg
+        ├── wheat20x (ignored, as they are augmented form the the 10x images)
+    ├── Processed
+        ├── T. aestivum
+    ├── source.txt
+    ├── discard.txt
+
+    1. Rename images
+    2. Dsicard unwanted images and their annotations
+    3. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
+    4. Train custom models for auto labeling
+    5. Check every annotation
+    """
+    def __init__(self):
+        super().__init__()
+        self.input_dir = self.zhu2021_dir  # input directory
+        self.processed_dir = self.input_dir.replace('Original', 'Processed')  # output directory
+        self.data_dir = os.path.join(self.input_dir, 'wheat10x')  # data directory
+        self.source_name = 'Zhu2021'  # source name
+        self.species_name = 'T. aestivum'  # plant species name
+        self.species_folder_dir = os.path.join(self.processed_dir, self.species_name)  # get the path of the species folder
+        self.samhq_configs = {'points_per_side': (24,), 'min_mask_ratio': 0.0005, 'max_mask_ratio': 0.02}  # SAM-HQ auto label configuration
+
+    def rename_images(self) -> None:
+        """Copy images to 'Processed' and rename them"""
+        self.ensemble_files(self.data_dir, ['images'], self.processed_dir, ['.jpg'], folder_rename=True)  # move image files to a temporary subfolder
+        # self.discard_files(os.path.join(self.input_dir.replace('//Original', ''), 'discard.txt'), self.processed_dir)  # remove unwanted images
+        file_names = [os.path.basename(path) for path in get_paths(self.processed_dir, '.jpg')]  # get file basenames
+        new_names = [f'{self.species_name} {self.source_name} wheat10x {file_name}' for file_name in file_names]  # get renamings
+        self.batch_rename(self.processed_dir, file_names, new_names)  # rename all images
+        self.create_species_folders(self.processed_dir, set([self.species_name]))  # create species folder
+        return None
+
+    def get_annotations(self, catergory: str = 'stoma', visualize: bool = False, random_color: bool = True) -> None:
+        """Generate ISAT annotations json files"""
+        points_per_side, min_mask_ratio, max_mask_ratio = self.samhq_configs['points_per_side'], self.samhq_configs['min_mask_ratio'], self.samhq_configs['max_mask_ratio']  # get SAN-HQ auto mask configs
+        image_paths = get_paths(self.species_folder_dir, '.jpg')  # get the image paths under the species folder
+        for image_path in tqdm(image_paths, total=len(image_paths)):
+            image, masks = imread_rgb(image_path), []  # load the image in RGB scale
+            try:
+                auto_masks = SAMHQ(image_path=image_path, points_per_side=points_per_side, min_mask_ratio=min_mask_ratio, max_mask_ratio=max_mask_ratio).auto_label(ellipse_threshold=0.2)  # get the auto labelled masks
+                masks = SAMHQ.isolate_masks(auto_masks)  # filter redundant masks
                 if visualize:
                     visual_masks = [mask['segmentation'] for mask in masks]  # get only bool masks
                     SAMHQ.show_masks(image, visual_masks, random_color=random_color)  # visualize bool masks
@@ -2224,7 +2305,7 @@ class Meng2023(StomataPyData):
     Rights and permissions:
     Data use rights granted by corresponding authors
 
-    2023 Meng et al
+    Meng2023
     ├── Original
         ├── large photos
             ├── 0.jpg
@@ -2300,7 +2381,7 @@ class Pathoumthong2023(StomataPyData):
     You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
     No additional restrictions — You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.
 
-    2023 Pathoumthong et al
+    Pathoumthong2023
     ├── Original
         ├── Arabidopsis (ignored: no images)
         ├── Rice (ignored: no images)
@@ -2333,9 +2414,8 @@ class Pathoumthong2023(StomataPyData):
 
     1. Rename images
     2. Dsicard unwanted images and their annotations
-    3. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
-    4. Train custom models for auto labeling
-    5. Check every annotation
+    3. Generate segmentation masks with SAM-HQ (did not work), mannually adjust them
+    4. Check every annotation
     """
     def __init__(self):
         super().__init__()

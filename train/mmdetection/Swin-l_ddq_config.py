@@ -6,25 +6,27 @@ log_processor = dict(type='LogProcessor', window_size=50, by_epoch=True)
 
 fp16 = dict(loss_scale='dynamic')
 with_cp = True  # for FSDP: the checkpoint needs to be controlled by the checkpoint_check_fn.
-optimizer_config = dict(type='GradientCumulativeOptimizerHook', cumulative_iters=4)
+optimizer_config = dict(type='GradientCumulativeOptimizerHook', cumulative_iters=8)
 
 classes = ('stomatal complex',)
 num_classes = len(classes)
-num_feature_levels = 5  # Feature Pyramid Network (FPN), "num_feature_levels" refers to the number of feature maps that the network generates.
 
 dataset_type = 'CocoDataset'
 data_root = 'Stomata_detection//'
-output_dir = 'Swin-L_DDQ_Yates'
+output_dir = 'Swin-L_DDQ_gmax'
 work_dir = 'Models//' + output_dir
 wandb_project = 'StomataPy'
 
-batch_size = 4
+train_ann_file = 'train_sahi/sahi_coco.json'
+val_ann_file = 'val_sahi/sahi_coco.json'
+
+batch_size = 2
 n_gpus = 4
 num_workers = 16
 original_batch_size = 16  # 2
 original_lr = 0.0002
 original_n_gpus = 8
-lr = original_lr * (n_gpus / original_n_gpus) * (batch_size / original_batch_size) * 10
+lr = original_lr * (n_gpus / original_n_gpus) * (batch_size / original_batch_size)
 auto_scale_lr = dict(base_batch_size=16, enable=False)
 
 ReduceOnPlateauLR_patience = 50
@@ -32,8 +34,8 @@ early_stopping_patience = 150
 max_epochs = 500
 warmup_epochs = 30
 
-image_size = (4320, 1620)
-crop_size = (512, 512)
+image_size = (1280, 1024)
+
 
 # -------------------------------- Data augmentation --------------------------------
 
@@ -58,43 +60,34 @@ load_pipeline = [
     dict(type='LoadImageFromFile', to_float32=True),
     dict(type='LoadAnnotations', with_bbox=True),
     # dict(type='CutOut', n_holes=5, cutout_ratio=(0.025, 0.05)),
-    dict(
-        type='RandomChoiceResize',
-        scales=[int(image_size[1] * x * 0.1) for x in range(9, 11)],
-        resize_type="ResizeShortestEdge",
-        max_size=image_size[1] * 2,
-    ),
-    dict(
-        type='RandomCrop',
-        crop_type='absolute',
-        crop_size=(image_size[0] // 2, image_size[1] // 2),
-        recompute_bbox=True,
-        allow_negative_crop=False,
-        bbox_clip_border=True
-    ),
-    # dict(type='YOLOXHSVRandomAug'),
-    dict(
-        type='RandomAffine',
-        max_rotate_degree=10,
-        max_translate_ratio=0.0,
-        scaling_ratio_range=(1.0, 1.0),
-        max_shear_degree=2,
-        border=(0, 0),
-        border_val=(114, 114, 114),
-        bbox_clip_border=True
-    ),
     # dict(
-    #     type='FixShapeResize',
-    #     width=2000,
-    #     height=1500,
-    #     pad_val=0,
-    #     keep_ratio=True,
-    #     clip_object_border=True,
-    #     interpolation='lanczos'
+    #     type='RandomChoiceResize',
+    #     scales=[int(image_size[1] * x * 0.1) for x in range(9, 11)],
+    #     resize_type="ResizeShortestEdge",
+    #     max_size=image_size[1] * 2,
+    # ),
+    # dict(
+    #     type='RandomCrop',
+    #     crop_type='absolute',
+    #     crop_size=(image_size[0] // 2, image_size[1] // 2),
+    #     recompute_bbox=True,
+    #     allow_negative_crop=False,
+    #     bbox_clip_border=True
+    # ),
+    # dict(type='YOLOXHSVRandomAug'),
+    # dict(
+    #     type='RandomAffine',
+    #     max_rotate_degree=10,
+    #     max_translate_ratio=0.0,
+    #     scaling_ratio_range=(1.0, 1.0),
+    #     max_shear_degree=2,
+    #     border=(0, 0),
+    #     border_val=(114, 114, 114),
+    #     bbox_clip_border=True
     # ),
     dict(type='RandomFlip', prob=0.5),
     dict(type='PhotoMetricDistortion'),
-    # dict(type='GeomTransform', prob=0.5, img_border_value=(0, 0, 0), interpolation='lanczos'),
+    dict(type='GeomTransform', prob=0.5, img_border_value=(0, 0, 0), interpolation='lanczos'),
     # dict(
     #     type='Albu',
     #     transforms=albu_train_transforms,
@@ -118,78 +111,45 @@ train_pipeline = [
         bbox_clip_border=True,
         prob=1
     ),
-    dict(
-        type='CachedMixUp',
-        img_scale=(crop_size[0] * 3, crop_size[1] * 3),
-        ratio_range=(1, 1),
-        flip_ratio=0.5,
-        pad_val=0,
-        max_iters=15,
-        bbox_clip_border=True,
-        max_cached_images=30,
-        random_pop=True,
-        prob=0
-    ),
-    # dict(type='MinIoURandomCrop', min_ious=(0.7, 0.8, 0.9, 1.0), min_crop_size=0.1, bbox_clip_border=True),
     # dict(
-    #     type='RandomCrop',
-    #     crop_type='absolute',
-    #     crop_size=(image_size[0] // 2, image_size[1] // 2),
-    #     recompute_bbox=True,
-    #     allow_negative_crop=False,
-    #     bbox_clip_border=True
+    #     type='CachedMixUp',
+    #     img_scale=(crop_size[0] * 3, crop_size[1] * 3),
+    #     ratio_range=(1, 1),
+    #     flip_ratio=0.5,
+    #     pad_val=0,
+    #     max_iters=15,
+    #     bbox_clip_border=True,
+    #     max_cached_images=30,
+    #     random_pop=True,
+    #     prob=0
     # ),
     dict(
         type='RandomCrop',
-        crop_type='relative',
-        crop_size=(0.125, 0.125),
+        crop_type='absolute',
+        crop_size=(image_size[0], image_size[1]),
         recompute_bbox=True,
         allow_negative_crop=False,
-        bbox_clip_border=True),
-    # dict(type='RandomChoiceResize', scales=[512, 576, 640, 704, 768], resize_type='ResizeShortestEdge', max_size=768),
+        bbox_clip_border=True
+    ),
+    dict(
+        type='RandomChoiceResize',
+        scales=[int(image_size[1] * x * 0.1) for x in range(9, 15)],
+        resize_type="ResizeShortestEdge",
+        max_size=image_size[1] * 1.2
+    ),
     dict(type='FilterAnnotations', min_gt_bbox_wh=(1e-4, 1e-4)),
     dict(type='PackDetInputs', meta_keys=('img_path', 'img_shape', 'img', 'gt_bboxes', 'gt_ignore_flags', 'gt_bboxes_labels'))
 ]
 
 test_pipeline = [
     dict(type='LoadImageFromFile', backend_args=None),
-    dict(type='RandomFlip', prob=0.5),
     dict(type='Resize', scale=(image_size[0], image_size[1]), keep_ratio=True),
     dict(type='LoadAnnotations', with_bbox=True),
     dict(
         type='PackDetInputs',
-        meta_keys=('img_id', 'img_path', 'ori_shape', 'img_shape', 'scale_factor', 'flip', 'flip_direction')
+        meta_keys=('img_id', 'img_path', 'ori_shape', 'img_shape', 'scale_factor')
     )
 ]
-
-tta_pipeline = [
-    dict(type='LoadImageFromFile', backend_args=None),
-    dict(
-        type='TestTimeAug',
-        transforms=[
-            [
-                dict(type='Resize', scale=scale, keep_ratio=True)
-                for scale in [(1080, 1080), (960, 960)]
-            ],
-            [
-                dict(type='RandomFlip', prob=1.),
-                dict(type='RandomFlip', prob=0.)
-            ],
-            [dict(type='LoadAnnotations', with_bbox=True)],
-            [
-                dict(
-                    type='PackDetInputs',
-                    meta_keys=('img_id', 'img_path', 'ori_shape', 'img_shape',
-                               'scale_factor', 'flip', 'flip_direction'))
-            ]
-        ])
-]
-
-tta_model = dict(
-    type='DetTTAModel',
-    tta_cfg=dict(
-        nms=dict(type='nms', iou_threshold=0.6), max_per_img=100)
-)
 
 
 # -------------------------------- Dataloader --------------------------------
@@ -200,10 +160,10 @@ train_dataset = dict(
         type=dataset_type,
         metainfo=dict(classes=classes),
         data_root=data_root,
-        ann_file='train/COCO.json',
-        data_prefix=dict(img='train/'),
+        ann_file=train_ann_file,
+        data_prefix=dict(img='train_sahi/'),
         pipeline=load_pipeline,
-        filter_cfg=dict(filter_empty_gt=False, min_size=32),
+        filter_cfg=dict(filter_empty_gt=True, min_size=32),
         backend_args=None),
     pipeline=train_pipeline)
 
@@ -216,7 +176,7 @@ train_dataloader = dict(
     dataset=train_dataset)
 
 val_dataloader = dict(
-    batch_size=batch_size // 2,  # original 2
+    batch_size=batch_size,  # original 2
     num_workers=num_workers,
     drop_last=False,
     persistent_workers=True,
@@ -225,12 +185,13 @@ val_dataloader = dict(
         type=dataset_type,
         metainfo=dict(classes=classes),
         data_root=data_root,
-        ann_file='val/COCO.json',
-        data_prefix=dict(img='val/'),
+        ann_file=val_ann_file,
+        data_prefix=dict(img='val_sahi/'),
         pipeline=test_pipeline,
         test_mode=True,
         backend_args=None)
 )
+
 
 test_dataloader = val_dataloader
 
@@ -239,7 +200,7 @@ test_dataloader = val_dataloader
 
 val_evaluator = dict(
     type='CocoMetric',
-    ann_file=data_root + '/val/COCO.json',
+    ann_file=data_root + val_ann_file,
     metric='bbox',
     format_only=False,
     backend_args=None
@@ -273,7 +234,7 @@ default_hooks = dict(
         rule='greater',
         patience=early_stopping_patience),
     sampler_seed=dict(type='DistSamplerSeedHook'),
-    visualization=dict(type='DetVisualizationHook', draw=True, interval=1000))
+    visualization=dict(type='DetVisualizationHook', draw=True, interval=10))
 
 custom_hooks = [
     dict(type='NumClassCheckHook'),
@@ -418,7 +379,7 @@ model = dict(
         label_noise_scale=0.5,
         box_noise_scale=1.0,
         group_cfg=dict(dynamic=True, num_groups=None, num_dn_queries=100)),
-    dqs_cfg=dict(type='nms', iou_threshold=0.8),
+    dqs_cfg=dict(type='nms', iou_threshold=0.6),  # originally 0.8
     # training and testing settings
     train_cfg=dict(
         assigner=dict(
@@ -428,7 +389,7 @@ model = dict(
                 dict(type='BBoxL1Cost', weight=5.0, box_format='xywh'),
                 dict(type='IoUCost', iou_mode='giou', weight=2.0)
             ])),
-    test_cfg=dict(max_per_img=100))
+    test_cfg=dict(max_per_img=200))
 
 
 # --------------------------------  No need to code below (Runtime) --------------------------------

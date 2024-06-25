@@ -388,7 +388,7 @@ class UtilsISAT:
                 for obj in objs:
                     category = obj.get('category')  # get the catergory of the given object
                     if 'background' in category:
-                        print(f'background class found in {data["image_name"]}')  # if background is labeled
+                        print(f'background class found in {json_path}')  # if background is labeled
                     elif category != 'epidermal cell' and category in categories:
                         print(f"Redundant category '{category}' in group {group} in {json_path}")  # if there is redundant non-background objects
                     categories.add(category)  # to count number of catergory apperance
@@ -771,34 +771,34 @@ class Anything2ISAT:
         return None
 
     @staticmethod
-    def create_empty_json(image_paths: str) -> None:
+    def create_empty_json(image_path: str) -> None:
         """
         Create empty file in ISAT JSON format
 
         Args:
-        - images_paths (str): the image paths
+        - images_path (str): the image path
 
         Returns:
         - None: the function writes data to a JSON file and does not return any value
         """
-        for image_path in image_paths:
-            json_path = f'{os.path.splitext(image_path)[0]}.json'  # get the ISAT json file path
-            image = cv2.imread(image_path)  # load the image
-            isat_info = {
-                'description': 'ISAT',  # must be exactly 'ISAT'
-                'folder': os.path.dirname(image_path),  # image parent directory
-                'name': os.path.basename(image_path),  # image base name
-                'width': image.shape[1],  # image width
-                'height': image.shape[0],  # image height
-                'depth': image.shape[2],  # image depth
-                'note': ''
-            }
-            isat_data = {
-                'info': isat_info,  # information section regarding the image
-                'objects': {}  # objects section regarding segmentation masks
-            }
-            with open(json_path, 'w', encoding='utf-8') as file:
-                json.dump(isat_data, file, indent=4)  # save the json file
+        json_path = f'{os.path.splitext(image_path)[0]}.json'  # get the ISAT json file path
+        image = cv2.imread(image_path)  # load the image
+        isat_info = {
+            'description': 'ISAT',  # must be exactly 'ISAT'
+            'folder': os.path.dirname(image_path),  # image parent directory
+            'name': os.path.basename(image_path),  # image base name
+            'width': image.shape[1],  # image width
+            'height': image.shape[0],  # image height
+            'depth': image.shape[2],  # image depth
+            'note': ''
+        }
+        isat_data = {
+            'info': isat_info,  # information section regarding the image
+            'objects': []  # objects section regarding segmentation masks
+        }
+        with open(json_path, 'w', encoding='utf-8') as file:
+            json.dump(isat_data, file, indent=4)  # save the json file
+        return None
 
     def from_yolo_seg(self, class_dictionary: dict = None) -> None:
         """
@@ -1122,11 +1122,12 @@ class Anything2ISAT:
                 data['objects'].append(new_object)  # update the objects section
             return data
 
-        for valid_prediction in valid_predictions:
+        print('Converting predictions to ISAT JSON files...')
+        for valid_prediction in tqdm(valid_predictions, total=len(valid_predictions)):
             image_path = valid_prediction['image_path']  # get the image path
             json_path = f'{os.path.splitext(image_path)[0]}.json'  # get the ISAT json file path
-            if os.path.exists(json_path):
-                pass
+            if not os.path.exists(json_path):
+                Anything2ISAT.create_empty_json(image_path)  # create an empty ISAT json file if not exists
             with open(json_path, 'r', encoding='utf-8') as file:
                 data = json.load(file)  # load the json data
             if data['info']['note'] != '':

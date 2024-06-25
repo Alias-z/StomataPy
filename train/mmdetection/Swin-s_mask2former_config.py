@@ -1,6 +1,6 @@
 resume = None
 load_from = 'https://download.openmmlab.com/mmdetection/v3.0/mask2former/mask2former_swin-s-p4-w7-224_8xb2-lsj-50e_coco/mask2former_swin-s-p4-w7-224_8xb2-lsj-50e_coco_20220504_001756-c9d0c4f2.pth'
-load_from = 'Models/SwinTransformer_Small_Mask2Former_Gmax/best_coco_segm_mAP_epoch_231.pth'
+load_from = 'Models/Swin-S_Mask2Former_Hvulgare0906/best_coco_segm_mAP_epoch_297.pth'
 val_interval = 1
 log_processor = dict(type='LogProcessor', window_size=50, by_epoch=True)
 
@@ -8,6 +8,7 @@ fp16 = dict(loss_scale='dynamic')
 with_cp = True  # for FSDP: the checkpoint needs to be controlled by the checkpoint_check_fn.
 optimizer_config = dict(type='GradientCumulativeOptimizerHook', cumulative_iters=4)
 
+# classes = ('stomatal complex', 'pavement cell')
 classes = ('stomatal complex', )
 num_stuff_classes = 0
 num_things_classes = len(classes)
@@ -15,23 +16,27 @@ num_classes = num_things_classes + num_stuff_classes
 
 dataset_type = 'CocoDataset'
 data_root = 'Stomata_detection//'
-output_dir = 'SwinTransformer_Small_Mask2Former_Gmax'
+# data_root = 'Epidermal_segmentation//'
+output_dir = 'Swin-S_Mask2Former_Hvulgare1206'
 work_dir = 'Models//' + output_dir
 wandb_project = 'StomataPy'
 
-batch_size = 4
+train_ann_file = 'train_sahi/sahi_coco.json'
+val_ann_file = 'val_sahi/sahi_coco.json'
+
+batch_size = 2
 n_gpus = 4
 num_workers = 16
 original_batch_size = 16  # 2
 original_lr = 0.0001
 original_n_gpus = 8
-lr = original_lr * (n_gpus / original_n_gpus) * (batch_size / original_batch_size) / 10
+lr = original_lr * (n_gpus / original_n_gpus) * (batch_size / original_batch_size)
 auto_scale_lr = dict(base_batch_size=16, enable=False)
 
 
 ReduceOnPlateauLR_patience = 50
 early_stopping_patience = 150
-max_epochs = 500
+max_epochs = 300
 warmup_epochs = 30
 
 
@@ -47,12 +52,12 @@ checkpoint = 'https://github.com/SwinTransformer/storage/releases/download/v1.0.
 # num_heads = [4, 8, 16, 32]
 # checkpoint = 'https://github.com/SwinTransformer/storage/releases/download/v1.0.0/swin_small_patch4_window7_224.pth'
 
-# # Swin-large
+# Swin-large
 # embed_dims = 192
 # num_heads = [6, 12, 24, 48]
-# checkpoint = 'https://github.com/SwinTransformer/storage/releases/download/v1.0.0/swin_small_patch4_window7_224.pth'
+# checkpoint = 'https://github.com/SwinTransformer/storage/releases/download/v1.0.0/swin_large_patch4_window12_384_22k.pth'
 
-crop_size = (1024, 1024)
+crop_size = (1280, 1024)
 image_size = (1024, 1024)
 
 
@@ -78,20 +83,36 @@ load_pipeline = [
     dict(type='LoadAnnotations', with_bbox=True, with_mask=True),
     # dict(type='RandomFlip', prob=0.5),
     # dict(type='CutOut', n_holes=5, cutout_ratio=(0.025, 0.05)),
-    dict(type='PhotoMetricDistortion'),
-    dict(
-        type='FixShapeResize',
-        width=2000,
-        height=1500,
-        pad_val=0,
-        keep_ratio=True,
-        clip_object_border=True,
-        interpolation='lanczos'
-    ),
+    # dict(
+    #     type='RandomChoiceResize',
+    #     scales=[int(image_size[1] * x * 0.1) for x in range(9, 11)],
+    #     resize_type="ResizeShortestEdge",
+    #     max_size=image_size[1] * 2,
+    # ),
+    # dict(
+    #     type='RandomCrop',
+    #     crop_type='absolute',
+    #     crop_size=(image_size[0], image_size[1]),
+    #     recompute_bbox=True,
+    #     allow_negative_crop=False,
+    #     bbox_clip_border=True
+    # ),
+    # dict(type='YOLOXHSVRandomAug'),
+    dict(type='RandomFlip', prob=0.5),
+    # dict(
+    #     type='FixShapeResize',
+    #     width=2000,
+    #     height=1500,
+    #     pad_val=0,
+    #     keep_ratio=True,
+    #     clip_object_border=True,
+    #     interpolation='lanczos'
+    # ),
     # dict(type='RandomResize', scale=crop_size, ratio_range=(0.8, 1.6), keep_ratio=True),
-    dict(type='Pad', size=crop_size, pad_to_square=False, pad_val=0, padding_mode='constant'),
+    # dict(type='Pad', size=crop_size, pad_to_square=False, pad_val=0, padding_mode='constant'),
+    dict(type='PhotoMetricDistortion'),
     dict(type='GeomTransform', prob=0.5, img_border_value=(0, 0, 0), interpolation='lanczos'),
-    dict(type='RandomCrop', crop_size=crop_size, crop_type='absolute', recompute_bbox=True, allow_negative_crop=False, bbox_clip_border=True),
+    # dict(type='RandomCrop', crop_size=crop_size, crop_type='absolute', recompute_bbox=True, allow_negative_crop=False, bbox_clip_border=True),
     # dict(
     #     type='Albu',
     #     transforms=albu_train_transforms,
@@ -108,7 +129,7 @@ load_pipeline = [
 
 
 train_pipeline = [
-    dict(type='CopyPaste', max_num_pasted=10, bbox_occluded_thr=10, mask_occluded_thr=300, selected=True, paste_by_box=False),
+    dict(type='CopyPaste', max_num_pasted=10, bbox_occluded_thr=10, mask_occluded_thr=100, selected=True, paste_by_box=False),
     dict(type='FilterAnnotations', min_gt_bbox_wh=(10, 10), min_gt_mask_area=100, by_mask=True),
     dict(
         type='PackDetInputs',
@@ -118,43 +139,13 @@ train_pipeline = [
 
 test_pipeline = [
     dict(type='LoadImageFromFile', to_float32=True),
-    dict(type='Resize', scale=(crop_size[0] * 2, crop_size[1] * 2), keep_ratio=True),  # 'scale_factor'
     dict(type='LoadAnnotations', with_bbox=True, with_mask=True),
+    dict(type='Resize', scale=(crop_size[0], crop_size[1]), keep_ratio=True),  # 'scale_factor'
     dict(
         type='PackDetInputs',
-        meta_keys=('img_id', 'img_path', 'ori_shape', 'img_shape', 'scale_factor'))
+        # meta_keys=('img_id', 'img_path', 'ori_shape', 'img_shape', 'scale_factor'))
+        meta_keys=('img_id', 'img_path', 'img', 'img_shape', 'ori_shape', 'scale_factor', 'gt_bboxes', 'gt_ignore_flags', 'gt_bboxes_labels', 'gt_masks'))
 ]
-
-
-tta_pipeline = [
-    dict(type='LoadImageFromFile', backend_args=None),
-    dict(
-        type='TestTimeAug',
-        transforms=[
-            [
-                dict(type='Resize', scale=scale, keep_ratio=True)
-                for scale in [(1080, 1080), (960, 960)]
-            ],
-            [
-                dict(type='RandomFlip', prob=1.),
-                dict(type='RandomFlip', prob=0.)
-            ],
-            [dict(type='LoadAnnotations', with_bbox=True, with_mask=True)],
-            [
-                dict(
-                    type='PackDetInputs',
-                    meta_keys=('img_id', 'img_path', 'ori_shape', 'img_shape',
-                               'scale_factor', 'flip', 'flip_direction'))
-            ]
-        ])
-]
-
-tta_model = dict(
-    type='DetTTAModel',
-    tta_cfg=dict(
-        nms=dict(type='nms', iou_threshold=0.6), max_per_img=100)
-)
-
 
 # -------------------------------- Dataloader --------------------------------
 
@@ -164,8 +155,8 @@ train_dataset = dict(
         type=dataset_type,
         metainfo=dict(classes=classes),
         data_root=data_root,
-        ann_file='train/COCO.json',
-        data_prefix=dict(img='train/', seg='annotations/panoptic_train2017/'),
+        ann_file=train_ann_file,
+        data_prefix=dict(img='train_sahi/', seg='annotations/panoptic_train2017/'),
         pipeline=load_pipeline,
         filter_cfg=dict(filter_empty_gt=True, min_size=32),
         backend_args=None),
@@ -180,7 +171,7 @@ train_dataloader = dict(
     dataset=train_dataset)
 
 val_dataloader = dict(
-    batch_size=batch_size // 2,  # original 2
+    batch_size=batch_size,  # original 2
     num_workers=num_workers,
     drop_last=False,
     persistent_workers=True,
@@ -189,10 +180,10 @@ val_dataloader = dict(
         type=dataset_type,
         metainfo=dict(classes=classes),
         data_root=data_root,
-        ann_file='val/COCO.json',
-        data_prefix=dict(img='val/', seg='annotations/panoptic_val2017/'),
+        ann_file=val_ann_file,
+        data_prefix=dict(img='val_sahi/', seg='annotations/panoptic_val2017/'),
         pipeline=test_pipeline,
-        test_mode=True,
+        test_mode=False,
         backend_args=None)
 )
 
@@ -202,7 +193,7 @@ test_dataloader = val_dataloader
 
 val_evaluator = dict(
     type='CocoMetric',
-    ann_file=data_root + '/val/COCO.json',
+    ann_file=data_root + val_ann_file,
     metric=['bbox', 'segm'],
     format_only=False,
     backend_args=None
@@ -234,11 +225,11 @@ default_hooks = dict(
         max_keep_ckpts=1),
     early_stopping=dict(
         type='EarlyStoppingHook',
-        monitor='coco/bbox_mAP',
+        monitor='coco/segm_mAP',
         rule='greater',
         patience=early_stopping_patience),
     sampler_seed=dict(type='DistSamplerSeedHook'),
-    visualization=dict(type='DetVisualizationHook', draw=True, interval=1000))
+    visualization=dict(type='DetVisualizationHook', draw=True, interval=10))
 
 custom_hooks = [
     dict(type='NumClassCheckHook'),
