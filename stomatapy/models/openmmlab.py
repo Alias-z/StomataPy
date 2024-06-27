@@ -197,13 +197,13 @@ class OpenMMlab(Data4Training):
                     adj_x2 = int((x2 - metadata['padding_horizontal']) / metadata['width_ratio'])  # adjust x2
                     adj_y2 = int((y2 - metadata['padding_vertical']) / metadata['height_ratio'])  # adjust y2
                     adjusted_bboxes.append([adj_x1, adj_y1, adj_x2, adj_y2])  # append the update bbox
-                
+
                 for mask in prediction['masks']:
                     if mask is not None:
                         updated_points = []  # to collect all points
                         for point in mask:
-                            point[0] = (point[0] - padding_horizontal) / width_ratio   # update x coordinate
-                            point[1] = (point[1] - padding_vertical) / height_ratio   # update y coordinate
+                            point[0] = (point[0] - metadata['padding_horizontal']) / metadata['width_ratio']   # update x coordinate
+                            point[1] = (point[1] - metadata['padding_vertical']) / metadata['height_ratio']   # update y coordinate
                             updated_points.append([point[0], point[1]])  # collect the updated points
                         adjusted_masks.append(updated_points)  # append the update mask
                 valid_predictions[idx]['bboxes'] = np.array(adjusted_bboxes, dtype=np.int32)  # update the all bboxes for the given image

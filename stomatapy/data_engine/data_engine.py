@@ -66,7 +66,7 @@ class StomataPyData:
         self.yang2021_dir = 'Datasets//Yang2021//Original'  # directory of Yang2021
         self.liang2022_dir = 'Datasets//2022 Liang et al//Original'  # directory of Liang2022
         self.zhu2021_dir = 'Datasets//Zhu2021//Original'  # directory of Zhu2021
-        self.dey2023_dir = 'Datasets//2023 Dey et al//Original'  # directory of Dey2023
+        self.dey2023_dir = 'Datasets//Dey2023//Original'  # directory of Dey2023
         self.li2023_dir = 'Datasets//2023 Li et al//Original'  # directory of Li2023
         self.meng2023_dir = 'Datasets//Meng2023//Original'  # directory of Meng2023
         self.pathoumthong2023_dir = 'Datasets//Pathoumthong2023//Original'  # directory of Pathoumthong2023
@@ -2074,7 +2074,7 @@ class Dey2023(StomataPyData):
     You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
     No additional restrictions — You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.
 
-    2023 Dey et al
+    Dey2023
     ├── Original
         ├── Code (ignored)
         ├── Raw data
