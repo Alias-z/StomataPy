@@ -57,7 +57,7 @@ class StomataPyData:
         self.casadogarcia2020_dir = 'Datasets//Casado-Garcia2020//Original'  # directory of Casado-Garcia2020
         self.meeus2020_dir = 'Datasets//Meeus2020//Original'  # directory of Meeus2020
         self.aono2021_dir = 'Datasets//Aono2021//Original'   # directory of Aono2021
-        self.ferguson2021_dir = 'Datasets//2021 Ferguson et al//Original'  # directory of Ferguson2021
+        self.ferguson2021_dir = 'Datasets//Ferguson2021//Original'  # directory of Ferguson2021
         self.sultana2021_dir = 'Datasets//Sultana2021//Original'  # directory of Sultana2021
         self.sun2021_dir = 'Datasets//2021 Sun et al//Original'  # directory of Sun2021
         self.thathapalliprakash2021_dir = 'Datasets//ThathapalliPrakash2021//Original'  # directory of ThathapalliPrakash2021
@@ -1146,7 +1146,7 @@ class Ferguson2021(StomataPyData):
     You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
     No additional restrictions — You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.
 
-    2021 Ferguson et al
+    Ferguson2021
     ├── Original
         ├── Accessions_2016_jpg
             ├── 2016
@@ -1165,7 +1165,8 @@ class Ferguson2021(StomataPyData):
     ├── discard2017.txt
 
     1. Rename images. As these FOVs are in 393 x 393 (too samll) and great in numbers, we stich them according to naming prefix.
-    2. Since the most common prefix consists of 8 patches, we stich them with 2 x 4 pattern and save only the stiched images.
+    [2. Since the most common prefix consists of 8 patches, we stich them with 2 x 4 pattern and save only the stiched images.]
+    2. Stiching leads to too small stomata, so we enlarge the image instead
     3. Dsicard unwanted images and their annotations
     4. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
     5. Train custom models for auto labeling
@@ -1178,61 +1179,61 @@ class Ferguson2021(StomataPyData):
         self.source_name = 'Ferguson2021'  # source name
         self.species_name = 'S. bicolor'  # to store species name
         self.species_folder_dir = os.path.join(self.processed_dir, self.species_name)  # get the path of the species folder
-        self.samhq_configs = {'points_per_side': (48,), 'min_mask_ratio': 0.0001, 'max_mask_ratio': 0.04}  # SAM-HQ auto label configuration
+        self.samhq_configs = {'points_per_side': (24,), 'min_mask_ratio': 0.001, 'max_mask_ratio': 0.04}  # SAM-HQ auto label configuration
 
-    def extract_prefixes(self, directory: str, folder: Literal['2016', '2017'] = '2016') -> set:
-        """Extract the the prefixes of the FOVs"""
-        if folder == '2016':
-            prefix_pattern = re.compile(r'(EF\d{4})_')  # prefix pattern of 2016
-        elif folder == '2017':
-            prefix_pattern = re.compile(r'(17EF\d{4})_')  # prefix pattern of 2017
-        unique_prefixes = set()   # to store unique prefixes
-        for filename in os.listdir(directory):
-            match = prefix_pattern.match(filename[5:])  # if the prefix matches
-            if match:
-                unique_prefixes.add(match.group(1))  # populate the unique prefixes
-        return unique_prefixes
+    # def extract_prefixes(self, directory: str, folder: Literal['2016', '2017'] = '2016') -> set:
+    #     """Extract the the prefixes of the FOVs"""
+    #     if folder == '2016':
+    #         prefix_pattern = re.compile(r'(EF\d{4})_')  # prefix pattern of 2016
+    #     elif folder == '2017':
+    #         prefix_pattern = re.compile(r'(17EF\d{4})_')  # prefix pattern of 2017
+    #     unique_prefixes = set()   # to store unique prefixes
+    #     for filename in os.listdir(directory):
+    #         match = prefix_pattern.match(filename[5:])  # if the prefix matches
+    #         if match:
+    #             unique_prefixes.add(match.group(1))  # populate the unique prefixes
+    #     return unique_prefixes
 
-    def stitch(self, prefix: str, directory: str, rows: int = 2, cols: int = 4) -> None:
-        """Stich patches in from right to left, from top to bottom"""
-        patches = [Image.open(os.path.join(directory, f'{prefix}_{x}_{y}_raw.jpg')) for x in range(1, 3) for y in range(1, 5)]  # open all patches to be stitched
-        total_width = sum(image.size[0] for image in patches[:cols])  # the width of the final stitched image
-        total_height = sum(image.size[1] for image in patches[::cols])   # the height of the final stitched image
-        stitched_image = Image.new('RGB', (total_width, total_height))  # create an empty stitched image
-        for row in range(rows):
-            for col in range(cols):
-                index = row * cols + (col if row % 2 == 0 else (cols - 1 - col))  # calculate the index in the zigzag order
-                x_position = col * patches[index].size[0] if row % 2 == 0 else (cols - col - 1) * patches[index].size[0]  # calculate the x position where the current image should be pasted
-                y_position = row * patches[index].size[1]  # same for the y position
-                stitched_image.paste(patches[index], (x_position, y_position))  # paste the current image into the stitched image
-        save_path = os.path.join(self.processed_dir, f'{self.species_name} {self.source_name} {os.path.basename(directory)} {prefix}_stiched.jpg')  # the path to the stitched image to be saved
-        stitched_image.save(save_path)  # save the stitched image
-        return None
+    # def stitch(self, prefix: str, directory: str, rows: int = 2, cols: int = 4) -> None:
+    #     """Stich patches in from right to left, from top to bottom"""
+    #     patches = [Image.open(os.path.join(directory, f'{prefix}_{x}_{y}_raw.jpg')) for x in range(1, 3) for y in range(1, 5)]  # open all patches to be stitched
+    #     total_width = sum(image.size[0] for image in patches[:cols])  # the width of the final stitched image
+    #     total_height = sum(image.size[1] for image in patches[::cols])   # the height of the final stitched image
+    #     stitched_image = Image.new('RGB', (total_width, total_height))  # create an empty stitched image
+    #     for row in range(rows):
+    #         for col in range(cols):
+    #             index = row * cols + (col if row % 2 == 0 else (cols - 1 - col))  # calculate the index in the zigzag order
+    #             x_position = col * patches[index].size[0] if row % 2 == 0 else (cols - col - 1) * patches[index].size[0]  # calculate the x position where the current image should be pasted
+    #             y_position = row * patches[index].size[1]  # same for the y position
+    #             stitched_image.paste(patches[index], (x_position, y_position))  # paste the current image into the stitched image
+    #     save_path = os.path.join(self.processed_dir, f'{self.species_name} {self.source_name} {os.path.basename(directory)} {prefix}_stiched.jpg')  # the path to the stitched image to be saved
+    #     stitched_image.save(save_path)  # save the stitched image
+    #     return None
 
-    def stitch_simple(self, directory: str, rows: int = 2, cols: int = 4) -> None:
-        """Stich patches in from right to left, from top to bottom, , without specific prefixes"""
-        image_files = [file for file in os.listdir(directory) if file.endswith('_raw.jpg')]
-        max_stitches = len(image_files) // (rows * cols)  # maximum possible stiched images
-        for batch in range(max_stitches):
-            patches = [Image.open(os.path.join(directory, image_files[idx])) for idx in range(batch * rows * cols, (batch + 1) * rows * cols)]  # open patches in a group
-            total_width = sum(image.size[0] for image in patches[:cols])  # the width of the final stitched image
-            total_height = sum(image.size[1] for image in patches[::cols])   # the height of the final stitched image
-            stitched_image = Image.new('RGB', (total_width, total_height))  # create an empty stitched image
-            for row in range(rows):
-                for col in range(cols):
-                    index = row * cols + (col if row % 2 == 0 else (cols - 1 - col))  # calculate the index in the zigzag order
-                    x_position = col * patches[index].size[0] if row % 2 == 0 else (cols - col - 1) * patches[index].size[0]  # calculate the x position where the current image should be pasted
-                    y_position = row * patches[index].size[1]  # same for the y position
-                    stitched_image.paste(patches[index], (x_position, y_position))  # paste the current image into the stitched image
-            save_path = os.path.join(self.processed_dir, f'{self.species_name} {self.source_name} {os.path.basename(directory)} stiched_{batch + 1}.jpg')  # the path to the stitched image to be saved
-            stitched_image.save(save_path)  # save the stitched image
-        return None
+    # def stitch_simple(self, directory: str, rows: int = 2, cols: int = 4) -> None:
+    #     """Stich patches in from right to left, from top to bottom, , without specific prefixes"""
+    #     image_files = [file for file in os.listdir(directory) if file.endswith('_raw.jpg')]
+    #     max_stitches = len(image_files) // (rows * cols)  # maximum possible stiched images
+    #     for batch in range(max_stitches):
+    #         patches = [Image.open(os.path.join(directory, image_files[idx])) for idx in range(batch * rows * cols, (batch + 1) * rows * cols)]  # open patches in a group
+    #         total_width = sum(image.size[0] for image in patches[:cols])  # the width of the final stitched image
+    #         total_height = sum(image.size[1] for image in patches[::cols])   # the height of the final stitched image
+    #         stitched_image = Image.new('RGB', (total_width, total_height))  # create an empty stitched image
+    #         for row in range(rows):
+    #             for col in range(cols):
+    #                 index = row * cols + (col if row % 2 == 0 else (cols - 1 - col))  # calculate the index in the zigzag order
+    #                 x_position = col * patches[index].size[0] if row % 2 == 0 else (cols - col - 1) * patches[index].size[0]  # calculate the x position where the current image should be pasted
+    #                 y_position = row * patches[index].size[1]  # same for the y position
+    #                 stitched_image.paste(patches[index], (x_position, y_position))  # paste the current image into the stitched image
+    #         save_path = os.path.join(self.processed_dir, f'{self.species_name} {self.source_name} {os.path.basename(directory)} stiched_{batch + 1}.jpg')  # the path to the stitched image to be saved
+    #         stitched_image.save(save_path)  # save the stitched image
+    #     return None
 
     def rename_images(self) -> None:
         """Copy images to 'Processed' and rename them"""
         temp_dir_2016, temp_dir_2017 = os.path.join(self.processed_dir, 'Accessions_2016_jpg'), os.path.join(self.processed_dir, 'Accessions_2017_jpg')  # temporary 2016 and 2017 directories
-        self.ensemble_files(os.path.join(self.input_dir, 'Accessions_2016_jpg'), ['2016'], temp_dir_2016, image_types, folder_rename=True)  # move image files to 'Processed'
-        self.ensemble_files(os.path.join(self.input_dir, 'Accessions_2017_jpg'), ['2017'], temp_dir_2017, image_types, folder_rename=True)  # move image files to 'Processed'
+        self.ensemble_files(os.path.join(self.input_dir, 'Accessions_2016_jpg'), ['2016'], temp_dir_2016, image_types, folder_rename=True)  # move image files to temporary 2016
+        self.ensemble_files(os.path.join(self.input_dir, 'Accessions_2017_jpg'), ['2017'], temp_dir_2017, image_types, folder_rename=True)  # move image files to temporary 2017
         self.discard_files(os.path.join(self.input_dir.replace('//Original', ''), 'discard2016.txt'), temp_dir_2016)  # remove unwanted images
         self.discard_files(os.path.join(self.input_dir.replace('//Original', ''), 'discard2017.txt'), temp_dir_2017)  # remove unwanted images
         # prefixes_2016, prefixes_2017 = self.extract_prefixes(temp_dir_2016, '2016'), self.extract_prefixes(temp_dir_2017, '2017')  # FOV prefixes of the 2016 and 2017 folder
@@ -1245,11 +1246,20 @@ class Ferguson2021(StomataPyData):
         #        self.stitch(prefix, directory)  # try to do a 2x4 stiching
         #    except OSError:
         #        pass
-        for directory in [temp_dir_2016, temp_dir_2017]:
-            self.stitch_simple(directory)  # try to do a 2x4 stiching
+        # for directory in [temp_dir_2016, temp_dir_2017]:
+        #     self.stitch_simple(directory)  # try to do a 2x4 stiching
+        self.ensemble_files(self.processed_dir, os.listdir(self.processed_dir), self.processed_dir, image_types, folder_rename=True)  # move image files to 'Processed'
         shutil.rmtree(temp_dir_2016); shutil.rmtree(temp_dir_2017)  # noqa: remove the temporary directories
+        file_paths = get_paths(self.processed_dir, '.jpg')  # get image path names
+        for file_path in file_paths:
+            image = imread_rgb(file_path)  # load the image for resizing
+            height, width = image.shape[:2]  # the original dimensions
+            enlarged_image = cv2.resize(image, (width * 4, height * 4), interpolation=cv2.INTER_LANCZOS4)  # resize the image
+            cv2.imwrite(file_path, cv2.cvtColor(enlarged_image, cv2.COLOR_RGB2BGR))  # save the resized image in position
+            new_basename = f'{self.species_name} {self.source_name} {os.path.basename(file_path)}'  # get new path basename
+            os.rename(file_path, os.path.join(self.processed_dir, new_basename))  # rename and move to the speceis folder
         self.create_species_folders(self.processed_dir, set([self.species_name]))  # create species folder
-        print(f"Selected {len(get_paths(self.species_folder_dir, '.jpg'))} stiched images (2x4)!")
+        # print(f"Selected {len(get_paths(self.species_folder_dir, '.jpg'))} stiched images (2x4)!")
         return None
 
     def get_annotations(self, catergory: str = 'stoma', visualize: bool = False, random_color: bool = True) -> None:

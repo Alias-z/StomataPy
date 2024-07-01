@@ -260,8 +260,8 @@ class UtilsISAT:
         """
 
         json_paths = get_paths(input_dir, '.json')  # get the paths of all json files
-
-        for json_path in json_paths:
+        print('Resizing ISAT json files...')
+        for json_path in tqdm(json_paths, total=len(json_paths)):
             with open(json_path, 'r', encoding='utf-8') as file:
                 data = json.load(file)  # load the json data
             image_path = json_path.replace('.json', os.path.splitext(data['info']['name'])[1])  # get the image path
