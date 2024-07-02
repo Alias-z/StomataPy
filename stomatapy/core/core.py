@@ -5,8 +5,8 @@ import os  # interact with the operating system
 import sys  # to use system standard output
 import contextlib  # for mutting prints
 import glob  # Unix style pathname pattern expansion
-import requests  # for downloading checkpoints
 from typing import Tuple, Optional  # support typing hints
+import requests  # for downloading checkpoints
 import cv2  # OpenCV
 import torch  # PyTorch
 import numpy as np  # NumPy
