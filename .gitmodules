@@ -1,10 +1,3 @@
 [submodule "ISAT_with_segment_anything"]
 	path = ISAT_with_segment_anything
 	url = https://github.com/Alias-z/ISAT_with_segment_anything
-[submodule "Rein"]
-	path = Rein
-	url = https://github.com/Alias-z/Rein
-[submodule "path/to/submodule"]
-	path = path/to/submodule
-	url = https://github.com/Alias-z/mmsegmentation.git
-	branch = Rein
