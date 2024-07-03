@@ -2,9 +2,9 @@
 
 # pylint: disable=line-too-long, import-error, multiple-statements, c-extension-no-member, relative-beyond-top-level, no-member, too-many-function-args, wrong-import-position, undefined-loop-variable, unused-import
 import os  # interact with the operating system
-import sys; sys.path.append(os.path.abspath(os.path.join('.', 'Rein')))  # noqa: to add rein into path
+import random  # suppress xformers to generate random predictions results
 from typing import List  # to support type hints
-import warnings; warnings.filterwarnings('ignore', message='.*in an upcoming release, it will be required to pass the indexing argument.*'); warnings.filterwarnings('ignore', message='Failed to add*'); warnings.filterwarnings('ignore', message='xFormers is available'); warnings.filterwarnings('ignore', module=r'.*dino_layers.*')  # noqa: suppress torch.meshgrid warnings
+import warnings; warnings.filterwarnings('ignore', message='.*in an upcoming release, it will be required to pass the indexing argument.*'); warnings.filterwarnings('ignore', message='Failed to add*'); warnings.filterwarnings('ignore', message='xFormers is available'); warnings.filterwarnings('ignore', module=r'.*dino_layers.*'); warnings.filterwarnings('ignore', message='The current default scope .* is not .*')  # noqa: supress warning messages
 import numpy as np  # NumPy
 from PIL import Image  # Pillow image processing
 import torch  # PyTorch
@@ -16,8 +16,6 @@ from mmdet.apis import init_detector as mmdet_apis_init_detector  # initialize m
 from mmdet.apis import inference_detector as mmdet_apis_inference_detector  # mmdet inference detector
 from sahi.auto_model import AutoDetectionModel  # sahi wrapper for mmdetection
 from sahi.predict import get_sliced_prediction  # sahi sliced prediction
-import rein  # noqa: rein, parameter-efficient backbone finetuning
-from mmengine.config import Config  # for mmsegmentation config
 from mmseg.utils import register_all_modules as mmseg_utils_register_all_modules  # register mmseg modules
 from mmseg.apis import init_model as mmseg_apis_init_model  # initialize mmseg model
 from mmseg.apis import inference_model as mmseg_apis_inference_model  # mmseg inference segmentor
@@ -25,6 +23,25 @@ from mmseg.apis import show_result_pyplot as mmseg_apis_show_result_pyplot  # vi
 from ..core.core import device, Cell_Colors, imread_rgb, resize_and_pad_image  # import core elements
 from ..core.isat import UtilsISAT, Anything2ISAT  # to interact with ISAT jason files
 from ..utils.data4training import Data4Training  # the traning processing pipelines
+
+
+def set_seeds(seed: int = 42) -> None:
+    """
+    Set the random seeds for reproducibility in Python, NumPy, and PyTorch.
+
+    Args:
+    - seed (int): the seed value to use. Default is 42.
+    """
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)  # if you are using multi-GPU.
+    torch.backends.cudnn.enabled = False
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    return None
 
 
 class OpenMMlab(Data4Training):
@@ -48,7 +65,7 @@ class OpenMMlab(Data4Training):
         self.seg_onehot_mapping = seg_onehot_mapping  # segmentation one-hot code against class_name
         self.seg_color_mapping = {cell_color.class_name: cell_color.mask_rgb for cell_color in Cell_Colors}  # mapp the segmentation class names to their colors
 
-    def detect_objects(self,
+    def detect_stomata(self,
                        image_paths: List[str],
                        if_resize_image: bool = True,
                        if_keep_ratio: bool = True,
@@ -124,12 +141,13 @@ class OpenMMlab(Data4Training):
             images = resized_images  # replace the images variable with the resized ones
 
         valid_predictions = []  # for predictions whose score > threshold
+
         if not self.use_sahi:
             mmdet_utils_register_all_modules(init_default_scope=False)  # initialize mmdet scope
             detector = mmdet_apis_init_detector(self.detector_config_path, self.detector_weight_path, device=device)  # initialize a detector from config file
             # print(detector.cfg)
             # print(detector)
-            category_names = detector.dataset_meta["classes"]  # get the category names
+            category_names = detector.dataset_meta['classes']  # get the category names
             category_mapping = {str(inx): category_name for inx, category_name in enumerate(category_names)}  # get the catergory mapping
             for idx, image in tqdm(enumerate(images), total=len(images)):
                 prediction = mmdet_apis_inference_detector(detector, image)  # inference image(s) with the detector
@@ -219,30 +237,17 @@ class OpenMMlab(Data4Training):
                 visualize_detections(image, valid_predictions[idx])  # plot the detection results
         return valid_predictions
 
-    def rein_segmentor(self):
-        """Load rein segmentor"""
-        torch.backends.cudnn.deterministic = False
-        torch.backends.cudnn.benchmark = False
-        mmseg_utils_register_all_modules(init_default_scope=False)  # initialize mmmseg scope
-        config = Config.fromfile(self.segmentor_config_path)  # load the segmentor config
-        network: torch.nn.Module = mmseg_apis_init_model(config, self.segmentor_weight_path, device)  # load the segmentor weights
-        network.cfg = config  # remap the config file to the neural network
-        torch.set_grad_enabled(False)  # eval model
-        return network
-
-    def stomata_segmentor(self,
-                          image_paths: List[str],
-                          if_resize_image: bool = True,
-                          if_keep_ratio: bool = True,
-                          if_visualize: bool = False,
-                          if_auto_label: bool = False,
-                          if_standard_pred: bool = False) -> List[np.ndarray]:
+    def segment_stomata(self,
+                        image_paths: List[str],
+                        if_resize_image: bool = True,
+                        if_keep_ratio: bool = True,
+                        if_visualize: bool = False,
+                        if_auto_label: bool = False) -> List[np.ndarray]:
         """
-        Detect objects in a list of images and return their bounding boxes and masks
-        Each image is processed through an object detection model
+        Segment objects within the detected bboxes (padded)
 
         Args:
-        - valid_predictions (List[dict]): a list of dictionaries containing detection results per image with keys 'image_path', 'category_id', 'category_name', 'bboxes', 'masks'
+        - image_paths (List[str]): list of image paths
         - if_resize_image (bool): if True, resize and pad image to target dimension before predictions
         - if_keep_ratio (bool): if True, maintains aspect ratio while resizing
         - if_visualize (bool): if True, visualize the detection results
@@ -251,27 +256,62 @@ class OpenMMlab(Data4Training):
         Returns:
         - List[dict]: a list of dictionaries containing detection results per image with keys 'image_path', 'category_id', 'category_name', 'bboxes', 'masks'
         """
-        # valid_predictions = self.detect_objects(image_paths, if_visualize=False, if_auto_label=False)
-        torch.backends.cudnn.enabled = False
-        torch.manual_seed(42)
-        if torch.cuda.is_available():
-            torch.cuda.manual_seed_all(42)
-        segmentor = self.rein_segmentor()  # load the segmentor
-        # for valid_prediction in valid_predictions:
-        for image_path in image_paths:
-            # image_path = valid_prediction['image_path']  # get the image path
+        def pad_bbox(bbox: np.ndarray, padding: int, max_width: int, max_height: int) -> np.ndarray:
+            """
+            Expand the bbox by a specified padding while ensuring it stays within the image boundaries
+
+            Args:
+            - bbox (np.ndarray): the original bbox as a 1D array [x_min, y_min, x_max, y_max]
+            - padding (int): the amount of padding to add to each side of the bbox
+            - max_width (int): the maximum allowable width (image width)
+            - max_height (int): the maximum allowable height (image height)
+
+            Returns:
+            - padded_bbox (np.ndarray): the padded bbox as a 1D array [x_min_padded, y_min_padded, x_max_padded, y_max_padded]
+            """
+            x_min, y_min, x_max, y_max = bbox  # get the bbox coordinates
+            x_min_padded, x_max_padded = max(x_min - padding, 0), min(x_max + padding, max_width)  # calculate padding values of x axis
+            y_min_padded, y_max_padded = max(y_min - padding, 0), min(y_max + padding, max_height)  # same for the y axis
+            padded_bbox = np.array([x_min_padded, y_min_padded, x_max_padded, y_max_padded], dtype=np.int32)  # get the padded bbox
+            return padded_bbox
+
+        def crop_image_with_padding(image: np.ndarray, bboxes: np.ndarray, padding: int) -> List[np.ndarray]:
+            """
+            Crop image patches based on provided bounding boxes with added padding, ensuring none exceed the image's dimensions.
+
+            Args:
+            - image (np.ndarray): the image from which patches are to be cropped (height, width, channels)
+            - bboxes (np.ndarray): a 2D array of bounding boxes, each row being [x_min, y_min, x_max, y_max]
+            - padding (int): the amount of padding to add around each bounding box
+
+            Returns:
+            - padded_patches (List[np.ndarray]): a list of cropped image patches as NumPy arrays
+            """
+            padded_patches = []  # to collect the padded patches
+            max_height, max_width = image.shape[:2]  # get the image height and width
+            for bbox in bboxes:
+                padded_bbox = pad_bbox(bbox, padding, max_width, max_height)  # pad the bbox
+                crop = image[padded_bbox[1]:padded_bbox[3], padded_bbox[0]:padded_bbox[2]]  # crop the image using the padded bounding box
+                padded_patches.append(crop)  # collect the padded patches
+            return padded_patches
+
+        set_seeds(42); segmentor = mmseg_apis_init_model(self.segmentor_config_path, self.segmentor_weight_path, device='cpu')   # noqa: initialize a segmentor from config file
+        valid_predictions = self.detect_stomata(image_paths, if_resize_image=if_resize_image, if_keep_ratio=if_keep_ratio, if_visualize=if_visualize, if_auto_label=False)  # detect stomata
+        segmentor.to(device)  # move segmentor to device ('cuda')
+
+        for valid_prediction in valid_predictions:
+            image_path = valid_prediction['image_path']  # get the image path
             image = imread_rgb(image_path)  # load the image
-            # bboxes = valid_prediction['bboxes']  # get the predicted bboxes
-            # stoma_patches = [np.array(Image.fromarray(image).crop(bbox)) for bbox in bboxes]  # crop the detected patches
-            # for stoma_patch in stoma_patches:
-                # resized_patch, padding, scale = resize_and_pad_image(stoma_patch, target_size=(512, 512))  # resized and pad the image to target dimensions
-                # result = mmseg_apis_inference_model(segmentor, resized_patch)  # inference on the given image
-                # vis_img = mmseg_apis_show_result_pyplot(segmentor, resized_patch, result)  # visualize the segmentation results
-                # plt.imshow(vis_img)
-                # plt.axis('off')
-            result = mmseg_apis_inference_model(segmentor, image)  # inference on the given image
-            vis_img = mmseg_apis_show_result_pyplot(segmentor, image, result)  # visualize the segmentation results
-            plt.imshow(vis_img)
-            plt.axis('off')
-            plt.show()
+            bboxes = valid_prediction['bboxes']  # get the predicted bboxes
+            stoma_patches = crop_image_with_padding(image, bboxes, padding=self.crop_padding_value)  # crop the image with padded bbox for bigger fild of view
+            for stoma_patch in stoma_patches:
+                resized_patch, _, _ = resize_and_pad_image(stoma_patch, initial_padding_ratio=0, target_size=(512, 512))  # resized and pad the image to target dimensions
+                mmseg_utils_register_all_modules(init_default_scope=True)  # initialize mmmseg scope
+                result = mmseg_apis_inference_model(segmentor, resized_patch)  # inference on the given image
+                if if_visualize:
+                    vis_img = mmseg_apis_show_result_pyplot(segmentor, resized_patch, result)  # visualize the segmentation results
+                    plt.imshow(vis_img); plt.axis('off'); plt.show()  # noqa: visualization the segmentation results
         return result.pred_sem_seg.data.cpu().numpy()
+
+    # def unit_test(self):
+    #     """Test the combination of detction and segmentation"""0
