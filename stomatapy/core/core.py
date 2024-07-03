@@ -126,13 +126,14 @@ def get_contour(image: np.ndarray,
     return foreground, contours[contour_id[-1]]
 
 
-def resize_and_pad_image(image: np.ndarray, target_size: Tuple[int, int] = (512, 512)) -> Tuple[np.ndarray, Tuple[int, int, int, int], float]:
+def resize_and_pad_image(image: np.ndarray, initial_padding_ratio: float = 0.2, target_size: Tuple[int, int] = (512, 512)) -> Tuple[np.ndarray, Tuple[int, int, int, int], float]:
     """
     Adjusts an image's size to fit precisely within the specified target dimensions
-    Initial outward padding of 20% to each edge, then resizing to slightly larger than the target, and finally applying the necessary padding
+    Initial outward padding of n% to each edge, then resizing to slightly larger than the target, and finally applying the necessary padding
 
     Args:
     - image (np.ndarray): the image object to be processed
+    - initial_padding_ratio (float): the n% initial outward padding to each edge
     - target_size (Tuple[int, int], optional): the dimensions to which the image is resized and padded, defaults to (512, 512)
 
     Returns:
@@ -141,7 +142,7 @@ def resize_and_pad_image(image: np.ndarray, target_size: Tuple[int, int] = (512,
     - scale_factor (float): the scale used to adjust the image size initially
     """
     image = Image.fromarray(image)  # convert np.ndarray to pil image
-    initial_padding_amount = (int(image.width * 0.2), int(image.height * 0.2))  # calculate 20% padding
+    initial_padding_amount = (int(image.width * initial_padding_ratio), int(image.height * initial_padding_ratio))  # calculate n% padding
     padded_image = ImageOps.expand(image, border=initial_padding_amount, fill=0)  # apply initial padding
 
     temp_target_size = (int(target_size[0] * 1.1), int(target_size[1] * 1.1))  # calculate 10% larger than the final target size
@@ -182,16 +183,10 @@ def restore_original_dimensions(image: Image.Image, padding: Tuple[int, int, int
     crop_top = padding[1] + initial_padding  # add initial padding to top
     crop_right = image.width - (padding[2] + initial_padding)  # subtract initial padding from right
     crop_bottom = image.height - (padding[3] + initial_padding)  # subtract initial padding from bottom
-
-    # crop the image to remove all padding
-    cropped_image = image.crop((crop_left, crop_top, crop_right, crop_bottom))
-
-    # calculate the original dimensions by reversing the scaling
+    cropped_image = image.crop((crop_left, crop_top, crop_right, crop_bottom))  # crop the image to remove all padding
     original_width = int(cropped_image.width / scale)  # reverse width scaling based on original scale
     original_height = int(cropped_image.height / scale)  # reverse height scaling based on original scale
-
-    # resize the cropped image back to its original dimensions
-    restored_image = cropped_image.resize((original_width, original_height), Image.Resampling.LANCZOS)
+    restored_image = cropped_image.resize((original_width, original_height), Image.Resampling.LANCZOS)  # resize the cropped image back to its original dimensions
 
     return restored_image
 
