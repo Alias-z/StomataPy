@@ -5,7 +5,7 @@ import os  # interact with the operating system
 import shutil  # for copying files
 import json  # manipulate json files
 import random  # for random sampling
-from typing import Literal  # to support type hints
+from typing import Literal, Tuple  # to support type hints
 import numpy as np  # NumPy
 from PIL import Image  # Pillow image processing
 from tqdm import tqdm  # progress bar
@@ -48,6 +48,33 @@ class Data4Training:
 
         valid_aims = ['semantic segmentation', 'object detection', 'instance segmentation']
         assert self.aim in valid_aims, f'Invalid aim value. Must be one of {valid_aims}'
+
+    @staticmethod
+    def calculate_optimal_slicing(slice_width: int, slice_height: int, overlap_ratio: float, num_width_slices: int, num_height_slices: int) -> Tuple[int, int]:
+        """
+        Calculate the minimum image dimensions required to fit a specified number of slices with overlaps.
+
+        Parameters:
+        - slice_width (int): the width of each slice in pixels
+        - slice_height (int): the height of each slice in pixels
+        - overlap_ratio (float): the ratio of overlap between slices (e.g., 0.2 for 20% overlap)
+        - num_width_slices (int): the desired number of slices along the width of the image
+        - num_height_slices (int): the desired number of slices along the height of the image
+
+        Returns:
+        - target_image_dimensions (tuple): a tuple containing the calculated minimum image width and height in pixels to accommodate the slices.
+        """
+        overlap_width, overlap_height = int(slice_width * overlap_ratio), int(slice_height * overlap_ratio)  # calculate the overlap in pixels
+        effective_width, effective_height = slice_width - overlap_width, slice_height - overlap_height  # calculate the non-overlapping effective area of each slice
+        if num_width_slices > 1:
+            image_width = slice_width + (num_width_slices - 1) * effective_width  # calculate the minimum dimensions of the image to fit the desired number of slices
+        else:
+            image_width = slice_width
+        if num_height_slices > 1:
+            image_height = slice_height + (num_height_slices - 1) * effective_height  # same for the height
+        else:
+            image_height = slice_height
+        return (image_width, image_height)  # f(1280, 1024, 0.2, 4, 2) = (4352, 1844)
 
     def get_padded_bbox(self, bbox: list, image_width: int, image_height: int, padding=9) -> list:
         """Padding bbox for cropping image"""
