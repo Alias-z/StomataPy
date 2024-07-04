@@ -56,6 +56,7 @@ class StomataPyData:
         self.fetter2019_dir = 'Datasets//Fetter2019//Original'  # directory of Fetter2019
         self.jayakody2017_dir = 'Datasets//Jayakody2017//Original'  # directory of Jayakody2017
         self.koheler2023_dir = 'Datasets//Koheler2023//Original'  # directory of Koheler2023
+        self.koheler2024_dir = 'Datasets//Koheler2024//Original'  # directory of Koheler2024
         self.li2023_dir = 'Datasets//Li2023//Original'  # directory of Li2023
         self.meeus2020_dir = 'Datasets//Meeus2020//Original'  # directory of Meeus2020
         self.meng2023_dir = 'Datasets//Meng2023//Original'  # directory of Meng2023
@@ -1091,6 +1092,84 @@ class Koheler2023(StomataPyData):
         """Generate ISAT annotations json files"""
         points_per_side, min_mask_ratio, max_mask_ratio = self.samhq_configs['points_per_side'], self.samhq_configs['min_mask_ratio'], self.samhq_configs['max_mask_ratio']  # get SAN-HQ auto mask configs
         image_paths = get_paths(self.species_folder_dir, '.tif')  # get the image paths under the species folder
+        for image_path in tqdm(image_paths, total=len(image_paths)):
+            image, masks = imread_rgb(image_path), []  # load the image in RGB scale
+            try:
+                auto_masks = SAMHQ(image_path=image_path, points_per_side=points_per_side, min_mask_ratio=min_mask_ratio, max_mask_ratio=max_mask_ratio).auto_label()  # get the auto labelled masks
+                masks = SAMHQ.isolate_masks(auto_masks)  # filter redundant masks
+                if visualize:
+                    visual_masks = [mask['segmentation'] for mask in masks]  # get only bool masks
+                    SAMHQ.show_masks(image, visual_masks, random_color=random_color)  # visualize bool masks
+                if len(masks) > 0:
+                    Anything2ISAT.from_samhq(masks, image, image_path, catergory=catergory)  # export the ISAT json file
+            except ValueError:
+                pass
+        return None
+
+
+class Koheler2024(StomataPyData):
+    """
+    Koheler et al., 2024  Manuscript in Preparation
+    Dataset source: provided by the authors
+
+    Rights and permissions:
+    Creative Commons Attribution 4.0 International License (https://creativecommons.org/licenses/by/4.0/)
+
+    You are free to:
+    Share — copy and redistribute the material in any medium or format for any purpose, even commercially.
+    Adapt — remix, transform, and build upon the material for any purpose, even commercially.
+    The licensor cannot revoke these freedoms as long as you follow the license terms.
+
+    Under the following terms:
+    Attribution — You must give appropriate credit , provide a link to the license, and indicate if changes were made.
+    You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
+    No additional restrictions — You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.
+
+    Koheler2024
+    ├── Original
+        ├── All
+            ├── 1_1_1.jpg
+            ├── 1_1_1.jpg_metadata.xml
+            ...
+            ├── size_0.2mm.jpg
+            ├── size_2.0um.jpg_metadata.xml
+    ├── Processed
+        ├── T. aestivum
+    ├── source.txt
+    ├── discard.txt
+
+    1. Rename images
+    2. Dsicard unwanted images and their annotations
+    3. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
+    4. Train custom models for auto labeling
+    5. Check every annotation
+    """
+    def __init__(self):
+        super().__init__()
+        self.input_dir = self.koheler2024_dir  # original dataset directory
+        self.processed_dir = self.input_dir.replace('Original', 'Processed')  # output directory
+        self.species_name = 'T. aestivum'  # plant species
+        self.source_name = 'Koheler2024'  # source name
+        self.species_folder_dir = os.path.join(self.processed_dir, self.species_name)  # get the path of the species folder
+        self.samhq_configs = {'points_per_side': (24,), 'min_mask_ratio': 0.0005, 'max_mask_ratio': 0.005}  # SAM-HQ auto label configuration
+
+    def rename_images(self) -> None:
+        """Copy images to 'Processed' and rename them"""
+        self.ensemble_files(self.input_dir, ['All'], self.processed_dir, image_types, folder_rename=True)  # move image files to 'Processed'
+        self.discard_files(os.path.join(self.input_dir.replace('//Original', ''), 'discard.txt'), self.processed_dir)  # remove unwanted images
+        file_names, new_names = [], []  # to store the old and new names
+        for image_path in get_paths(self.processed_dir, '.jpg'):
+            image_basename = os.path.basename(image_path)  # get the basename
+            file_names.append(image_basename)  # populate the file_names
+            new_names.append(f'{self.species_name} {self.source_name} {image_basename}')  # populate the new names
+        self.batch_rename(self.processed_dir, file_names, new_names)  # rename all images
+        self.create_species_folders(self.processed_dir, set([self.species_name]))  # create species folder
+        return None
+
+    def get_annotations(self, catergory: str = 'stoma', visualize: bool = False, random_color: bool = True) -> None:
+        """Generate ISAT annotations json files"""
+        points_per_side, min_mask_ratio, max_mask_ratio = self.samhq_configs['points_per_side'], self.samhq_configs['min_mask_ratio'], self.samhq_configs['max_mask_ratio']  # get SAN-HQ auto mask configs
+        image_paths = get_paths(self.species_folder_dir, '.jpg')  # get the image paths under the species folder
         for image_path in tqdm(image_paths, total=len(image_paths)):
             image, masks = imread_rgb(image_path), []  # load the image in RGB scale
             try:
