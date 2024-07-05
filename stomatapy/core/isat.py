@@ -40,7 +40,7 @@ class UtilsISAT:
         file_names = sorted(os.listdir(images_dir), key=str.casefold)
         file_names = [name for name in file_names if any(name.endswith(file_type) for file_type in image_types)]  # image files only
         train_size = int(len(file_names) * r_train)  # training size
-        validation_size = int(len(file_names) * (1 - r_train))  # validation size
+        validation_size = len(file_names) - train_size  # validation size
         file_names_shuffle = file_names.copy()  # prevent changing in place
         random.shuffle(file_names_shuffle)  # random shuffle file names
         train_names = file_names_shuffle[:train_size]  # file names for training
