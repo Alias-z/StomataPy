@@ -91,20 +91,22 @@ class SAMHQ:
             )
             masks = mask_generator.generate(self.image)  # auto predict the masks
             masks = [mask for mask in masks if self.min_mask_area <= mask['area'] <= self.max_mask_area]  # filter out masks that are too large
-            for mask in masks:
-                mask['is_ellipse'], mask['ellipse_iou'] = UtilsISAT.ellipse_filter(mask['segmentation'], ellipse_threshold)  # check if fitting ellipse well and get the ellipse_iou score
-                if mask['is_ellipse']:
-                    mask['bbox'] = UtilsISAT.boolmask2bbox(mask['segmentation'])  # get the bbox
-                    filtered_masks.append(mask)  # filter out masks that are not ellipse
-        filtered_masks = self.isolate_masks(filtered_masks)  # remove noisy masks
+        #     for mask in masks:
+        #         mask['is_ellipse'], mask['ellipse_iou'] = UtilsISAT.ellipse_filter(mask['segmentation'], ellipse_threshold)  # check if fitting ellipse well and get the ellipse_iou score
+        #         if mask['is_ellipse']:
+        #             mask['bbox'] = UtilsISAT.boolmask2bbox(mask['segmentation'])  # get the bbox
+        #             filtered_masks.append(mask)  # filter out masks that are not ellipse
+        # filtered_masks = self.isolate_masks(filtered_masks)  # remove noisy masks
 
-        if statistics_filter:
-            areas = [mask['area'] for mask in filtered_masks]  # get all mask areas for statistical filtering
-            if len(areas) >= 3:
-                quartile_1, quartile_3 = np.percentile(areas, [25, 75])  # get the 1st and 3rd percentile
-                iqr = quartile_3 - quartile_1  # calculate the interquartile range
-                lower_boundary, upper_boundary = quartile_1 - 2.0 * iqr, quartile_3 + 1.5 * iqr  # set the area bounary
-                filtered_masks = [mask for mask in filtered_masks if lower_boundary <= mask['area'] <= upper_boundary]  # final masks
+        # if statistics_filter:
+        #     areas = [mask['area'] for mask in filtered_masks]  # get all mask areas for statistical filtering
+        #     if len(areas) >= 3:
+        #         quartile_1, quartile_3 = np.percentile(areas, [25, 75])  # get the 1st and 3rd percentile
+        #         iqr = quartile_3 - quartile_1  # calculate the interquartile range
+        #         lower_boundary, upper_boundary = quartile_1 - 2.0 * iqr, quartile_3 + 1.5 * iqr  # set the area bounary
+        #         filtered_masks = [mask for mask in filtered_masks if lower_boundary <= mask['area'] <= upper_boundary]  # final masks
+
+        filtered_masks = masks
         return filtered_masks
 
     def prompt_label(self, input_point: np.ndarray = None, input_label: np.ndarray = None, input_box: list = None, mode: Literal['single', 'multiple'] = 'single') -> list:
