@@ -68,7 +68,7 @@ class SAMHQ:
                 SAMHQ._model_cache[self.model_type] = sam_model_registry[self.model_type](checkpoint=self.checkpoint_path).to(device)  # load the model only if it hasn't been loaded before
         return SAMHQ._model_cache[self.model_type]
 
-    def auto_label(self, ellipse_threshold: float = 0.9, statistics_filter: bool = True) -> list:
+    def auto_label(self, ellipse_threshold: float = 0.9, statistics_filter: bool = True, use_isolate_masks: bool = False) -> list:
         """Auto label with SAM-HQ"""
         filtered_masks = []  # store ellipse filtered masks
         for points_per_side in self.points_per_side:
@@ -96,7 +96,8 @@ class SAMHQ:
                 if mask['is_ellipse']:
                     mask['bbox'] = UtilsISAT.boolmask2bbox(mask['segmentation'])  # get the bbox
                     filtered_masks.append(mask)  # filter out masks that are not ellipse
-        filtered_masks = self.isolate_masks(filtered_masks)  # remove noisy masks
+        if use_isolate_masks:
+            filtered_masks = self.isolate_masks(filtered_masks)  # remove noisy masks
 
         if statistics_filter:
             areas = [mask['area'] for mask in filtered_masks]  # get all mask areas for statistical filtering
@@ -105,6 +106,7 @@ class SAMHQ:
                 iqr = quartile_3 - quartile_1  # calculate the interquartile range
                 lower_boundary, upper_boundary = quartile_1 - 2.0 * iqr, quartile_3 + 1.5 * iqr  # set the area bounary
                 filtered_masks = [mask for mask in filtered_masks if lower_boundary <= mask['area'] <= upper_boundary]  # final masks
+
         return filtered_masks
 
     def prompt_label(self, input_point: np.ndarray = None, input_label: np.ndarray = None, input_box: list = None, mode: Literal['single', 'multiple'] = 'single') -> list:
