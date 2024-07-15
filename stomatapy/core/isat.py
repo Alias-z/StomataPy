@@ -40,7 +40,7 @@ class UtilsISAT:
         file_names = sorted(os.listdir(images_dir), key=str.casefold)
         file_names = [name for name in file_names if any(name.endswith(file_type) for file_type in image_types)]  # image files only
         train_size = int(len(file_names) * r_train)  # training size
-        validation_size = len(file_names) - train_size  # validation size
+        validation_size = int(len(file_names) * (1 - r_train))  # validation size
         file_names_shuffle = file_names.copy()  # prevent changing in place
         random.shuffle(file_names_shuffle)  # random shuffle file names
         train_names = file_names_shuffle[:train_size]  # file names for training
@@ -260,8 +260,8 @@ class UtilsISAT:
         """
 
         json_paths = get_paths(input_dir, '.json')  # get the paths of all json files
-        print('Resizing ISAT json files...')
-        for json_path in tqdm(json_paths, total=len(json_paths)):
+
+        for json_path in json_paths:
             with open(json_path, 'r', encoding='utf-8') as file:
                 data = json.load(file)  # load the json data
             image_path = json_path.replace('.json', os.path.splitext(data['info']['name'])[1])  # get the image path
@@ -388,7 +388,7 @@ class UtilsISAT:
                 for obj in objs:
                     category = obj.get('category')  # get the catergory of the given object
                     if 'background' in category:
-                        print(f'background class found in {json_path}')  # if background is labeled
+                        print(f'background class found in {data["image_name"]}')  # if background is labeled
                     elif category != 'epidermal cell' and category in categories:
                         print(f"Redundant category '{category}' in group {group} in {json_path}")  # if there is redundant non-background objects
                     categories.add(category)  # to count number of catergory apperance
@@ -771,34 +771,34 @@ class Anything2ISAT:
         return None
 
     @staticmethod
-    def create_empty_json(image_path: str) -> None:
+    def create_empty_json(image_paths: str) -> None:
         """
         Create empty file in ISAT JSON format
 
         Args:
-        - images_path (str): the image path
+        - images_paths (str): the image paths
 
         Returns:
         - None: the function writes data to a JSON file and does not return any value
         """
-        json_path = f'{os.path.splitext(image_path)[0]}.json'  # get the ISAT json file path
-        image = cv2.imread(image_path)  # load the image
-        isat_info = {
-            'description': 'ISAT',  # must be exactly 'ISAT'
-            'folder': os.path.dirname(image_path),  # image parent directory
-            'name': os.path.basename(image_path),  # image base name
-            'width': image.shape[1],  # image width
-            'height': image.shape[0],  # image height
-            'depth': image.shape[2],  # image depth
-            'note': ''
-        }
-        isat_data = {
-            'info': isat_info,  # information section regarding the image
-            'objects': []  # objects section regarding segmentation masks
-        }
-        with open(json_path, 'w', encoding='utf-8') as file:
-            json.dump(isat_data, file, indent=4)  # save the json file
-        return None
+        for image_path in image_paths:
+            json_path = f'{os.path.splitext(image_path)[0]}.json'  # get the ISAT json file path
+            image = cv2.imread(image_path)  # load the image
+            isat_info = {
+                'description': 'ISAT',  # must be exactly 'ISAT'
+                'folder': os.path.dirname(image_path),  # image parent directory
+                'name': os.path.basename(image_path),  # image base name
+                'width': image.shape[1],  # image width
+                'height': image.shape[0],  # image height
+                'depth': image.shape[2],  # image depth
+                'note': ''
+            }
+            isat_data = {
+                'info': isat_info,  # information section regarding the image
+                'objects': {}  # objects section regarding segmentation masks
+            }
+            with open(json_path, 'w', encoding='utf-8') as file:
+                json.dump(isat_data, file, indent=4)  # save the json file
 
     def from_yolo_seg(self, class_dictionary: dict = None) -> None:
         """
@@ -1122,12 +1122,11 @@ class Anything2ISAT:
                 data['objects'].append(new_object)  # update the objects section
             return data
 
-        print('Converting predictions to ISAT JSON files...')
-        for valid_prediction in tqdm(valid_predictions, total=len(valid_predictions)):
+        for valid_prediction in valid_predictions:
             image_path = valid_prediction['image_path']  # get the image path
             json_path = f'{os.path.splitext(image_path)[0]}.json'  # get the ISAT json file path
-            if not os.path.exists(json_path):
-                Anything2ISAT.create_empty_json(image_path)  # create an empty ISAT json file if not exists
+            if os.path.exists(json_path):
+                pass
             with open(json_path, 'r', encoding='utf-8') as file:
                 data = json.load(file)  # load the json data
             if data['info']['note'] != '':

@@ -49,32 +49,29 @@ class StomataPyData:
         self.input_dir = input_dir  # input directory
         self.species = species  # species
         self.source_name = source_name  # source name
-        self.aono2021_dir = 'Datasets//Aono2021//Original'   # the directory of Aono2021
-        self.casadogarcia2020_dir = 'Datasets//Casado-Garcia2020//Original'  # the directory of Casado-Garcia2020
-        self.dey2023_dir = 'Datasets//Dey2023//Original'  # directory of Dey2023
-        self.ferguson2021_dir = 'Datasets//Ferguson2021//Original'  # directory of Ferguson2021
-        self.fetter2019_dir = 'Datasets//Fetter2019//Original'  # directory of Fetter2019
         self.jayakody2017_dir = 'Datasets//Jayakody2017//Original'  # directory of Jayakody2017
-        self.koheler2023_dir = 'Datasets//Koheler2023//Original'  # directory of Koheler2023
-        self.koheler2024_dir = 'Datasets//Koheler2024//Original'  # directory of Koheler2024
-        self.li2023_dir = 'Datasets//Li2023//Original'  # directory of Li2023
-        self.meeus2020_dir = 'Datasets//Meeus2020//Original'  # directory of Meeus2020
-        self.meng2023_dir = 'Datasets//Meng2023//Original'  # directory of Meng2023
-        self.pathoumthong2023_dir = 'Datasets//Pathoumthong2023//Original'  # directory of Pathoumthong2023
-        self.sultana2021_dir = 'Datasets//Sultana2021//Original'  # directory of Sultana2021
-        self.sun2021_dir = 'Datasets//Sun2021//Original'  # directory of Sun2021
-        self.sun2023_dir = 'Datasets//Sun2023//Original'  # directory of Sun2023
-        self.takagi2023_dir = 'Datasets//Takagi2023//Original'  # directory of Takagi2023
-        self.thathapalliprakash2021_dir = 'Datasets//ThathapalliPrakash2021//Original'  # directory of ThathapalliPrakash2021
         self.toda2018_dir = 'Datasets//Toda2018//Original'  # directory of Toda2018
-        self.toda2021_dir = 'Datasets//Toda2021//Original'  # directory of Toda2021
-        self.vofely2019_dir = 'Datasets//Vofely2019//Original'  # directory of Vofely2019
-        self.wangrenninger2023_dir = 'Datasets//WangRenninger2023//Original'  # directory of WangRenninger2023
-        self.xie2021_dir = 'Datasets//Xie2021//Original'  # directory of Xie2021
-        self.yang2021_dir = 'Datasets//Yang2021//Original'  # directory of Yang2021
         self.yates_dir = 'Datasets//Yates2018//Original'  # directory of Yates2018
-        self.zhu2021_dir = 'Datasets//Zhu2021//Original'  # directory of Zhu2021
+        self.fetter2019_dir = 'Datasets//Fetter2019//Original'  # directory of Fetter2019
+        self.vofely2019_dir = 'Datasets//Vofely2019//Original'  # directory of Vofely2019
+        self.casadogarcia2020_dir = 'Datasets//Casado-Garcia2020//Original'  # directory of Casado-Garcia2020
+        self.meeus2020_dir = 'Datasets//2020 Meeus et al//Original'  # directory of Meeus2020
+        self.aono2021_dir = 'Datasets//Aono2021//Original'   # directory of Aono2021
+        self.ferguson2021_dir = 'Datasets//2021 Ferguson et al//Original'  # directory of Ferguson2021
+        self.sultana2021_dir = 'Datasets//Sultana2021//Original'  # directory of Sultana2021
+        self.sun2021_dir = 'Datasets//2021 Sun et al//Original'  # directory of Sun2021
+        self.thathapalliprakash2021_dir = 'Datasets//ThathapalliPrakash2021//Original'  # directory of ThathapalliPrakash2021
+        self.toda2021_dir = 'Datasets//2021 Toda et al//Original'  # directory of Toda2021
+        self.xie2021_dir = 'Datasets//2021 Xie et al//Original'  # directory of Xie2021
+        self.yang2021_dir = 'Datasets//2021 Yang et al//Original'  # directory of Yang2021
         self.liang2022_dir = 'Datasets//2022 Liang et al//Original'  # directory of Liang2022
+        self.dey2023_dir = 'Datasets//2023 Dey et al//Original'  # directory of Dey2023
+        self.li2023_dir = 'Datasets//2023 Li et al//Original'  # directory of Li2023
+        self.meng2023_dir = 'Datasets//2023 Meng et al//Original'  # directory of Meng2023
+        self.pathoumthong2023_dir = 'Datasets//2023 Pathoumthong et al//Original'  # directory of Pathoumthong2023
+        self.sun2023_dir = 'Datasets//2023 Sun et al//Original'  # directory of Sun2023
+        self.takagi2023_dir = 'Datasets//2023 Takagi et al//Original'  # directory of Takagi2023
+        self.wangrenninger2023_dir = 'Datasets//2023 Wang and Renninger//Original'  # directory of WangRenninger2023
 
     @staticmethod
     def ensemble_files(input_dir: str, subfolders: list, output_dir: str, file_types: list = image_types, folder_rename: bool = False) -> list:
@@ -197,10 +194,10 @@ class StomataPyData:
         return None
 
 
-class Aono2021(StomataPyData):
+class Jayakody2017(StomataPyData):
     """
-    Aono et al., 2021  https://doi.org/10.1371/journal.pone.0258679
-    Dataset source: https://zenodo.org/records/3938047
+    Jayakody et al., 2017 https://doi.org/10.1186/s13007-017-0244-9
+    Dataset source: https://github.com/Smart-Robotic-Viticulture/Stomata_Aperture_Measurement_2017
 
     Rights and permissions:
     Creative Commons Attribution 4.0 International License (https://creativecommons.org/licenses/by/4.0/)
@@ -215,42 +212,29 @@ class Aono2021(StomataPyData):
     You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
     No additional restrictions — You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.
 
-    Aono2021
+    Jayakody2017
     ├── Original
-        ├── data
-            ├── dataset
-                ├── ERRO (ignored)
-                ├── STOMA
-                    ├── 1_10.jpeg
-                    ...
-                    ├── 200_179.jpeg
-            ├── deep_learn
-                ├── teste
-                    ├── erro (ignored)
-                    ├── stoma
-                        ├── 5_49.jpeg
-                        ...
-                        ├── 200_179.jpeg
-                ├── train
-                    ├── erro (ignored)
-                    ├── stoma
-                        ├── 1_10.jpeg
-                        ...
-                        ├── 199_226.jpeg
-            ├── original2
-                ├── 1.jpg
+        ├── raw_dataset_1
+            ├── Image_001.jpg
+            ...
+            ├── Image_110.jpg
+        ├── raw_dataset_2
+            ├── Image_001.jpg
+            ...
+            ├── Image_108.jpg
+        ├── Test_dataset (ignored)
+        ├── Training_dataset
+            ├── Negative (ignored)
+            ├── Positive
+                ├── 01.jpg
                 ...
-                ├── 200.jpg
-        ├── img (ignored)
-        ├── src (ignored)
-        ├── LICENSE
-        ├── README.md
+                ├── 555.jpg
     ├── Processed
-        ├── Z. mays
+        ├── V. vinifera
     ├── source.txt
     ├── discard.txt
 
-    1. Rename images
+    1. Combine 'raw_dataset_1' and 'raw_dataset_1', then Copy the images to 'Processed', and rename them with f'V. vinifera Jayakody2017 {orginal file name}'
     2. Dsicard unwanted images
     3. Map the patches from "Positive" back to renamed images to generate json fiels with bounding boxes
     4. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
@@ -259,37 +243,34 @@ class Aono2021(StomataPyData):
     """
     def __init__(self):
         super().__init__()
-        self.input_dir = self.aono2021_dir  # original dataset directory
+        self.input_dir = self.jayakody2017_dir  # original dataset directory
         self.processed_dir = self.input_dir.replace('Original', 'Processed')  # output directory
-        self.species_name = 'Z. mays'  # plant species
-        self.source_name = 'Aono2021'  # source name
-        self.species_folder_dir = os.path.join(self.processed_dir, self.species_name)  # get the path of the species folder
-        self.patches_dir_1 = os.path.join(self.input_dir, 'data', 'dataset', 'STOMA')  # cropped stomata patches dir 1
-        self.patches_dir_2 = os.path.join(self.input_dir, 'deep_learn', 'teste', 'stoma')  # cropped stomata patches dir 2
-        self.patches_dir_3 = os.path.join(self.input_dir, 'deep_learn', 'train', 'stoma')  # cropped stomata patches dir 3
+        self.species = 'V. vinifera'  # plant species
+        self.output_dir = os.path.join(self.processed_dir, self.species)
+        self.source_name = 'Jayakody2017'  # source name
+        self.prefix = f'{self.species} {self.source_name}'  # the prefix for renaming
+        self.patches_dir = os.path.join(self.input_dir, 'Training_dataset', 'Positive')  # cropped stomata patches dir
         self.samhq_configs = {'points_per_side': (24,), 'min_mask_ratio': 0.0005, 'max_mask_ratio': 0.01}  # SAM-HQ auto label configuration
 
     def rename_images(self) -> None:
         """Copy images and annotation files to 'Processed' and rename them"""
-        os.makedirs(self.species_folder_dir, exist_ok=True)  # create the species folder
-        self.ensemble_files(os.path.join(self.input_dir, 'data'), ['original2'], self.processed_dir)  # move files to 'Processed' of image files
-        file_paths = get_paths(self.processed_dir, '.jpg')  # get image path names
-        for file_path in file_paths:
-            new_basename = f'{self.species_name} {self.source_name} original2 {os.path.basename(file_path)}'  # get new path basename
-            os.rename(file_path, os.path.join(self.species_folder_dir, new_basename))  # rename and move to the speceis folder
-        self.discard_files(os.path.join(self.input_dir.replace('//Original', ''), 'discard.txt'), self.species_folder_dir)  # remove unwanted images
+        subfolders = ['raw_dataset_1', 'raw_dataset_2']  # to combine images in these two folders
+        for subfolder in subfolders:
+            file_names = self.ensemble_files(self.input_dir, [subfolder], self.output_dir)  # move files to 'Processed' of image files
+            new_names = [f'{self.prefix} {subfolder} {file_name}' for file_name in file_names]  # get renamings
+            self.batch_rename(self.output_dir, file_names, new_names)  # rename
+        self.discard_files(os.path.join(self.input_dir.replace('//Original', ''), 'discard.txt'), self.output_dir)  # remove unwanted images
         return None
 
     def get_annotations(self, bbbox_prompt: bool = True, catergory: str = 'stoma', visualize: bool = False, random_color: bool = True) -> None:
         """Generate ISAT annotations json files"""
-        path_paths_1 = get_paths(self.patches_dir_1, '.jpeg')  # get the paths of path 1
-        path_paths_2 = get_paths(self.patches_dir_2, '.jpeg')  # get the paths of path 2
-        path_paths_3 = get_paths(self.patches_dir_3, '.jpeg')  # get the paths of path 3
-        patch_paths = path_paths_1 + path_paths_2 + path_paths_3  # combine all patches paths
+        patch_names = [name for name in os.listdir(self.patches_dir) if any(name.lower().endswith(file_type) for file_type in image_types)]  # patch image files only
+        image_names = [name for name in os.listdir(self.output_dir) if any(name.lower().endswith(file_type) for file_type in image_types)]  # image files only
+        patch_paths = [os.path.join(self.patches_dir, name) for name in patch_names]  # get patch paths
+        image_paths = [os.path.join(self.output_dir, name) for name in image_names]  # get image paths
         points_per_side, min_mask_ratio, max_mask_ratio = self.samhq_configs['points_per_side'], self.samhq_configs['min_mask_ratio'], self.samhq_configs['max_mask_ratio']  # get SAN-HQ auto mask configs
-        image_paths = get_paths(self.species_folder_dir, '.jpg')  # get the image paths under the species folder
         for image_path in tqdm(image_paths, total=len(image_paths)):
-            image, masks = imread_rgb(image_path), []  # load the image in RGB scale
+            image = imread_rgb(image_path)  # load the image in RGB scale
             try:
                 auto_masks = SAMHQ(image_path=image_path, points_per_side=points_per_side, min_mask_ratio=min_mask_ratio, max_mask_ratio=max_mask_ratio).auto_label()  # get the auto labelled masks
                 if bbbox_prompt:
@@ -302,23 +283,21 @@ class Aono2021(StomataPyData):
                 if visualize:
                     visual_masks = [mask['segmentation'] for mask in masks]  # get only bool masks
                     SAMHQ.show_masks(image, visual_masks, random_color=random_color)  # visualize bool masks
-                if len(masks) > 0:
-                    Anything2ISAT.from_samhq(masks, image, image_path, catergory=catergory)  # export the ISAT json file
+                Anything2ISAT.from_samhq(masks, image, image_path, catergory=catergory)  # export the ISAT json file
             except ValueError:
-                pass
+                print(f'{image_path} cannot be segmented by SAM-HQ')
         return None
 
 
-class CasadoGarcia2020(StomataPyData):
+class Toda2018(StomataPyData):
     """
-    Casado-García et al., 2020 https://doi.org/10.1016/j.compag.2020.105751
-    Dataset source: https://github.com/ancasag/labelStoma
+    Toda2018 et al., 2018 https://doi.org/10.1101/365098
+    Dataset source: https://github.com/totti0223/deepstomata/tree/master/examples
 
     Rights and permissions:
     MIT License
-    Copyright (c) <2015-Present> Tzutalin
 
-    Copyright (C) 2013  MIT, Computer Science and Artificial Intelligence Laboratory. Bryan Russell, Antonio Torralba, William T. Freeman
+    Copyright (c) 2018 yosuke toda
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -338,130 +317,56 @@ class CasadoGarcia2020(StomataPyData):
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 
-    Casado-Garcia2020
+    Toda2018
     ├── Original
-        ├── all
-            ├── test
-                ├── JPEGImages
-                    ├── (01)62_3_2Bx10.jpg
-                    ├── (01)62_3_2Bx10.xml
-                    ...
-                    ├── T4024_2_A5.jpg
-                    ├── T4024_2_A5.xml
-            ├── train
-                ├── JPEGImages
-                    ├── (01)60_1_2Bx10.jpg
-                    ├── (01)60_1_2Bx10.xml
-                    ...
-                    ├── T4024_2_B3.jpg
-                    ├── T4024_2_B3.xml
-        ├── bean (ignored)
-        ├── bearley (ignored)
-        ├── commonBean (ignored)
+        ├── 1.jpg
+        ...
+        ├── 11.jpg
     ├── Processed
-        ├── G. max
-        ├── H. vulgare
-        ├── P. vulgaris
+        ├── C. benghalensis
     ├── source.txt
     ├── discard.txt
 
-    1. Combine 'test' and 'train' under 'all'
-    2. Since the 'all' folder does not indicating species names, we need to find them from 'bean' and 'commonBean' as images in 'bearley' (Barley) could be patches
-    3. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
-    4. Train custom models for auto labeling
-    5. Check every annotation
+    1. Rename images with f'C. benghalensis Toda2018 {orginal file name}'
+    2. Generate segmentation masks with SAM-HQ and Cellpose; then mannually adjust them
     """
     def __init__(self):
         super().__init__()
-        self.input_dir = self.casadogarcia2020_dir  # original dataset directory
+        self.input_dir = self.toda2018_dir  # original dataset directory
         self.processed_dir = self.input_dir.replace('Original', 'Processed')  # output directory
-        self.source_name = 'Casado-Garcia2020'  # source name
-        self.samhq_configs = {
-            'G. max': {'points_per_side': (24,), 'min_mask_ratio': 0.0001, 'max_mask_ratio': 0.04},
-            'H. vulgare': {'points_per_side': (24,), 'min_mask_ratio': 0.0001, 'max_mask_ratio': 0.02},
-            'P. vulgaris': {'points_per_side': (24,), 'min_mask_ratio': 0.0001, 'max_mask_ratio': 0.04}}
+        self.species = 'C. benghalensis'  # plant species
+        self.output_dir = os.path.join(self.processed_dir, self.species)
+        self.source_name = 'Toda2018'  # source name
+        self.prefix = f'{self.species} {self.source_name}'  # the prefix for renaming
+        self.samhq_configs = {'points_per_side': (12,), 'min_mask_ratio': 0.0001, 'max_mask_ratio': 0.04}  # SAM-HQ auto label configuration
 
     def rename_images(self) -> None:
         """Copy images and annotation files to 'Processed' and rename them"""
-        def names_by_species(species_folder_dir: str) -> list:
-            """Get image names under a given speceis folder"""
-            train_dir = os.path.join(species_folder_dir, 'train', 'JPEGImages')  # train directory
-            train_names = [os.path.basename(image_path) for image_path in get_paths(train_dir, '.jpg')]  # image names under train directory
-            test_dir = os.path.join(species_folder_dir, 'test', 'JPEGImages')  # test directory
-            test_names = [os.path.basename(image_path) for image_path in get_paths(test_dir, '.jpg')]  # image names under test directory
-            return train_names + test_names
-
-        bean_names = names_by_species(os.path.join(self.input_dir, 'bean'))  # images names of G. max
-        common_bean_names = names_by_species(os.path.join(self.input_dir, 'commonBean'))  # image names of P. vulgaris
-        all_train_dir = os.path.join(self.input_dir, 'all', 'train')  # the 'all' train directory
-        all_test_dir = os.path.join(self.input_dir, 'all', 'test')  # the 'all' train directory
-        self.ensemble_files(all_train_dir, ['JPEGImages'], self.processed_dir, ['.jpg', '.xml'])  # move files to 'Processed' of train files
-        self.ensemble_files(all_test_dir, ['JPEGImages'], self.processed_dir, ['.jpg', '.xml'])  # move files to 'Processed' of test files
-        self.discard_files(os.path.join(self.input_dir.replace('//Original', ''), 'discard.txt'), self.processed_dir)  # remove unwanted images
-        for file_path in get_paths(self.processed_dir, file_extension='.xml'):
-            if not os.path.exists(file_path.replace('.xml', '.jpg')):
-                os.remove(file_path)  # remove the xml file whose image has been discarded
-        file_names = os.listdir(self.processed_dir)  # the remaining file names
-        bean_folder_dir = os.path.join(self.processed_dir, 'G. max'); os.makedirs(bean_folder_dir, exist_ok=True)  # noqa: create the G. max folder
-        common_bean_folder_dir = os.path.join(self.processed_dir, 'P. vulgaris'); os.makedirs(common_bean_folder_dir, exist_ok=True)  # noqa: create the P. vulgaris folder
-        barley_dir = os.path.join(self.processed_dir, 'H. vulgare'); os.makedirs(barley_dir, exist_ok=True)  # noqa: create the H. vulgare folder
-        for file_name in file_names:
-            file_path = os.path.join(self.processed_dir, file_name)  # get file path
-            if file_name in set(common_bean_names) or len(file_name) <= 11:
-                new_name = f'P. vulgaris {self.source_name} {file_name}'  # unify naming
-                new_path = os.path.join(common_bean_folder_dir, new_name)  # path to P. vulgaris directory
-            elif file_name in set(bean_names) or 'set' in file_name or len(file_name) <= 16 and 'x' not in os.path.splitext(file_name)[0]:
-                new_name = f'G. max {self.source_name} {file_name}'  # unify naming
-                new_path = os.path.join(bean_folder_dir, new_name)  # path to G. max directory
-            else:
-                new_name = f'H. vulgare {self.source_name} {file_name}'  # unify naming
-                new_path = os.path.join(barley_dir, new_name)  # path to H. vulgare directory
-            os.rename(file_path, new_path)  # rename image and move to its species directory
+        file_names = self.ensemble_files(self.input_dir.replace('//Original', ''), ['Original'], self.output_dir)  # move files to 'Processed' of image files
+        new_names = [f'{self.prefix} {file_name}' for file_name in file_names]  # get renamings
+        self.batch_rename(self.output_dir, file_names, new_names)  # rename
+        self.discard_files(os.path.join(self.input_dir.replace('//Original', ''), 'discard.txt'), self.output_dir)  # remove low quality images
         return None
 
-    def load_xml_bbox(self, xml_file_path: str) -> np.ndarray:
-        """Load bbox of stomata from xml annotation files"""
-        root, bboxes = ET.parse(xml_file_path).getroot(), []  # to store information from xml annotations
-        for obj in root.findall('object'):
-            bbox = obj.find('bndbox')  # get each bbox
-            xmin = int(bbox.find('xmin').text)  # find the xmin
-            ymin = int(bbox.find('ymin').text)  # find the ymin
-            xmax = int(bbox.find('xmax').text)  # find the xmax
-            ymax = int(bbox.find('ymax').text)  # find the ymax
-            bboxes.append((xmin, ymin, xmax, ymax))  # collect bbox to the list
-        return np.array(bboxes)
-
-    def get_annotations(self, bbbox_prompt: bool = True, catergory: str = 'stoma', visualize: bool = False, random_color: bool = True) -> None:
+    def get_annotations(self, catergory: str = 'stoma', visualize: bool = False, random_color: bool = True) -> None:
         """Generate ISAT annotations json files"""
-        for species in self.samhq_configs:
-            species_config = self.samhq_configs.get(species)  # load the species config for SAM-HQ
-            points_per_side, min_mask_ratio, max_mask_ratio = species_config['points_per_side'], species_config['min_mask_ratio'], species_config['max_mask_ratio']  # get config parameters
-            subfolder_dir = os.path.join(self.processed_dir, species)  # get the species subfolder directory
-            image_paths = get_paths(subfolder_dir, '.jpg')  # get the image paths
-            for image_path in tqdm(image_paths, total=len(image_paths)):
-                image = imread_rgb(image_path)  # load the image in RGB scale
-                try:
-                    auto_masks = SAMHQ(image_path=image_path, points_per_side=points_per_side, min_mask_ratio=min_mask_ratio, max_mask_ratio=max_mask_ratio).auto_label()  # get the auto labelled masks
-                    if bbbox_prompt:
-                        isat_bboxes = self.load_xml_bbox(image_path.replace('.jpg', '.xml'))  # get ISAT format bboxes from xml annotations
-                        if len(isat_bboxes) > 0:
-                            prompt_masks = SAMHQ(image_path=image_path).prompt_label(input_box=isat_bboxes, mode='multiple')  # get the bbox prompt masks
-                            masks = SAMHQ.isolate_masks(prompt_masks + auto_masks)  # filter redundant masks
-                    else:
-                        masks = SAMHQ.isolate_masks(auto_masks)  # filter redundant masks
-                    if visualize:
-                        visual_masks = [mask['segmentation'] for mask in masks]  # get only bool masks
-                        SAMHQ.show_masks(image, visual_masks, random_color=random_color)  # visualize bool masks
-                    Anything2ISAT.from_samhq(masks, image, image_path, catergory=catergory)  # export the ISAT json file
-                except ValueError:
-                    print(f'{image_path} cannot be segmented by SAM-HQ')
+        image_names = [name for name in os.listdir(self.output_dir) if any(name.lower().endswith(file_type) for file_type in image_types)]  # image files only
+        image_paths = [os.path.join(self.output_dir, name) for name in image_names]  # get image paths
+        points_per_side, min_mask_ratio, max_mask_ratio = self.samhq_configs['points_per_side'], self.samhq_configs['min_mask_ratio'], self.samhq_configs['max_mask_ratio']  # get SAN-HQ auto mask configs
+        for image_path in tqdm(image_paths, total=len(image_paths)):
+            image = imread_rgb(image_path)  # load the image in RGB scale
+            auto_masks = SAMHQ(image_path=image_path, points_per_side=points_per_side, min_mask_ratio=min_mask_ratio, max_mask_ratio=max_mask_ratio).auto_label(ellipse_threshold=0.1, statistics_filter=False)  # get the auto labelled masks
+            if visualize:
+                visual_masks = [mask['segmentation'] for mask in auto_masks]  # get only bool masks
+                SAMHQ.show_masks(image, visual_masks, random_color=random_color)  # visualize bool masks
+            Anything2ISAT.from_samhq(auto_masks, image, image_path, catergory=catergory)  # export the ISAT json file
         return None
 
 
-class Dey2023(StomataPyData):
+class Yates2018(StomataPyData):
     """
-    Dey et al., 2023   https://doi.org/10.1016/j.ecoinf.2023.102128
-    Dataset source: https://doi.org/10.17632/4brcwhmvyk.4
+    Yates et al., 2018  https://doi.org/10.1101/490029
+    Dataset source: provided by the authors
 
     Rights and permissions:
     Creative Commons Attribution 4.0 International License (https://creativecommons.org/licenses/by/4.0/)
@@ -476,262 +381,48 @@ class Dey2023(StomataPyData):
     You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
     No additional restrictions — You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.
 
-    Dey2023
+    Yates2018
     ├── Original
-        ├── Code (ignored)
-        ├── Raw data
-            ├── rawdata
-                ├── Aglaia cucullata
-                    ├── 0118.jpg
-                    ...
-                    ├── 0200.jpg
-                ├── Barringtonia acutangula
-                    ├── Hijol (1).jpg
-                    ...
-                    ├── Hijol (81).jpg
-                ├── Bruguiera gymnorrhiza
-                    ├── Lal_kakra (1).jpg
-                    ...
-                    ├── Lal_kakra (100).jpg
-                ├── Bruguiera sexangula
-                    ├── SK (1).jpg
-                    ...
-                    ├── SK (176).jpg
-                ├── Cerbera manghas
-                    ├── 0002.jpg
-                    ...
-                    ├── vcc.jpg
-                ├── Ceriops decandra
-                    ├── Goran (1).jpg
-                    ...
-                    ├── Goran (101).jpg
-                ├── Excoecaria agallocha
-                    ├── Gewa (1).jpg
-                    ...
-                    ├── Gewa (60).jpg
-                ├── Heritiera fomes
-                    ├── 0001.jpg
-                    ...
-                    ├── 0083.jpg
-                ├── Pongamia pinnata
-                    ├── koroch (1).jpg
-                    ...
-                    ├── koroch (124).jpg
-                ├── Sonneratia apetala
-                    ├── kewra (1).jpg
-                    ...
-                    ├── kewra (52).jpg
-                ├── Xylocarpus moluccensis
-                    ├── pasur (1).jpg
-                    ...
-                    ├── pasur (106).jpg
-            ├── readme.csv
-        ├── Stomatal traits (ignored)
-        ├── Trained models (ignored)
-        ├── Stomata ISO19139 Metadata.xml (ignored)
+        ├── ZENODO_pictures_2014
+            ├── ACHAT_2014_plot391_rep1.jpg
+            ...
+            ├── ZOBEL_2014_plot128_rep4.jpg
+        ├── ZENODO_text_2014
+            ├── ACHAT_2014_plot391_rep1
+            ...
+            ZOBEL_2014_plot128_rep4
     ├── Processed
-        ├── A. cucullata
-        ├── P. pinnata
-        ├── X. moluccensis
+        ├── T. aestivum
     ├── source.txt
     ├── discard.txt
 
     1. Rename images
-    2. Dsicard unwanted images and their annotations
-    3. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
-    4. Train custom models for auto labeling
-    5. Check every annotation
-    """
-    def __init__(self):
-        super().__init__()
-        self.input_dir = self.dey2023_dir  # input directory
-        self.processed_dir = self.input_dir.replace('Original', 'Processed')  # output directory
-        self.data_dir = os.path.join(self.input_dir, 'Raw data', 'rawdata')  # data directory
-        self.source_name = 'Dey2023'  # source name
-        self.species_names = []  # to store species names
-        self.samhq_configs = {'points_per_side': (24,), 'min_mask_ratio': 0.0005, 'max_mask_ratio': 0.005}  # SAM-HQ auto label configuration
-
-    def rename_images(self) -> None:
-        """Copy images to 'Processed' and rename them"""
-        self.ensemble_files(self.data_dir, os.listdir(self.data_dir), self.processed_dir, image_types, folder_rename=True)  # move image files to 'Processed'
-        self.discard_files(os.path.join(self.input_dir.replace('//Original', ''), 'discard.txt'), self.processed_dir)  # remove unwanted images
-        file_names, new_names = [], []  # to store old and new names
-        for image_path in get_paths(self.processed_dir, '.jpg'):
-            image_basename = os.path.basename(image_path)  # get the image basename
-            file_names.append(image_basename)  # populate file names
-            for species_name in os.listdir(self.data_dir):
-                if species_name in image_path:
-                    species_name = self.abbreviate_species(species_name)  # abbreviate species name
-                    new_names.append(f'{species_name} {self.source_name} {image_basename}')  # populate the new names
-                    self.species_names.append(species_name)  # populate the species names
-        self.batch_rename(self.processed_dir, file_names, new_names)  # rename all images
-        self.create_species_folders(self.processed_dir, set(self.species_names))  # create species folder
-        return None
-
-    def load_xml_bbox(self, xml_file_path: str) -> np.ndarray:
-        """Load bbox of stomata from xml annotation files"""
-        root, bboxes = ET.parse(xml_file_path).getroot(), []  # to store information from xml annotations
-        for obj in root.findall('object'):
-            bbox = obj.find('bndbox')  # get each bbox
-            xmin = int(bbox.find('xmin').text)  # find the xmin
-            ymin = int(bbox.find('ymin').text)  # find the ymin
-            xmax = int(bbox.find('xmax').text)  # find the xmax
-            ymax = int(bbox.find('ymax').text)  # find the ymax
-            bboxes.append((xmin, ymin, xmax, ymax))  # collect bbox to the list
-        return np.array(bboxes)
-
-    def get_annotations(self, catergory: str = 'stoma', visualize: bool = False, random_color: bool = True) -> None:
-        """Generate ISAT annotations json files"""
-        points_per_side, min_mask_ratio, max_mask_ratio = self.samhq_configs['points_per_side'], self.samhq_configs['min_mask_ratio'], self.samhq_configs['max_mask_ratio']  # get SAN-HQ auto mask configs
-        for species_folder in set(os.listdir(self.processed_dir)):
-            image_paths = get_paths(os.path.join(self.processed_dir, species_folder), '.jpg')  # get the image paths under the species folder
-            for image_path in tqdm(image_paths, total=len(image_paths)):
-                image, masks = imread_rgb(image_path), []  # load the image in RGB scale
-                try:
-                    auto_masks = SAMHQ(image_path=image_path, points_per_side=points_per_side, min_mask_ratio=min_mask_ratio, max_mask_ratio=max_mask_ratio).auto_label(ellipse_threshold=0.7)  # get the auto labelled masks
-                    masks = SAMHQ.isolate_masks(auto_masks)  # filter redundant masks
-                    if visualize:
-                        visual_masks = [mask['segmentation'] for mask in masks]  # get only bool masks
-                        SAMHQ.show_masks(image, visual_masks, random_color=random_color)  # visualize bool masks
-                    if len(masks) > 0:
-                        Anything2ISAT.from_samhq(masks, image, image_path, catergory=catergory)  # export the ISAT json file
-                except ValueError:
-                    pass
-        return None
-
-
-class Ferguson2021(StomataPyData):
-    """
-    Ferguson et al., 2021  https://doi.org/10.1093/plphys/kiab346
-    Dataset source: https://doi.org/10.13012/B2IDB-5565022_V2
-
-    Rights and permissions:
-    Creative Commons Attribution 4.0 International License (https://creativecommons.org/licenses/by/4.0/)
-
-    You are free to:
-    Share — copy and redistribute the material in any medium or format for any purpose, even commercially.
-    Adapt — remix, transform, and build upon the material for any purpose, even commercially.
-    The licensor cannot revoke these freedoms as long as you follow the license terms.
-
-    Under the following terms:
-    Attribution — You must give appropriate credit , provide a link to the license, and indicate if changes were made.
-    You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
-    No additional restrictions — You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.
-
-    Ferguson2021
-    ├── Original
-        ├── Accessions_2016_jpg
-            ├── 2016
-                ├── 16EF0041_2_1_raw.jpg
-                ...
-                ├── FF1056_2_6_raw.jpg
-        ├── Accessions_2017_jpg
-            ├── 2017
-                ├── 2-17MW0795_#2_1_raw.jpg
-                ...
-                ├── 17MW0960_#2_4_raw.jpg
-    ├── Processed
-        ├── S. bicolor
-    ├── source.txt
-    ├── discard2016.txt
-    ├── discard2017.txt
-
-    1. Rename images. As these FOVs are in 393 x 393 (too samll) and great in numbers, we stich them according to naming prefix.
-    # [2. Since the most common prefix consists of 8 patches, we stich them with 2 x 4 pattern and save only the stiched images.]
-    2. Stiching leads to too small stomata, so we enlarge the image instead
-    3. Dsicard unwanted images and their annotations
+    2. Dsicard unwanted images
+    3. Map the patches from "Positive" back to renamed images to generate json fiels with bounding boxes
     4. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
     5. Train custom models for auto labeling
     6. Check every annotation
     """
     def __init__(self):
         super().__init__()
-        self.input_dir = self.ferguson2021_dir  # directory of Sun2023  # input directory
+        self.input_dir = self.yates_dir  # original dataset directory
         self.processed_dir = self.input_dir.replace('Original', 'Processed')  # output directory
-        self.source_name = 'Ferguson2021'  # source name
-        self.species_name = 'S. bicolor'  # to store species name
+        self.species_name = 'T. aestivum'  # plant species
+        self.source_name = 'Yates2018'  # source name
         self.species_folder_dir = os.path.join(self.processed_dir, self.species_name)  # get the path of the species folder
-        self.samhq_configs = {'points_per_side': (24,), 'min_mask_ratio': 0.001, 'max_mask_ratio': 0.04}  # SAM-HQ auto label configuration
-
-    # def extract_prefixes(self, directory: str, folder: Literal['2016', '2017'] = '2016') -> set:
-    #     """Extract the the prefixes of the FOVs"""
-    #     if folder == '2016':
-    #         prefix_pattern = re.compile(r'(EF\d{4})_')  # prefix pattern of 2016
-    #     elif folder == '2017':
-    #         prefix_pattern = re.compile(r'(17EF\d{4})_')  # prefix pattern of 2017
-    #     unique_prefixes = set()   # to store unique prefixes
-    #     for filename in os.listdir(directory):
-    #         match = prefix_pattern.match(filename[5:])  # if the prefix matches
-    #         if match:
-    #             unique_prefixes.add(match.group(1))  # populate the unique prefixes
-    #     return unique_prefixes
-
-    # def stitch(self, prefix: str, directory: str, rows: int = 2, cols: int = 4) -> None:
-    #     """Stich patches in from right to left, from top to bottom"""
-    #     patches = [Image.open(os.path.join(directory, f'{prefix}_{x}_{y}_raw.jpg')) for x in range(1, 3) for y in range(1, 5)]  # open all patches to be stitched
-    #     total_width = sum(image.size[0] for image in patches[:cols])  # the width of the final stitched image
-    #     total_height = sum(image.size[1] for image in patches[::cols])   # the height of the final stitched image
-    #     stitched_image = Image.new('RGB', (total_width, total_height))  # create an empty stitched image
-    #     for row in range(rows):
-    #         for col in range(cols):
-    #             index = row * cols + (col if row % 2 == 0 else (cols - 1 - col))  # calculate the index in the zigzag order
-    #             x_position = col * patches[index].size[0] if row % 2 == 0 else (cols - col - 1) * patches[index].size[0]  # calculate the x position where the current image should be pasted
-    #             y_position = row * patches[index].size[1]  # same for the y position
-    #             stitched_image.paste(patches[index], (x_position, y_position))  # paste the current image into the stitched image
-    #     save_path = os.path.join(self.processed_dir, f'{self.species_name} {self.source_name} {os.path.basename(directory)} {prefix}_stiched.jpg')  # the path to the stitched image to be saved
-    #     stitched_image.save(save_path)  # save the stitched image
-    #     return None
-
-    # def stitch_simple(self, directory: str, rows: int = 2, cols: int = 4) -> None:
-    #     """Stich patches in from right to left, from top to bottom, , without specific prefixes"""
-    #     image_files = [file for file in os.listdir(directory) if file.endswith('_raw.jpg')]
-    #     max_stitches = len(image_files) // (rows * cols)  # maximum possible stiched images
-    #     for batch in range(max_stitches):
-    #         patches = [Image.open(os.path.join(directory, image_files[idx])) for idx in range(batch * rows * cols, (batch + 1) * rows * cols)]  # open patches in a group
-    #         total_width = sum(image.size[0] for image in patches[:cols])  # the width of the final stitched image
-    #         total_height = sum(image.size[1] for image in patches[::cols])   # the height of the final stitched image
-    #         stitched_image = Image.new('RGB', (total_width, total_height))  # create an empty stitched image
-    #         for row in range(rows):
-    #             for col in range(cols):
-    #                 index = row * cols + (col if row % 2 == 0 else (cols - 1 - col))  # calculate the index in the zigzag order
-    #                 x_position = col * patches[index].size[0] if row % 2 == 0 else (cols - col - 1) * patches[index].size[0]  # calculate the x position where the current image should be pasted
-    #                 y_position = row * patches[index].size[1]  # same for the y position
-    #                 stitched_image.paste(patches[index], (x_position, y_position))  # paste the current image into the stitched image
-    #         save_path = os.path.join(self.processed_dir, f'{self.species_name} {self.source_name} {os.path.basename(directory)} stiched_{batch + 1}.jpg')  # the path to the stitched image to be saved
-    #         stitched_image.save(save_path)  # save the stitched image
-    #     return None
+        self.samhq_configs = {'points_per_side': (32,), 'min_mask_ratio': 0.0002, 'max_mask_ratio': 0.001}  # SAM-HQ auto label configuration
 
     def rename_images(self) -> None:
         """Copy images to 'Processed' and rename them"""
-        temp_dir_2016, temp_dir_2017 = os.path.join(self.processed_dir, 'Accessions_2016_jpg'), os.path.join(self.processed_dir, 'Accessions_2017_jpg')  # temporary 2016 and 2017 directories
-        self.ensemble_files(os.path.join(self.input_dir, 'Accessions_2016_jpg'), ['2016'], temp_dir_2016, image_types, folder_rename=True)  # move image files to temporary 2016
-        self.ensemble_files(os.path.join(self.input_dir, 'Accessions_2017_jpg'), ['2017'], temp_dir_2017, image_types, folder_rename=True)  # move image files to temporary 2017
-        self.discard_files(os.path.join(self.input_dir.replace('//Original', ''), 'discard2016.txt'), temp_dir_2016)  # remove unwanted images
-        self.discard_files(os.path.join(self.input_dir.replace('//Original', ''), 'discard2017.txt'), temp_dir_2017)  # remove unwanted images
-        # prefixes_2016, prefixes_2017 = self.extract_prefixes(temp_dir_2016, '2016'), self.extract_prefixes(temp_dir_2017, '2017')  # FOV prefixes of the 2016 and 2017 folder
-        # for prefix in list(prefixes_2016) + list(prefixes_2017):
-        #    if '2017' in prefix:
-        #        directory = temp_dir_2017  # point to the 2017 directory
-        #    else:
-        #        directory = temp_dir_2016  # point to the 2016 directory
-        #    try:
-        #        self.stitch(prefix, directory)  # try to do a 2x4 stiching
-        #    except OSError:
-        #        pass
-        # for directory in [temp_dir_2016, temp_dir_2017]:
-        #     self.stitch_simple(directory)  # try to do a 2x4 stiching
-        self.ensemble_files(self.processed_dir, os.listdir(self.processed_dir), self.processed_dir, image_types, folder_rename=True)  # move image files to 'Processed'
-        shutil.rmtree(temp_dir_2016); shutil.rmtree(temp_dir_2017)  # noqa: remove the temporary directories
-        file_paths = get_paths(self.processed_dir, '.jpg')  # get image path names
-        for file_path in file_paths:
-            image = imread_rgb(file_path)  # load the image for resizing
-            height, width = image.shape[:2]  # the original dimensions
-            enlarged_image = cv2.resize(image, (width * 4, height * 4), interpolation=cv2.INTER_LANCZOS4)  # resize the image
-            cv2.imwrite(file_path, cv2.cvtColor(enlarged_image, cv2.COLOR_RGB2BGR))  # save the resized image in position
-            new_basename = f'{self.species_name} {self.source_name} {os.path.basename(file_path)}'  # get new path basename
-            os.rename(file_path, os.path.join(self.processed_dir, new_basename))  # rename and move to the speceis folder
+        self.ensemble_files(self.input_dir, ['ZENODO_pictures_2014'], self.processed_dir, image_types, folder_rename=True)  # move image files to 'Processed'
+        self.discard_files(os.path.join(self.input_dir.replace('//Original', ''), 'discard.txt'), self.processed_dir)  # remove unwanted images
+        file_names, new_names = [], []  # to store the old and new names
+        for image_path in get_paths(self.processed_dir, '.jpg'):
+            image_basename = os.path.basename(image_path)  # get the basename
+            file_names.append(image_basename)  # populate the file_names
+            new_names.append(f'{self.species_name} {self.source_name} {image_basename}')  # populate the new names
+        self.batch_rename(self.processed_dir, file_names, new_names)  # rename all images
         self.create_species_folders(self.processed_dir, set([self.species_name]))  # create species folder
-        # print(f"Selected {len(get_paths(self.species_folder_dir, '.jpg'))} stiched images (2x4)!")
         return None
 
     def get_annotations(self, catergory: str = 'stoma', visualize: bool = False, random_color: bool = True) -> None:
@@ -936,336 +627,117 @@ class Fetter2019(StomataPyData):
         return None
 
 
-class Jayakody2017(StomataPyData):
+class Vofely2019(StomataPyData):
     """
-    Jayakody et al., 2017 https://doi.org/10.1186/s13007-017-0244-9
-    Dataset source: https://github.com/Smart-Robotic-Viticulture/Stomata_Aperture_Measurement_2017
+    Vőfély et al, 2019  https://doi.org/10.1111/nph.15461
+    Dataset source: https://doi.org/10.5061/dryad.g4q6pv3
 
     Rights and permissions:
-    Creative Commons Attribution 4.0 International License (https://creativecommons.org/licenses/by/4.0/)
+    CC0 1.0 Universal (CC0 1.0) Public Domain Dedication license (https://creativecommons.org/publicdomain/zero/1.0/)
 
-    You are free to:
-    Share — copy and redistribute the material in any medium or format for any purpose, even commercially.
-    Adapt — remix, transform, and build upon the material for any purpose, even commercially.
-    The licensor cannot revoke these freedoms as long as you follow the license terms.
+    No Copyright
+    The person who associated a work with this deed has dedicated the work to the public domain by waiving all of his or her rights
+    to the work worldwide under copyright law, including all related and neighboring rights, to the extent allowed by law.
+    You can copy, modify, distribute and perform the work, even for commercial purposes, all without asking permission.
 
-    Under the following terms:
-    Attribution — You must give appropriate credit , provide a link to the license, and indicate if changes were made.
-    You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
-    No additional restrictions — You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.
-
-    Jayakody2017
+    Vofely2019
     ├── Original
-        ├── raw_dataset_1
-            ├── Image_001.jpg
+        ├── CellCoordinates (ignored)
+        ├── CellImages
+            ├── ConfocalImages (ignored)
+            ├── 3-03-700x-1-01.tif
             ...
-            ├── Image_110.jpg
-        ├── raw_dataset_2
-            ├── Image_001.jpg
-            ...
-            ├── Image_108.jpg
-        ├── Test_dataset (ignored)
-        ├── Training_dataset
-            ├── Negative (ignored)
-            ├── Positive
-                ├── 01.jpg
-                ...
-                ├── 555.jpg
+            ├── JH15-010_ad_02.tif
+            ├── CellMagnifications.txt
+            ├── README.txt
+        ├── LeafImages (ignored)
+        ├── PhylogeneticResources (ignored)
+        ├── README_for_CellCoordinates.txt
+        ├── README_for_CellImages.txt
+        ├── README_for_LeafImages.txt
+        ├── README_for_PhylogeneticResources.txt
+        ├── README_for_SampleTable.txt
+        ├── SampleTable.csv
+        ├── Table S1.xlsx
     ├── Processed
-        ├── V. vinifera
+        ├── A. caudatus
+        ...
+        ├── Z. officinale
     ├── source.txt
     ├── discard.txt
 
-    1. Combine 'raw_dataset_1' and 'raw_dataset_1', then Copy the images to 'Processed', and rename them with f'V. vinifera Jayakody2017 {orginal file name}'
-    2. Dsicard unwanted images
-    3. Map the patches from "Positive" back to renamed images to generate json fiels with bounding boxes
-    4. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
-    5. Train custom models for auto labeling
-    6. Check every annotation
-    """
-    def __init__(self):
-        super().__init__()
-        self.input_dir = self.jayakody2017_dir  # original dataset directory
-        self.processed_dir = self.input_dir.replace('Original', 'Processed')  # output directory
-        self.species = 'V. vinifera'  # plant species
-        self.output_dir = os.path.join(self.processed_dir, self.species)
-        self.source_name = 'Jayakody2017'  # source name
-        self.prefix = f'{self.species} {self.source_name}'  # the prefix for renaming
-        self.patches_dir = os.path.join(self.input_dir, 'Training_dataset', 'Positive')  # cropped stomata patches dir
-        self.samhq_configs = {'points_per_side': (24,), 'min_mask_ratio': 0.0005, 'max_mask_ratio': 0.01}  # SAM-HQ auto label configuration
+    MICROSCOPE IMAGES README
+    There are two different formats for naming the microscope images
+    The first convention has a number of numeric fields separated by hyphens.
+    Fields 1 and 2 combined determine the species (please see “SampleTable.csv” file)
+    Field 3 contains the magnification of the field.
+    Field 4 denotes the side of the leaf represented in the picture (i.e. adaxial or abaxial; please see “SampleTable.csv” as 1 and 2 are not consistent)
+    Field 5 is an arbitrary numbering of the images from a leaf side.
+    In some cases an optional final pain explains that the image is an overview, rather than the image from which measurements were taken.
+    Those samples named “9.**.*.*” use the same convention, with decimal separated fields, but lacks the magnification. Instead, the scale is include on the image.
 
-    def rename_images(self) -> None:
-        """Copy images and annotation files to 'Processed' and rename them"""
-        subfolders = ['raw_dataset_1', 'raw_dataset_2']  # to combine images in these two folders
-        for subfolder in subfolders:
-            file_names = self.ensemble_files(self.input_dir, [subfolder], self.output_dir)  # move files to 'Processed' of image files
-            new_names = [f'{self.prefix} {subfolder} {file_name}' for file_name in file_names]  # get renamings
-            self.batch_rename(self.output_dir, file_names, new_names)  # rename
-        self.discard_files(os.path.join(self.input_dir.replace('//Original', ''), 'discard.txt'), self.output_dir)  # remove unwanted images
-        return None
-
-    def get_annotations(self, bbbox_prompt: bool = True, catergory: str = 'stoma', visualize: bool = False, random_color: bool = True) -> None:
-        """Generate ISAT annotations json files"""
-        patch_names = [name for name in os.listdir(self.patches_dir) if any(name.lower().endswith(file_type) for file_type in image_types)]  # patch image files only
-        image_names = [name for name in os.listdir(self.output_dir) if any(name.lower().endswith(file_type) for file_type in image_types)]  # image files only
-        patch_paths = [os.path.join(self.patches_dir, name) for name in patch_names]  # get patch paths
-        image_paths = [os.path.join(self.output_dir, name) for name in image_names]  # get image paths
-        points_per_side, min_mask_ratio, max_mask_ratio = self.samhq_configs['points_per_side'], self.samhq_configs['min_mask_ratio'], self.samhq_configs['max_mask_ratio']  # get SAN-HQ auto mask configs
-        for image_path in tqdm(image_paths, total=len(image_paths)):
-            image = imread_rgb(image_path)  # load the image in RGB scale
-            try:
-                auto_masks = SAMHQ(image_path=image_path, points_per_side=points_per_side, min_mask_ratio=min_mask_ratio, max_mask_ratio=max_mask_ratio).auto_label()  # get the auto labelled masks
-                if bbbox_prompt:
-                    isat_bboxes = self.template_match(image_path, patch_paths)  # get ISAT format bboxes from template matching
-                    if len(isat_bboxes) > 0:
-                        prompt_masks = SAMHQ(image_path=image_path).prompt_label(input_box=isat_bboxes, mode='multiple')  # get the bbox prompt masks
-                        masks = SAMHQ.isolate_masks(prompt_masks + auto_masks)  # filter redundant masks
-                else:
-                    masks = SAMHQ.isolate_masks(auto_masks)  # filter redundant masks
-                if visualize:
-                    visual_masks = [mask['segmentation'] for mask in masks]  # get only bool masks
-                    SAMHQ.show_masks(image, visual_masks, random_color=random_color)  # visualize bool masks
-                Anything2ISAT.from_samhq(masks, image, image_path, catergory=catergory)  # export the ISAT json file
-            except ValueError:
-                print(f'{image_path} cannot be segmented by SAM-HQ')
-        return None
-
-
-class Koheler2023(StomataPyData):
-    """
-    Koheler et al., 2023  https://doi.org/10.1093/aob/mcac147
-    Dataset source: provided by the authors
-
-    Rights and permissions:
-    Creative Commons Attribution 4.0 International License (https://creativecommons.org/licenses/by/4.0/)
-
-    You are free to:
-    Share — copy and redistribute the material in any medium or format for any purpose, even commercially.
-    Adapt — remix, transform, and build upon the material for any purpose, even commercially.
-    The licensor cannot revoke these freedoms as long as you follow the license terms.
-
-    Under the following terms:
-    Attribution — You must give appropriate credit , provide a link to the license, and indicate if changes were made.
-    You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
-    No additional restrictions — You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.
-
-    Koheler2023
-    ├── Original
-        ├── All
-            ├── 1.tif
-            ...
-            ├── Image_1402.tif
-    ├── Processed
-        ├── Z. mays
-    ├── source.txt
-    ├── discard.txt
+    The second convention are named either “gp##-###” or “JH##-###”.
+    Fields 1 and 2, including “gp” or “JH”, indicate the species (see "SampleTable.csv").
+    Field 3 appears as either (1) the picture number, (2) the magnification, or (3) whether the image is from the adaxial (ad) or abaxial (ab) side.
+    Magnifications for these images are saved in CellMagnifications.txt or are part of file names.
 
     1. Rename images
-    2. Dsicard unwanted images and their annotations
+    2. Dsicard unwanted / corrupt images and their annotations
     3. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
     4. Train custom models for auto labeling
     5. Check every annotation
     """
     def __init__(self):
         super().__init__()
-        self.input_dir = self.koheler2023_dir  # original dataset directory
+        self.input_dir = self.vofely2019_dir  # input directory
         self.processed_dir = self.input_dir.replace('Original', 'Processed')  # output directory
-        self.species_name = 'Z. mays'  # plant species
-        self.source_name = 'Koheler2023'  # source name
-        self.species_folder_dir = os.path.join(self.processed_dir, self.species_name)  # get the path of the species folder
-        self.samhq_configs = {'points_per_side': (24,), 'min_mask_ratio': 0.0005, 'max_mask_ratio': 0.005}  # SAM-HQ auto label configuration
+        self.csv_path = os.path.join(self.input_dir, 'SampleTable.csv')  # CSV file path
+        self.images_dir = os.path.join(self.input_dir, 'CellImages')  # images directory
+        self.source_name = 'Vofely2019'  # source name
+        self.samhq_configs = {'points_per_side': (24,), 'min_mask_ratio': 0.001, 'max_mask_ratio': 0.04}  # SAM-HQ auto label configuration
+
+    def get_taxonomy(self) -> dict:
+        """Get the image file name and plant species from CSV file"""
+        dataframe = pd.read_csv(self.csv_path, encoding='ISO-8859-1')  # load the dataframe from the CSV file
+        dataframe['Matrix_name'] = dataframe['Matrix_name'].fillna(dataframe['Name_submitted'])  # fill in the empty matrix names with submitted names
+        sample_ids = dataframe['Sample'].tolist()  # get sample, as each sample is uniquely mapped to a matrix name
+        species_names = dataframe['Matrix_name'].tolist()  # get full species names
+        species_names = [self.abbreviate_species(species_name.replace('_', ' ')) for species_name in species_names]  # abbreviate the species names
+        return dict(zip(sample_ids, species_names))
 
     def rename_images(self) -> None:
-        """Copy images to 'Processed' and rename them"""
-        self.ensemble_files(self.input_dir, ['All'], self.processed_dir, image_types, folder_rename=True)  # move image files to 'Processed'
-        # self.discard_files(os.path.join(self.input_dir.replace('//Original', ''), 'discard.txt'), self.processed_dir)  # remove unwanted images
-        file_names, new_names = [], []  # to store the old and new names
-        for image_path in get_paths(self.processed_dir, '.tif'):
-            image_basename = os.path.basename(image_path)  # get the basename
-            file_names.append(image_basename)  # populate the file_names
-            new_names.append(f'{self.species_name} {self.source_name} {image_basename}')  # populate the new names
-        self.batch_rename(self.processed_dir, file_names, new_names)  # rename all images
-        self.create_species_folders(self.processed_dir, set([self.species_name]))  # create species folder
-        return None
-
-    def get_annotations(self, catergory: str = 'stoma', visualize: bool = False, random_color: bool = True) -> None:
-        """Generate ISAT annotations json files"""
-        points_per_side, min_mask_ratio, max_mask_ratio = self.samhq_configs['points_per_side'], self.samhq_configs['min_mask_ratio'], self.samhq_configs['max_mask_ratio']  # get SAN-HQ auto mask configs
-        image_paths = get_paths(self.species_folder_dir, '.tif')  # get the image paths under the species folder
-        for image_path in tqdm(image_paths, total=len(image_paths)):
-            image, masks = imread_rgb(image_path), []  # load the image in RGB scale
-            try:
-                auto_masks = SAMHQ(image_path=image_path, points_per_side=points_per_side, min_mask_ratio=min_mask_ratio, max_mask_ratio=max_mask_ratio).auto_label()  # get the auto labelled masks
-                masks = SAMHQ.isolate_masks(auto_masks)  # filter redundant masks
-                if visualize:
-                    visual_masks = [mask['segmentation'] for mask in masks]  # get only bool masks
-                    SAMHQ.show_masks(image, visual_masks, random_color=random_color)  # visualize bool masks
-                if len(masks) > 0:
-                    Anything2ISAT.from_samhq(masks, image, image_path, catergory=catergory)  # export the ISAT json file
-            except ValueError:
-                pass
-        return None
-
-
-class Koheler2024(StomataPyData):
-    """
-    Koheler et al., 2024  Manuscript in Preparation
-    Dataset source: provided by the authors
-
-    Rights and permissions:
-    Creative Commons Attribution 4.0 International License (https://creativecommons.org/licenses/by/4.0/)
-
-    You are free to:
-    Share — copy and redistribute the material in any medium or format for any purpose, even commercially.
-    Adapt — remix, transform, and build upon the material for any purpose, even commercially.
-    The licensor cannot revoke these freedoms as long as you follow the license terms.
-
-    Under the following terms:
-    Attribution — You must give appropriate credit , provide a link to the license, and indicate if changes were made.
-    You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
-    No additional restrictions — You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.
-
-    Koheler2024
-    ├── Original
-        ├── All
-            ├── 1_1_1.jpg
-            ├── 1_1_1.jpg_metadata.xml
-            ...
-            ├── size_0.2mm.jpg
-            ├── size_2.0um.jpg_metadata.xml
-    ├── Processed
-        ├── T. aestivum
-    ├── source.txt
-    ├── discard.txt
-
-    1. Rename images
-    2. Dsicard unwanted images and their annotations
-    3. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
-    4. Train custom models for auto labeling
-    5. Check every annotation
-    """
-    def __init__(self):
-        super().__init__()
-        self.input_dir = self.koheler2024_dir  # original dataset directory
-        self.processed_dir = self.input_dir.replace('Original', 'Processed')  # output directory
-        self.species_name = 'T. aestivum'  # plant species
-        self.source_name = 'Koheler2024'  # source name
-        self.species_folder_dir = os.path.join(self.processed_dir, self.species_name)  # get the path of the species folder
-        self.samhq_configs = {'points_per_side': (24,), 'min_mask_ratio': 0.0005, 'max_mask_ratio': 0.005}  # SAM-HQ auto label configuration
-
-    def rename_images(self) -> None:
-        """Copy images to 'Processed' and rename them"""
-        self.ensemble_files(self.input_dir, ['All'], self.processed_dir, image_types, folder_rename=True)  # move image files to 'Processed'
+        """Copy images and txt files to 'Processed' and rename them"""
+        self.ensemble_files(self.input_dir, ['CellImages'], self.processed_dir, image_types, folder_rename=True)  # move files to 'Processed'
         self.discard_files(os.path.join(self.input_dir.replace('//Original', ''), 'discard.txt'), self.processed_dir)  # remove unwanted images
-        file_names, new_names = [], []  # to store the old and new names
-        for image_path in get_paths(self.processed_dir, '.jpg'):
-            image_basename = os.path.basename(image_path)  # get the basename
-            file_names.append(image_basename)  # populate the file_names
-            new_names.append(f'{self.species_name} {self.source_name} {image_basename}')  # populate the new names
-        self.batch_rename(self.processed_dir, file_names, new_names)  # rename all images
-        self.create_species_folders(self.processed_dir, set([self.species_name]))  # create species folder
+        species_dictionary = self.get_taxonomy()  # get the dictionary of species names and file names
+        new_names, species_names = [], []  # the store new names and species names
+        file_names = [os.path.basename(path) for path in get_paths(self.processed_dir, '.tif') + get_paths(self.processed_dir, '.png')]
+        for file_name in file_names:
+            species_name = 'Unknown'  # initialize the default value
+            for key in species_dictionary:
+                if str(key).replace('.', '-') in file_name or str(key) in file_name:
+                    species_name = species_dictionary.get(key, 'Unknown')  # get the corresponding species name
+            if species_name == 'A. sp.':
+                species_name = 'Adromischus sp'
+            if species_name == '0 spp':
+                species_name = 'C. wilmottianum'
+            new_names.append(f'{species_name} {self.source_name} {file_name}')  # get the image renaming
+            species_names.append(species_name)
+        self.batch_rename(self.processed_dir, file_names, new_names)  # rename
+        self.create_species_folders(self.processed_dir, set(species_names))  # group files by plant species
         return None
 
     def get_annotations(self, catergory: str = 'stoma', visualize: bool = False, random_color: bool = True) -> None:
         """Generate ISAT annotations json files"""
+        print('Show the progress bar of species folders instead')
         points_per_side, min_mask_ratio, max_mask_ratio = self.samhq_configs['points_per_side'], self.samhq_configs['min_mask_ratio'], self.samhq_configs['max_mask_ratio']  # get SAN-HQ auto mask configs
-        image_paths = get_paths(self.species_folder_dir, '.jpg')  # get the image paths under the species folder
-        for image_path in tqdm(image_paths, total=len(image_paths)):
-            image, masks = imread_rgb(image_path), []  # load the image in RGB scale
-            try:
-                auto_masks = SAMHQ(image_path=image_path, points_per_side=points_per_side, min_mask_ratio=min_mask_ratio, max_mask_ratio=max_mask_ratio).auto_label()  # get the auto labelled masks
-                masks = SAMHQ.isolate_masks(auto_masks)  # filter redundant masks
-                if visualize:
-                    visual_masks = [mask['segmentation'] for mask in masks]  # get only bool masks
-                    SAMHQ.show_masks(image, visual_masks, random_color=random_color)  # visualize bool masks
-                if len(masks) > 0:
-                    Anything2ISAT.from_samhq(masks, image, image_path, catergory=catergory)  # export the ISAT json file
-            except ValueError:
-                pass
-        return None
-
-
-class Li2023(StomataPyData):
-    """
-    Li et al., 2023  https://doi.org/10.1049/ipr2.12617
-    Dataset source: https://doi.org/10.5281/zenodo.6302921
-
-    Rights and permissions:
-    Creative Commons Attribution 4.0 International License (https://creativecommons.org/licenses/by/4.0/)
-
-    You are free to:
-    Share — copy and redistribute the material in any medium or format for any purpose, even commercially.
-    Adapt — remix, transform, and build upon the material for any purpose, even commercially.
-    The licensor cannot revoke these freedoms as long as you follow the license terms.
-
-    Under the following terms:
-    Attribution — You must give appropriate credit , provide a link to the license, and indicate if changes were made.
-    You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
-    No additional restrictions — You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.
-
-    Li2023
-    ├── Original
-        ├── bean
-            ├── Capture_1.jpg
-            ...
-            ├── Capture_850.jpg
-        ├── validation dataset
-            ├── ��֤�����·��.txt (ignored)
-            ├── 001.jpg
-            ...
-            ├── 101.jpg
-            ├── ������ȡ�ļ���.bat (ignored)
-        ├── wheat
-            ├── 001.jpg
-            ...
-            ├── 160.jpg
-            ├── ������ȡ�ļ���.bat (ignored)
-            ├── С�����ݼ����·��.txt (ignored)
-    ├── Processed
-        ├── V. faba
-        ├── T. aestivum
-    ├── source.txt
-    ├── discard.txt
-
-    1. Rename images
-    2. Dsicard unwanted images and their annotations
-    3. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
-    4. Train custom models for auto labeling
-    5. Check every annotation
-    """
-    def __init__(self):
-        super().__init__()
-        self.input_dir = self.li2023_dir  # input directory
-        self.processed_dir = self.input_dir.replace('Original', 'Processed')  # output directory
-        self.source_name = 'Li2023'  # source name
-        self.species_names = ['V. faba', 'T. aestivum']  # to store species names
-        self.samhq_configs = {'points_per_side': (24,), 'min_mask_ratio': 0.005, 'max_mask_ratio': 0.05}  # SAM-HQ auto label configuration
-
-    def rename_images(self) -> None:
-        """Copy images to 'Processed' and rename them"""
-        self.ensemble_files(self.input_dir, os.listdir(self.input_dir), self.processed_dir, image_types, folder_rename=True)  # move image files to 'Processed'
-        self.discard_files(os.path.join(self.input_dir.replace('//Original', ''), 'discard.txt'), self.processed_dir)  # remove unwanted images
-        file_names, new_names = [], []  # to store the old and new names
-        for image_path in get_paths(self.processed_dir, '.jpg'):
-            image_basename = os.path.basename(image_path)  # get the basename
-            file_names.append(image_basename)  # populate the file_names
-            if 'bean' in image_path or 'validation dataset' in image_path:
-                new_names.append(f'V. faba {self.source_name} {image_basename}')  # populate the new names
-            elif 'wheat' in image_path:
-                new_names.append(f'T. aestivum {self.source_name} {image_basename}')  # populate the new names
-        self.batch_rename(self.processed_dir, file_names, new_names)  # rename all images
-        self.create_species_folders(self.processed_dir, set(self.species_names))  # create species folder
-        return None
-
-    def get_annotations(self, catergory: str = 'stoma', visualize: bool = False, random_color: bool = True) -> None:
-        """Generate ISAT annotations json files"""
-        points_per_side, min_mask_ratio, max_mask_ratio = self.samhq_configs['points_per_side'], self.samhq_configs['min_mask_ratio'], self.samhq_configs['max_mask_ratio']  # get SAN-HQ auto mask configs
-        for species_folder in set(os.listdir(self.processed_dir)):
-            image_paths = get_paths(os.path.join(self.processed_dir, species_folder), '.jpg')  # get the image paths under the species folder
-            for image_path in tqdm(image_paths, total=len(image_paths)):
+        for species in tqdm(os.listdir(self.processed_dir), total=len(os.listdir(self.processed_dir))):
+            species_folder_dir = os.path.join(self.processed_dir, species)  # the species folder directory
+            image_paths = get_paths(species_folder_dir, '.tif') + get_paths(species_folder_dir, '.png')  # get the image paths under the species folder
+            for image_path in image_paths:
                 image, masks = imread_rgb(image_path), []  # load the image in RGB scale
                 try:
-                    auto_masks = SAMHQ(image_path=image_path, points_per_side=points_per_side, min_mask_ratio=min_mask_ratio, max_mask_ratio=max_mask_ratio).auto_label()  # get the auto labelled masks
+                    auto_masks = SAMHQ(image_path=image_path, points_per_side=points_per_side, min_mask_ratio=min_mask_ratio, max_mask_ratio=max_mask_ratio).auto_label(ellipse_threshold=0.7)  # get the auto labelled masks
                     masks = SAMHQ.isolate_masks(auto_masks)  # filter redundant masks
                     if visualize:
                         visual_masks = [mask['segmentation'] for mask in masks]  # get only bool masks
@@ -1274,6 +746,155 @@ class Li2023(StomataPyData):
                         Anything2ISAT.from_samhq(masks, image, image_path, catergory=catergory)  # export the ISAT json file
                 except ValueError:
                     pass
+        return None
+
+
+class CasadoGarcia2020(StomataPyData):
+    """
+    Casado-García et al., 2020 https://doi.org/10.1016/j.compag.2020.105751
+    Dataset source: https://github.com/ancasag/labelStoma
+
+    Rights and permissions:
+    MIT License
+    Copyright (c) <2015-Present> Tzutalin
+
+    Copyright (C) 2013  MIT, Computer Science and Artificial Intelligence Laboratory. Bryan Russell, Antonio Torralba, William T. Freeman
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
+    Casado-Garcia2020
+    ├── Original
+        ├── all
+            ├── test
+                ├── JPEGImages
+                    ├── (01)62_3_2Bx10.jpg
+                    ├── (01)62_3_2Bx10.xml
+                    ...
+                    ├── T4024_2_A5.jpg
+                    ├── T4024_2_A5.xml
+            ├── train
+                ├── JPEGImages
+                    ├── (01)60_1_2Bx10.jpg
+                    ├── (01)60_1_2Bx10.xml
+                    ...
+                    ├── T4024_2_B3.jpg
+                    ├── T4024_2_B3.xml
+        ├── bean (ignored)
+        ├── bearley (ignored)
+        ├── commonBean (ignored)
+    ├── Processed
+        ├── G. max
+        ├── H. vulgare
+        ├── P. vulgaris
+    ├── source.txt
+    ├── discard.txt
+
+    1. Combine 'test' and 'train' under 'all'
+    2. Since the 'all' folder does not indicating species names, we need to find them from 'bean' and 'commonBean' as images in 'bearley' (Barley) could be patches
+    3. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
+    4. Train custom models for auto labeling
+    5. Check every annotation
+    """
+    def __init__(self):
+        super().__init__()
+        self.input_dir = self.casadogarcia2020_dir  # original dataset directory
+        self.processed_dir = self.input_dir.replace('Original', 'Processed')  # output directory
+        self.source_name = 'Casado-Garcia2020'  # source name
+        self.samhq_configs = {
+            'G. max': {'points_per_side': (24,), 'min_mask_ratio': 0.0001, 'max_mask_ratio': 0.04},
+            'H. vulgare': {'points_per_side': (24,), 'min_mask_ratio': 0.0001, 'max_mask_ratio': 0.02},
+            'P. vulgaris': {'points_per_side': (24,), 'min_mask_ratio': 0.0001, 'max_mask_ratio': 0.04}}
+
+    def rename_images(self) -> None:
+        """Copy images and annotation files to 'Processed' and rename them"""
+        def names_by_species(species_folder_dir: str) -> list:
+            """Get image names under a given speceis folder"""
+            train_dir = os.path.join(species_folder_dir, 'train', 'JPEGImages')  # train directory
+            train_names = [os.path.basename(image_path) for image_path in get_paths(train_dir, '.jpg')]  # image names under train directory
+            test_dir = os.path.join(species_folder_dir, 'test', 'JPEGImages')  # test directory
+            test_names = [os.path.basename(image_path) for image_path in get_paths(test_dir, '.jpg')]  # image names under test directory
+            return train_names + test_names
+
+        bean_names = names_by_species(os.path.join(self.input_dir, 'bean'))  # images names of G. max
+        common_bean_names = names_by_species(os.path.join(self.input_dir, 'commonBean'))  # image names of P. vulgaris
+        all_train_dir = os.path.join(self.input_dir, 'all', 'train')  # the 'all' train directory
+        all_test_dir = os.path.join(self.input_dir, 'all', 'test')  # the 'all' train directory
+        self.ensemble_files(all_train_dir, ['JPEGImages'], self.processed_dir, ['.jpg', '.xml'])  # move files to 'Processed' of train files
+        self.ensemble_files(all_test_dir, ['JPEGImages'], self.processed_dir, ['.jpg', '.xml'])  # move files to 'Processed' of test files
+        self.discard_files(os.path.join(self.input_dir.replace('//Original', ''), 'discard.txt'), self.processed_dir)  # remove unwanted images
+        for file_path in get_paths(self.processed_dir, file_extension='.xml'):
+            if not os.path.exists(file_path.replace('.xml', '.jpg')):
+                os.remove(file_path)  # remove the xml file whose image has been discarded
+        file_names = os.listdir(self.processed_dir)  # the remaining file names
+        bean_folder_dir = os.path.join(self.processed_dir, 'G. max'); os.makedirs(bean_folder_dir, exist_ok=True)  # noqa: create the G. max folder
+        common_bean_folder_dir = os.path.join(self.processed_dir, 'P. vulgaris'); os.makedirs(common_bean_folder_dir, exist_ok=True)  # noqa: create the P. vulgaris folder
+        barley_dir = os.path.join(self.processed_dir, 'H. vulgare'); os.makedirs(barley_dir, exist_ok=True)  # noqa: create the H. vulgare folder
+        for file_name in file_names:
+            file_path = os.path.join(self.processed_dir, file_name)  # get file path
+            if file_name in set(common_bean_names) or len(file_name) <= 11:
+                new_name = f'P. vulgaris {self.source_name} {file_name}'  # unify naming
+                new_path = os.path.join(common_bean_folder_dir, new_name)  # path to P. vulgaris directory
+            elif file_name in set(bean_names) or 'set' in file_name or len(file_name) <= 16 and 'x' not in os.path.splitext(file_name)[0]:
+                new_name = f'G. max {self.source_name} {file_name}'  # unify naming
+                new_path = os.path.join(bean_folder_dir, new_name)  # path to G. max directory
+            else:
+                new_name = f'H. vulgare {self.source_name} {file_name}'  # unify naming
+                new_path = os.path.join(barley_dir, new_name)  # path to H. vulgare directory
+            os.rename(file_path, new_path)  # rename image and move to its species directory
+        return None
+
+    def load_xml_bbox(self, xml_file_path: str) -> np.ndarray:
+        """Load bbox of stomata from xml annotation files"""
+        root, bboxes = ET.parse(xml_file_path).getroot(), []  # to store information from xml annotations
+        for obj in root.findall('object'):
+            bbox = obj.find('bndbox')  # get each bbox
+            xmin = int(bbox.find('xmin').text)  # find the xmin
+            ymin = int(bbox.find('ymin').text)  # find the ymin
+            xmax = int(bbox.find('xmax').text)  # find the xmax
+            ymax = int(bbox.find('ymax').text)  # find the ymax
+            bboxes.append((xmin, ymin, xmax, ymax))  # collect bbox to the list
+        return np.array(bboxes)
+
+    def get_annotations(self, bbbox_prompt: bool = True, catergory: str = 'stoma', visualize: bool = False, random_color: bool = True) -> None:
+        """Generate ISAT annotations json files"""
+        for species in self.samhq_configs:
+            species_config = self.samhq_configs.get(species)  # load the species config for SAM-HQ
+            points_per_side, min_mask_ratio, max_mask_ratio = species_config['points_per_side'], species_config['min_mask_ratio'], species_config['max_mask_ratio']  # get config parameters
+            subfolder_dir = os.path.join(self.processed_dir, species)  # get the species subfolder directory
+            image_paths = get_paths(subfolder_dir, '.jpg')  # get the image paths
+            for image_path in tqdm(image_paths, total=len(image_paths)):
+                image = imread_rgb(image_path)  # load the image in RGB scale
+                try:
+                    auto_masks = SAMHQ(image_path=image_path, points_per_side=points_per_side, min_mask_ratio=min_mask_ratio, max_mask_ratio=max_mask_ratio).auto_label()  # get the auto labelled masks
+                    if bbbox_prompt:
+                        isat_bboxes = self.load_xml_bbox(image_path.replace('.jpg', '.xml'))  # get ISAT format bboxes from xml annotations
+                        if len(isat_bboxes) > 0:
+                            prompt_masks = SAMHQ(image_path=image_path).prompt_label(input_box=isat_bboxes, mode='multiple')  # get the bbox prompt masks
+                            masks = SAMHQ.isolate_masks(prompt_masks + auto_masks)  # filter redundant masks
+                    else:
+                        masks = SAMHQ.isolate_masks(auto_masks)  # filter redundant masks
+                    if visualize:
+                        visual_masks = [mask['segmentation'] for mask in masks]  # get only bool masks
+                        SAMHQ.show_masks(image, visual_masks, random_color=random_color)  # visualize bool masks
+                    Anything2ISAT.from_samhq(masks, image, image_path, catergory=catergory)  # export the ISAT json file
+                except ValueError:
+                    print(f'{image_path} cannot be segmented by SAM-HQ')
         return None
 
 
@@ -1295,7 +916,7 @@ class Meeus2020(StomataPyData):
     You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
     No additional restrictions — You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.
 
-    Meeus2020
+    2020 Meeus et al
     ├── Original
         ├── data
             ├── Carapa procera_CBMFO M3-53_leaf1-field1_BR0000013004071.jpg
@@ -1394,76 +1015,10 @@ class Meeus2020(StomataPyData):
         return None
 
 
-class Meng2023(StomataPyData):
+class Aono2021(StomataPyData):
     """
-    Meng et al., 2023  https://doi.org/10.1007/s00425-023-04231-y
-    Dataset source: Kindly provided by Prof. Yoichiro Hoshino via email: hoshino@fsc.hokudai.ac.jp
-
-    Rights and permissions:
-    Data use rights granted by corresponding authors
-
-    Meng2023
-    ├── Original
-        ├── large photos
-            ├── 0.jpg
-            ...
-            ├── 219.jpg
-        ├── labels_my-project-name_2023-11-01-09-45-08.json (ignored: only 15 images labeled)
-    ├── Processed
-        ├── L. caerulea
-    ├── source.txt
-    ├── discard.txt
-
-    1. Rename images
-    2. Dsicard unwanted images and their annotations
-    3. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
-    4. Train custom models for auto labeling
-    5. Check every annotation
-    """
-    def __init__(self):
-        super().__init__()
-        self.input_dir = self.meng2023_dir  # input directory
-        self.processed_dir = self.input_dir.replace('Original', 'Processed')  # output directory
-        self.source_name = 'Meng2023'  # source name
-        self.species_name = 'L. caerulea'  # to store species name
-        self.samhq_configs = {'points_per_side': (24,), 'min_mask_ratio': 0.0001, 'max_mask_ratio': 0.04}  # SAM-HQ auto label configuration
-
-    def rename_images(self) -> None:
-        """Copy images to 'Processed' and rename them"""
-        self.ensemble_files(self.input_dir, ['large photos'], self.processed_dir, image_types, folder_rename=True)  # move image files to 'Processed'
-        self.discard_files(os.path.join(self.input_dir.replace('//Original', ''), 'discard.txt'), self.processed_dir)  # remove unwanted images
-        file_names, new_names = [], []  # to store the old and new names
-        for image_path in get_paths(self.processed_dir, '.jpg'):
-            image_basename = os.path.basename(image_path)  # get the basename
-            file_names.append(image_basename)  # populate the file_names
-            new_names.append(f'{self.species_name} {self.source_name} {image_basename}')  # populate the new names
-        self.batch_rename(self.processed_dir, file_names, new_names)  # rename all images
-        self.create_species_folders(self.processed_dir, set([self.species_name]))  # create species folder
-        return None
-
-    def get_annotations(self, catergory: str = 'stoma', visualize: bool = False, random_color: bool = True) -> None:
-        """Generate ISAT annotations json files"""
-        points_per_side, min_mask_ratio, max_mask_ratio = self.samhq_configs['points_per_side'], self.samhq_configs['min_mask_ratio'], self.samhq_configs['max_mask_ratio']  # get SAN-HQ auto mask configs
-        image_paths = get_paths(os.path.join(self.processed_dir, self.species_name), '.jpg')  # get the image paths under the species folder
-        for image_path in tqdm(image_paths, total=len(image_paths)):
-            image, masks = imread_rgb(image_path), []  # load the image in RGB scale
-            try:
-                auto_masks = SAMHQ(image_path=image_path, points_per_side=points_per_side, min_mask_ratio=min_mask_ratio, max_mask_ratio=max_mask_ratio).auto_label()  # get the auto labelled masks
-                masks = SAMHQ.isolate_masks(auto_masks)  # filter redundant masks
-                if visualize:
-                    visual_masks = [mask['segmentation'] for mask in masks]  # get only bool masks
-                    SAMHQ.show_masks(image, visual_masks, random_color=random_color)  # visualize bool masks
-                if len(masks) > 0:
-                    Anything2ISAT.from_samhq(masks, image, image_path, catergory=catergory)  # export the ISAT json file
-            except ValueError:
-                pass
-        return None
-
-
-class Pathoumthong2023(StomataPyData):
-    """
-    Pathoumthong et al., 2023  https://doi.org/10.1186/s13007-023-01016-y
-    Dataset source: https://github.com/rapidmethodstomata/rapidmethodstomata
+    Aono et al., 2021  https://doi.org/10.1371/journal.pone.0258679
+    Dataset source: https://zenodo.org/records/3938047
 
     Rights and permissions:
     Creative Commons Attribution 4.0 International License (https://creativecommons.org/licenses/by/4.0/)
@@ -1478,66 +1033,225 @@ class Pathoumthong2023(StomataPyData):
     You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
     No additional restrictions — You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.
 
-    Pathoumthong2023
+    Aono2021
     ├── Original
-        ├── Arabidopsis (ignored: no images)
-        ├── Rice (ignored: no images)
-        ├── Tomato (ignored: no images)
-        ├── Wheat
-            ├── WheatAnalysedImages (ignored: no images)
-            ├── WheatImages
-                ── Wheat_Scepter_2_8_W_Ad_X400_20210923.jpg
+        ├── data
+            ├── dataset
+                ├── ERRO (ignored)
+                ├── STOMA
+                    ├── 1_10.jpeg
+                    ...
+                    ├── 200_179.jpeg
+            ├── deep_learn
+                ├── teste
+                    ├── erro (ignored)
+                    ├── stoma
+                        ├── 5_49.jpeg
+                        ...
+                        ├── 200_179.jpeg
+                ├── train
+                    ├── erro (ignored)
+                    ├── stoma
+                        ├── 1_10.jpeg
+                        ...
+                        ├── 199_226.jpeg
+            ├── original2
+                ├── 1.jpg
                 ...
-                ├── Wheat_Scepter_4_10_W_Ad_X400_20210923.jpg
-            ├── WheatSegmentedImages
-                ├── J1-7_M_Rep1_P3.jpg-part1.jpg
-                ├── J1-7_M_Rep1_P3.jpg-part1.txt
-                ...
-                ├── J6_stb_IPO89011_Rep5.jpg-part4.jpg
-                ├── J6_stb_IPO89011_Rep5.jpg-part4.txt
-            ├── Bounding box extraction (ignored)
-            ├── Wheat Detection (100×) (ignored)
-            ├── Wheat Detection (200×) (ignored)
-            ├── Wheat Detection (400×) (ignored)
-            ├── Wheat Measurement (400×) (ignored)
-            ├── Wheat_detection_100x.pt (ignored)
-            ├── Wheat_detection_200x.pt.pt (ignored)
-            ├── Wheat_detection_400x.pt.pt (ignored)
-            ├── Wheat_measurement.pth (ignored)
+                ├── 200.jpg
+        ├── img (ignored)
+        ├── src (ignored)
+        ├── LICENSE
+        ├── README.md
     ├── Processed
-        ├── T. aestivum
+        ├── Z. mays
     ├── source.txt
     ├── discard.txt
 
     1. Rename images
-    2. Dsicard unwanted images and their annotations
-    3. Generate segmentation masks with SAM-HQ (did not work), mannually adjust them
-    4. Check every annotation
+    2. Dsicard unwanted images
+    3. Map the patches from "Positive" back to renamed images to generate json fiels with bounding boxes
+    4. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
+    5. Train custom models for auto labeling
+    6. Check every annotation
     """
     def __init__(self):
         super().__init__()
-        self.input_dir = self.pathoumthong2023_dir  # input directory
+        self.input_dir = self.aono2021_dir  # original dataset directory
         self.processed_dir = self.input_dir.replace('Original', 'Processed')  # output directory
-        self.data_dir = os.path.join(self.input_dir, 'Wheat')  # data directory
-        self.source_name = 'Pathoumthong2023'  # source name
-        self.species_name = 'T. aestivum'  # to store species name
+        self.species_name = 'Z. mays'  # plant species
+        self.source_name = 'Aono2021'  # source name
         self.species_folder_dir = os.path.join(self.processed_dir, self.species_name)  # get the path of the species folder
-        self.samhq_configs = {'points_per_side': (24,), 'min_mask_ratio': 0.0001, 'max_mask_ratio': 0.04}  # SAM-HQ auto label configuration
+        self.patches_dir_1 = os.path.join(self.input_dir, 'data', 'dataset', 'STOMA')  # cropped stomata patches dir 1
+        self.patches_dir_2 = os.path.join(self.input_dir, 'deep_learn', 'teste', 'stoma')  # cropped stomata patches dir 2
+        self.patches_dir_3 = os.path.join(self.input_dir, 'deep_learn', 'train', 'stoma')  # cropped stomata patches dir 3
+        self.samhq_configs = {'points_per_side': (24,), 'min_mask_ratio': 0.0005, 'max_mask_ratio': 0.01}  # SAM-HQ auto label configuration
 
     def rename_images(self) -> None:
-        """Copy images to 'Processed' and rename them"""
-        self.ensemble_files(self.data_dir, ['WheatImages', 'WheatSegmentedImages'], self.processed_dir, ['.jpg', '.txt'], folder_rename=True)  # move image files to 'Processed'
-        self.discard_files(os.path.join(self.input_dir.replace('//Original', ''), 'discard.txt'), self.processed_dir)  # remove unwanted images
-        file_names, new_names = [], []  # to store the old and new names
-        for file_path in get_paths(self.processed_dir, '.jpg') + get_paths(self.processed_dir, '.txt'):
-            file_basename = os.path.basename(file_path)  # get the basename
-            file_names.append(file_basename)  # populate the file_names
-            new_names.append(f'{self.species_name} {self.source_name} {file_basename}')  # populate the new names
-        self.batch_rename(self.processed_dir, file_names, new_names)  # rename all images
-        self.create_species_folders(self.processed_dir, set([self.species_name]))  # create species folder
+        """Copy images and annotation files to 'Processed' and rename them"""
+        os.makedirs(self.species_folder_dir, exist_ok=True)  # create the species folder
+        self.ensemble_files(os.path.join(self.input_dir, 'data'), ['original2'], self.processed_dir)  # move files to 'Processed' of image files
+        file_paths = get_paths(self.processed_dir, '.jpg')  # get image path names
+        for file_path in file_paths:
+            new_basename = f'{self.species_name} {self.source_name} original2 {os.path.basename(file_path)}'  # get new path basename
+            os.rename(file_path, os.path.join(self.species_folder_dir, new_basename))  # rename and move to the speceis folder
+        self.discard_files(os.path.join(self.input_dir.replace('//Original', ''), 'discard.txt'), self.species_folder_dir)  # remove unwanted images
         return None
 
     def get_annotations(self, bbbox_prompt: bool = True, catergory: str = 'stoma', visualize: bool = False, random_color: bool = True) -> None:
+        """Generate ISAT annotations json files"""
+        path_paths_1 = get_paths(self.patches_dir_1, '.jpeg')  # get the paths of path 1
+        path_paths_2 = get_paths(self.patches_dir_2, '.jpeg')  # get the paths of path 2
+        path_paths_3 = get_paths(self.patches_dir_3, '.jpeg')  # get the paths of path 3
+        patch_paths = path_paths_1 + path_paths_2 + path_paths_3  # combine all patches paths
+        points_per_side, min_mask_ratio, max_mask_ratio = self.samhq_configs['points_per_side'], self.samhq_configs['min_mask_ratio'], self.samhq_configs['max_mask_ratio']  # get SAN-HQ auto mask configs
+        image_paths = get_paths(self.species_folder_dir, '.jpg')  # get the image paths under the species folder
+        for image_path in tqdm(image_paths, total=len(image_paths)):
+            image, masks = imread_rgb(image_path), []  # load the image in RGB scale
+            try:
+                auto_masks = SAMHQ(image_path=image_path, points_per_side=points_per_side, min_mask_ratio=min_mask_ratio, max_mask_ratio=max_mask_ratio).auto_label()  # get the auto labelled masks
+                if bbbox_prompt:
+                    isat_bboxes = self.template_match(image_path, patch_paths)  # get ISAT format bboxes from template matching
+                    if len(isat_bboxes) > 0:
+                        prompt_masks = SAMHQ(image_path=image_path).prompt_label(input_box=isat_bboxes, mode='multiple')  # get the bbox prompt masks
+                        masks = SAMHQ.isolate_masks(prompt_masks + auto_masks)  # filter redundant masks
+                else:
+                    masks = SAMHQ.isolate_masks(auto_masks)  # filter redundant masks
+                if visualize:
+                    visual_masks = [mask['segmentation'] for mask in masks]  # get only bool masks
+                    SAMHQ.show_masks(image, visual_masks, random_color=random_color)  # visualize bool masks
+                if len(masks) > 0:
+                    Anything2ISAT.from_samhq(masks, image, image_path, catergory=catergory)  # export the ISAT json file
+            except ValueError:
+                pass
+        return None
+
+
+class Ferguson2021(StomataPyData):
+    """
+    Ferguson et al., 2021  https://doi.org/10.1093/plphys/kiab346
+    Dataset source: https://doi.org/10.13012/B2IDB-5565022_V2
+
+    Rights and permissions:
+    Creative Commons Attribution 4.0 International License (https://creativecommons.org/licenses/by/4.0/)
+
+    You are free to:
+    Share — copy and redistribute the material in any medium or format for any purpose, even commercially.
+    Adapt — remix, transform, and build upon the material for any purpose, even commercially.
+    The licensor cannot revoke these freedoms as long as you follow the license terms.
+
+    Under the following terms:
+    Attribution — You must give appropriate credit , provide a link to the license, and indicate if changes were made.
+    You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
+    No additional restrictions — You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.
+
+    2021 Ferguson et al
+    ├── Original
+        ├── Accessions_2016_jpg
+            ├── 2016
+                ├── 16EF0041_2_1_raw.jpg
+                ...
+                ├── FF1056_2_6_raw.jpg
+        ├── Accessions_2017_jpg
+            ├── 2017
+                ├── 2-17MW0795_#2_1_raw.jpg
+                ...
+                ├── 17MW0960_#2_4_raw.jpg
+    ├── Processed
+        ├── S. bicolor
+    ├── source.txt
+    ├── discard2016.txt
+    ├── discard2017.txt
+
+    1. Rename images. As these FOVs are in 393 x 393 (too samll) and great in numbers, we stich them according to naming prefix.
+    2. Since the most common prefix consists of 8 patches, we stich them with 2 x 4 pattern and save only the stiched images.
+    3. Dsicard unwanted images and their annotations
+    4. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
+    5. Train custom models for auto labeling
+    6. Check every annotation
+    """
+    def __init__(self):
+        super().__init__()
+        self.input_dir = self.ferguson2021_dir  # directory of Sun2023  # input directory
+        self.processed_dir = self.input_dir.replace('Original', 'Processed')  # output directory
+        self.source_name = 'Ferguson2021'  # source name
+        self.species_name = 'S. bicolor'  # to store species name
+        self.species_folder_dir = os.path.join(self.processed_dir, self.species_name)  # get the path of the species folder
+        self.samhq_configs = {'points_per_side': (48,), 'min_mask_ratio': 0.0001, 'max_mask_ratio': 0.04}  # SAM-HQ auto label configuration
+
+    def extract_prefixes(self, directory: str, folder: Literal['2016', '2017'] = '2016') -> set:
+        """Extract the the prefixes of the FOVs"""
+        if folder == '2016':
+            prefix_pattern = re.compile(r'(EF\d{4})_')  # prefix pattern of 2016
+        elif folder == '2017':
+            prefix_pattern = re.compile(r'(17EF\d{4})_')  # prefix pattern of 2017
+        unique_prefixes = set()   # to store unique prefixes
+        for filename in os.listdir(directory):
+            match = prefix_pattern.match(filename[5:])  # if the prefix matches
+            if match:
+                unique_prefixes.add(match.group(1))  # populate the unique prefixes
+        return unique_prefixes
+
+    def stitch(self, prefix: str, directory: str, rows: int = 2, cols: int = 4) -> None:
+        """Stich patches in from right to left, from top to bottom"""
+        patches = [Image.open(os.path.join(directory, f'{prefix}_{x}_{y}_raw.jpg')) for x in range(1, 3) for y in range(1, 5)]  # open all patches to be stitched
+        total_width = sum(image.size[0] for image in patches[:cols])  # the width of the final stitched image
+        total_height = sum(image.size[1] for image in patches[::cols])   # the height of the final stitched image
+        stitched_image = Image.new('RGB', (total_width, total_height))  # create an empty stitched image
+        for row in range(rows):
+            for col in range(cols):
+                index = row * cols + (col if row % 2 == 0 else (cols - 1 - col))  # calculate the index in the zigzag order
+                x_position = col * patches[index].size[0] if row % 2 == 0 else (cols - col - 1) * patches[index].size[0]  # calculate the x position where the current image should be pasted
+                y_position = row * patches[index].size[1]  # same for the y position
+                stitched_image.paste(patches[index], (x_position, y_position))  # paste the current image into the stitched image
+        save_path = os.path.join(self.processed_dir, f'{self.species_name} {self.source_name} {os.path.basename(directory)} {prefix}_stiched.jpg')  # the path to the stitched image to be saved
+        stitched_image.save(save_path)  # save the stitched image
+        return None
+
+    def stitch_simple(self, directory: str, rows: int = 2, cols: int = 4) -> None:
+        """Stich patches in from right to left, from top to bottom, , without specific prefixes"""
+        image_files = [file for file in os.listdir(directory) if file.endswith('_raw.jpg')]
+        max_stitches = len(image_files) // (rows * cols)  # maximum possible stiched images
+        for batch in range(max_stitches):
+            patches = [Image.open(os.path.join(directory, image_files[idx])) for idx in range(batch * rows * cols, (batch + 1) * rows * cols)]  # open patches in a group
+            total_width = sum(image.size[0] for image in patches[:cols])  # the width of the final stitched image
+            total_height = sum(image.size[1] for image in patches[::cols])   # the height of the final stitched image
+            stitched_image = Image.new('RGB', (total_width, total_height))  # create an empty stitched image
+            for row in range(rows):
+                for col in range(cols):
+                    index = row * cols + (col if row % 2 == 0 else (cols - 1 - col))  # calculate the index in the zigzag order
+                    x_position = col * patches[index].size[0] if row % 2 == 0 else (cols - col - 1) * patches[index].size[0]  # calculate the x position where the current image should be pasted
+                    y_position = row * patches[index].size[1]  # same for the y position
+                    stitched_image.paste(patches[index], (x_position, y_position))  # paste the current image into the stitched image
+            save_path = os.path.join(self.processed_dir, f'{self.species_name} {self.source_name} {os.path.basename(directory)} stiched_{batch + 1}.jpg')  # the path to the stitched image to be saved
+            stitched_image.save(save_path)  # save the stitched image
+        return None
+
+    def rename_images(self) -> None:
+        """Copy images to 'Processed' and rename them"""
+        temp_dir_2016, temp_dir_2017 = os.path.join(self.processed_dir, 'Accessions_2016_jpg'), os.path.join(self.processed_dir, 'Accessions_2017_jpg')  # temporary 2016 and 2017 directories
+        self.ensemble_files(os.path.join(self.input_dir, 'Accessions_2016_jpg'), ['2016'], temp_dir_2016, image_types, folder_rename=True)  # move image files to 'Processed'
+        self.ensemble_files(os.path.join(self.input_dir, 'Accessions_2017_jpg'), ['2017'], temp_dir_2017, image_types, folder_rename=True)  # move image files to 'Processed'
+        self.discard_files(os.path.join(self.input_dir.replace('//Original', ''), 'discard2016.txt'), temp_dir_2016)  # remove unwanted images
+        self.discard_files(os.path.join(self.input_dir.replace('//Original', ''), 'discard2017.txt'), temp_dir_2017)  # remove unwanted images
+        # prefixes_2016, prefixes_2017 = self.extract_prefixes(temp_dir_2016, '2016'), self.extract_prefixes(temp_dir_2017, '2017')  # FOV prefixes of the 2016 and 2017 folder
+        # for prefix in list(prefixes_2016) + list(prefixes_2017):
+        #    if '2017' in prefix:
+        #        directory = temp_dir_2017  # point to the 2017 directory
+        #    else:
+        #        directory = temp_dir_2016  # point to the 2016 directory
+        #    try:
+        #        self.stitch(prefix, directory)  # try to do a 2x4 stiching
+        #    except OSError:
+        #        pass
+        for directory in [temp_dir_2016, temp_dir_2017]:
+            self.stitch_simple(directory)  # try to do a 2x4 stiching
+        shutil.rmtree(temp_dir_2016); shutil.rmtree(temp_dir_2017)  # noqa: remove the temporary directories
+        self.create_species_folders(self.processed_dir, set([self.species_name]))  # create species folder
+        print(f"Selected {len(get_paths(self.species_folder_dir, '.jpg'))} stiched images (2x4)!")
+        return None
+
+    def get_annotations(self, catergory: str = 'stoma', visualize: bool = False, random_color: bool = True) -> None:
         """Generate ISAT annotations json files"""
         points_per_side, min_mask_ratio, max_mask_ratio = self.samhq_configs['points_per_side'], self.samhq_configs['min_mask_ratio'], self.samhq_configs['max_mask_ratio']  # get SAN-HQ auto mask configs
         image_paths = get_paths(self.species_folder_dir, '.jpg')  # get the image paths under the species folder
@@ -1545,17 +1259,7 @@ class Pathoumthong2023(StomataPyData):
             image, masks = imread_rgb(image_path), []  # load the image in RGB scale
             try:
                 auto_masks = SAMHQ(image_path=image_path, points_per_side=points_per_side, min_mask_ratio=min_mask_ratio, max_mask_ratio=max_mask_ratio).auto_label()  # get the auto labelled masks
-                if bbbox_prompt and os.path.exists(image_path.replace('.jpg', '.txt')):
-                    isat_bboxes = []  # to store bboxes
-                    with open(image_path.replace('.jpg', '.txt'), 'r', encoding='utf-8') as file:
-                        for line in file:
-                            parts = line.strip().split()  # split the line
-                            isat_bboxes.append(UtilsISAT.bbox_convert(tuple(map(float, parts[1:5])), 'YOLO2ISAT', image.shape))  # to [x_min, y_min, x_max, y_max]
-                    if len(isat_bboxes) > 0:
-                        prompt_masks = SAMHQ(image_path=image_path).prompt_label(input_box=isat_bboxes, mode='multiple')  # get the bbox prompt masks
-                        masks = SAMHQ.isolate_masks(prompt_masks + auto_masks)  # filter redundant masks
-                else:
-                    masks = SAMHQ.isolate_masks(auto_masks)  # filter redundant masks
+                masks = SAMHQ.isolate_masks(auto_masks)  # filter redundant masks
                 if visualize:
                     visual_masks = [mask['segmentation'] for mask in masks]  # get only bool masks
                     SAMHQ.show_masks(image, visual_masks, random_color=random_color)  # visualize bool masks
@@ -1681,7 +1385,7 @@ class Sun2021(StomataPyData):
     You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
     No additional restrictions — You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.
 
-    Sun2021
+    2021 Sun et al
     ├── Original
         ├── dataset1_408
             ├── jpg
@@ -1736,176 +1440,6 @@ class Sun2021(StomataPyData):
                 continue
             else:
                 os.remove(mask_path)  # remove these unwanted mask files
-        return None
-
-    def get_annotations(self, catergory: str = 'stoma', visualize: bool = False, random_color: bool = True) -> None:
-        """Generate ISAT annotations json files"""
-        points_per_side, min_mask_ratio, max_mask_ratio = self.samhq_configs['points_per_side'], self.samhq_configs['min_mask_ratio'], self.samhq_configs['max_mask_ratio']  # get SAN-HQ auto mask configs
-        image_paths = get_paths(self.species_folder_dir, '.jpg')  # get the image paths under the species folder
-        for image_path in tqdm(image_paths, total=len(image_paths)):
-            image, masks = imread_rgb(image_path), []  # load the image in RGB scale
-            try:
-                auto_masks = SAMHQ(image_path=image_path, points_per_side=points_per_side, min_mask_ratio=min_mask_ratio, max_mask_ratio=max_mask_ratio).auto_label()  # get the auto labelled masks
-                masks = SAMHQ.isolate_masks(auto_masks)  # filter redundant masks
-                if visualize:
-                    visual_masks = [mask['segmentation'] for mask in masks]  # get only bool masks
-                    SAMHQ.show_masks(image, visual_masks, random_color=random_color)  # visualize bool masks
-                if len(masks) > 0:
-                    Anything2ISAT.from_samhq(masks, image, image_path, catergory=catergory)  # export the ISAT json file
-            except ValueError:
-                pass
-        return None
-
-
-class Sun2023(StomataPyData):
-    """
-    Sun et al., 2023  https://doi.org/10.1016/j.compag.2023.108120
-    Dataset source: Kindly provided by the PhD student of Prof. Dong Jiang, Zhuangzhuang Sun via email: jiangd@njau.edu.cn
-
-    Rights and permissions:
-    Data use rights granted by corresponding authors
-
-    Sun2023
-    ├── Original
-        ├── stomata
-            ├── 0001.jpg
-            ├── 0001.xml
-            ...
-            ├── 02190.jpg
-            ├── 02190.xml
-    ├── Processed
-        ├── T. aestivum
-    ├── source.txt
-    ├── discard.txt
-
-    1. Rename images
-    2. Dsicard unwanted images and their annotations
-    3. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
-    4. Train custom models for auto labeling
-    5. Check every annotation
-    """
-    def __init__(self):
-        super().__init__()
-        self.input_dir = self.sun2023_dir  # directory of Sun2023  # input directory
-        self.processed_dir = self.input_dir.replace('Original', 'Processed')  # output directory
-        self.source_name = 'Sun2023'  # source name
-        self.species_name = 'T. aestivum'  # to store species name
-        self.species_folder_dir = os.path.join(self.processed_dir, self.species_name)  # get the path of the species folder
-        self.samhq_configs = {'points_per_side': (24,), 'min_mask_ratio': 0.001, 'max_mask_ratio': 0.04}  # SAM-HQ auto label configuration
-
-    def rename_images(self) -> None:
-        """Copy images to 'Processed' and rename them"""
-        self.ensemble_files(self.input_dir, ['stomata'], self.processed_dir, ['.jpg', '.xml'], folder_rename=True)  # move image files to 'Processed'
-        self.discard_files(os.path.join(self.input_dir.replace('//Original', ''), 'discard.txt'), self.processed_dir)  # remove unwanted images
-        for xml_path in get_paths(self.processed_dir, '.xml'):
-            if not os.path.exists(xml_path.replace('.xml', '.jpg')):
-                os.remove(xml_path)  # remove unwanted xml files
-        file_names, new_names = [], []  # to store the old and new names
-        for file_path in get_paths(self.processed_dir, '.jpg') + get_paths(self.processed_dir, '.xml'):
-            file_basename = os.path.basename(file_path)  # get the basename
-            file_names.append(file_basename)  # populate the file_names
-            new_names.append(f'{self.species_name} {self.source_name} {file_basename}')  # populate the new names
-        self.batch_rename(self.processed_dir, file_names, new_names)  # rename all images
-        self.create_species_folders(self.processed_dir, set([self.species_name]))  # create species folder
-        return None
-
-    def load_xml_bbox(self, xml_file_path: str) -> np.ndarray:
-        """Load bbox of stomata from xml annotation files"""
-        root, bboxes = ET.parse(xml_file_path).getroot(), []  # to store information from xml annotations
-        for obj in root.findall('object'):
-            bbox = obj.find('bndbox')  # get each bbox
-            xmin = int(bbox.find('xmin').text)  # find the xmin
-            ymin = int(bbox.find('ymin').text)  # find the ymin
-            xmax = int(bbox.find('xmax').text)  # find the xmax
-            ymax = int(bbox.find('ymax').text)  # find the ymax
-            bboxes.append((xmin, ymin, xmax, ymax))  # collect bbox to the list
-        return np.array(bboxes)
-
-    def get_annotations(self, bbbox_prompt: bool = True, catergory: str = 'stoma', visualize: bool = False, random_color: bool = True) -> None:
-        """Generate ISAT annotations json files"""
-        points_per_side, min_mask_ratio, max_mask_ratio = self.samhq_configs['points_per_side'], self.samhq_configs['min_mask_ratio'], self.samhq_configs['max_mask_ratio']  # get SAN-HQ auto mask configs
-        image_paths = get_paths(self.species_folder_dir, '.jpg')  # get the image paths under the species folder
-        for image_path in tqdm(image_paths, total=len(image_paths)):
-            image, masks = imread_rgb(image_path), []  # load the image in RGB scale
-            xml_path = image_path.replace('.jpg', '.xml')  # the corresponding xml annotation file path
-            try:
-                auto_masks = SAMHQ(image_path=image_path, points_per_side=points_per_side, min_mask_ratio=min_mask_ratio, max_mask_ratio=max_mask_ratio).auto_label()  # get the auto labelled masks
-                if bbbox_prompt and os.path.exists(xml_path):
-                    isat_bboxes = self.load_xml_bbox(xml_path)  # try to get the bboxes
-                    if len(isat_bboxes) > 0:
-                        prompt_masks = SAMHQ(image_path=image_path).prompt_label(input_box=isat_bboxes, mode='multiple')  # get the bbox prompt masks
-                        masks = SAMHQ.isolate_masks(prompt_masks + auto_masks)  # filter redundant masks
-                else:
-                    masks = SAMHQ.isolate_masks(auto_masks)  # filter redundant masks
-                if visualize:
-                    visual_masks = [mask['segmentation'] for mask in masks]  # get only bool masks
-                    SAMHQ.show_masks(image, visual_masks, random_color=random_color)  # visualize bool masks
-                if len(masks) > 0:
-                    Anything2ISAT.from_samhq(masks, image, image_path, catergory=catergory)  # export the ISAT json file
-            except ValueError:
-                pass
-        return None
-
-
-class Takagi2023(StomataPyData):
-    """
-    Takagi et al., 2023  https://doi.org/10.1093/pcp/pcad018
-    Dataset source: https://doi.org/10.5281/zenodo.7549842
-
-    Rights and permissions:
-    Creative Commons Attribution 4.0 International License (https://creativecommons.org/licenses/by/4.0/)
-
-    You are free to:
-    Share — copy and redistribute the material in any medium or format for any purpose, even commercially.
-    Adapt — remix, transform, and build upon the material for any purpose, even commercially.
-    The licensor cannot revoke these freedoms as long as you follow the license terms.
-
-    Under the following terms:
-    Attribution — You must give appropriate credit , provide a link to the license, and indicate if changes were made.
-    You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
-    No additional restrictions — You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.
-
-    Takagi2023
-    ├── Original
-        ├── microscope_test_images
-            ├── 20190507_Disk_Dark_DMSO_18.jpg
-            ...
-            ├── 20190507_Disk_Light_DMSO_10.jpg
-        ├── test_images_with_mask (ignored)
-        ├── 221121_micro_seg.onnx (ignored)
-        ├── 221121_micro_yolox_s1920.onnx (ignored)
-        ├── readme.txt (ignored)
-    ├── Processed
-        ├── A. thaliana
-    ├── source.txt
-    ├── discard.txt
-
-    1. Rename images
-    2. Dsicard unwanted images and their annotations
-    3. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
-    4. Train custom models for auto labeling
-    5. Check every annotation
-    """
-    def __init__(self):
-        super().__init__()
-        self.input_dir = self.takagi2023_dir  # directory of Sun2023  # input directory
-        self.processed_dir = self.input_dir.replace('Original', 'Processed')  # output directory
-        self.source_name = 'Takagi2023'  # source name
-        self.species_name = 'A. thaliana'  # to store species name
-        self.species_folder_dir = os.path.join(self.processed_dir, self.species_name)  # get the path of the species folder
-        self.samhq_configs = {'points_per_side': (24,), 'min_mask_ratio': 0.0001, 'max_mask_ratio': 0.01}  # SAM-HQ auto label configuration
-
-    def rename_images(self) -> None:
-        """Copy images to 'Processed' and rename them"""
-        self.ensemble_files(self.input_dir, ['microscope_test_images'], self.processed_dir, image_types, folder_rename=True)  # move image files to 'Processed'
-        self.discard_files(os.path.join(self.input_dir.replace('//Original', ''), 'discard.txt'), self.processed_dir)  # remove unwanted images
-        file_names, new_names = [], []  # to store the old and new names
-        for file_path in get_paths(self.processed_dir, '.jpg'):
-            file_basename = os.path.basename(file_path)  # get the basename
-            file_names.append(file_basename)  # populate the file_names
-            new_names.append(f'{self.species_name} {self.source_name} {file_basename}')  # populate the new names
-        self.batch_rename(self.processed_dir, file_names, new_names)  # rename all images
-        self.create_species_folders(self.processed_dir, set([self.species_name]))  # create species folder
         return None
 
     def get_annotations(self, catergory: str = 'stoma', visualize: bool = False, random_color: bool = True) -> None:
@@ -2004,80 +1538,6 @@ class ThathapalliPrakash2021(StomataPyData):
         return None
 
 
-class Toda2018(StomataPyData):
-    """
-    Toda2018 et al., 2018 https://doi.org/10.1101/365098
-    Dataset source: https://github.com/totti0223/deepstomata/tree/master/examples
-
-    Rights and permissions:
-    MIT License
-
-    Copyright (c) 2018 yosuke toda
-
-    Permission is hereby granted, free of charge, to any person obtaining a copy
-    of this software and associated documentation files (the "Software"), to deal
-    in the Software without restriction, including without limitation the rights
-    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-    copies of the Software, and to permit persons to whom the Software is
-    furnished to do so, subject to the following conditions:
-
-    The above copyright notice and this permission notice shall be included in all
-    copies or substantial portions of the Software.
-
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-    SOFTWARE.
-
-    Toda2018
-    ├── Original
-        ├── 1.jpg
-        ...
-        ├── 11.jpg
-    ├── Processed
-        ├── C. benghalensis
-    ├── source.txt
-    ├── discard.txt
-
-    1. Rename images with f'C. benghalensis Toda2018 {orginal file name}'
-    2. Generate segmentation masks with SAM-HQ and Cellpose; then mannually adjust them
-    """
-    def __init__(self):
-        super().__init__()
-        self.input_dir = self.toda2018_dir  # original dataset directory
-        self.processed_dir = self.input_dir.replace('Original', 'Processed')  # output directory
-        self.species = 'C. benghalensis'  # plant species
-        self.output_dir = os.path.join(self.processed_dir, self.species)
-        self.source_name = 'Toda2018'  # source name
-        self.prefix = f'{self.species} {self.source_name}'  # the prefix for renaming
-        self.samhq_configs = {'points_per_side': (12,), 'min_mask_ratio': 0.0001, 'max_mask_ratio': 0.04}  # SAM-HQ auto label configuration
-
-    def rename_images(self) -> None:
-        """Copy images and annotation files to 'Processed' and rename them"""
-        file_names = self.ensemble_files(self.input_dir.replace('//Original', ''), ['Original'], self.output_dir)  # move files to 'Processed' of image files
-        new_names = [f'{self.prefix} {file_name}' for file_name in file_names]  # get renamings
-        self.batch_rename(self.output_dir, file_names, new_names)  # rename
-        self.discard_files(os.path.join(self.input_dir.replace('//Original', ''), 'discard.txt'), self.output_dir)  # remove low quality images
-        return None
-
-    def get_annotations(self, catergory: str = 'stoma', visualize: bool = False, random_color: bool = True) -> None:
-        """Generate ISAT annotations json files"""
-        image_names = [name for name in os.listdir(self.output_dir) if any(name.lower().endswith(file_type) for file_type in image_types)]  # image files only
-        image_paths = [os.path.join(self.output_dir, name) for name in image_names]  # get image paths
-        points_per_side, min_mask_ratio, max_mask_ratio = self.samhq_configs['points_per_side'], self.samhq_configs['min_mask_ratio'], self.samhq_configs['max_mask_ratio']  # get SAN-HQ auto mask configs
-        for image_path in tqdm(image_paths, total=len(image_paths)):
-            image = imread_rgb(image_path)  # load the image in RGB scale
-            auto_masks = SAMHQ(image_path=image_path, points_per_side=points_per_side, min_mask_ratio=min_mask_ratio, max_mask_ratio=max_mask_ratio).auto_label(ellipse_threshold=0.1, statistics_filter=False)  # get the auto labelled masks
-            if visualize:
-                visual_masks = [mask['segmentation'] for mask in auto_masks]  # get only bool masks
-                SAMHQ.show_masks(image, visual_masks, random_color=random_color)  # visualize bool masks
-            Anything2ISAT.from_samhq(auto_masks, image, image_path, catergory=catergory)  # export the ISAT json file
-        return None
-
-
 class Toda2021(StomataPyData):
     """
     Toda et al, 2021  https://doi.org/10.3389/fpls.2021.715309
@@ -2106,7 +1566,7 @@ class Toda2021(StomataPyData):
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 
-    Toda2021
+    2021 Toda et al
     ├── Original
         ├── test
             ├── 20200904_135153__0.jpg
@@ -2196,261 +1656,6 @@ class Toda2021(StomataPyData):
         return None
 
 
-class Vofely2019(StomataPyData):
-    """
-    Vőfély et al, 2019  https://doi.org/10.1111/nph.15461
-    Dataset source: https://doi.org/10.5061/dryad.g4q6pv3
-
-    Rights and permissions:
-    CC0 1.0 Universal (CC0 1.0) Public Domain Dedication license (https://creativecommons.org/publicdomain/zero/1.0/)
-
-    No Copyright
-    The person who associated a work with this deed has dedicated the work to the public domain by waiving all of his or her rights
-    to the work worldwide under copyright law, including all related and neighboring rights, to the extent allowed by law.
-    You can copy, modify, distribute and perform the work, even for commercial purposes, all without asking permission.
-
-    Vofely2019
-    ├── Original
-        ├── CellCoordinates (ignored)
-        ├── CellImages
-            ├── ConfocalImages (ignored)
-            ├── 3-03-700x-1-01.tif
-            ...
-            ├── JH15-010_ad_02.tif
-            ├── CellMagnifications.txt
-            ├── README.txt
-        ├── LeafImages (ignored)
-        ├── PhylogeneticResources (ignored)
-        ├── README_for_CellCoordinates.txt
-        ├── README_for_CellImages.txt
-        ├── README_for_LeafImages.txt
-        ├── README_for_PhylogeneticResources.txt
-        ├── README_for_SampleTable.txt
-        ├── SampleTable.csv
-        ├── Table S1.xlsx
-    ├── Processed
-        ├── A. caudatus
-        ...
-        ├── Z. officinale
-    ├── source.txt
-    ├── discard.txt
-
-    MICROSCOPE IMAGES README
-    There are two different formats for naming the microscope images
-    The first convention has a number of numeric fields separated by hyphens.
-    Fields 1 and 2 combined determine the species (please see “SampleTable.csv” file)
-    Field 3 contains the magnification of the field.
-    Field 4 denotes the side of the leaf represented in the picture (i.e. adaxial or abaxial; please see “SampleTable.csv” as 1 and 2 are not consistent)
-    Field 5 is an arbitrary numbering of the images from a leaf side.
-    In some cases an optional final pain explains that the image is an overview, rather than the image from which measurements were taken.
-    Those samples named “9.**.*.*” use the same convention, with decimal separated fields, but lacks the magnification. Instead, the scale is include on the image.
-
-    The second convention are named either “gp##-###” or “JH##-###”.
-    Fields 1 and 2, including “gp” or “JH”, indicate the species (see "SampleTable.csv").
-    Field 3 appears as either (1) the picture number, (2) the magnification, or (3) whether the image is from the adaxial (ad) or abaxial (ab) side.
-    Magnifications for these images are saved in CellMagnifications.txt or are part of file names.
-
-    1. Rename images
-    2. Dsicard unwanted / corrupt images and their annotations
-    3. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
-    4. Train custom models for auto labeling
-    5. Check every annotation
-    """
-    def __init__(self):
-        super().__init__()
-        self.input_dir = self.vofely2019_dir  # input directory
-        self.processed_dir = self.input_dir.replace('Original', 'Processed')  # output directory
-        self.csv_path = os.path.join(self.input_dir, 'SampleTable.csv')  # CSV file path
-        self.images_dir = os.path.join(self.input_dir, 'CellImages')  # images directory
-        self.source_name = 'Vofely2019'  # source name
-        self.samhq_configs = {'points_per_side': (24,), 'min_mask_ratio': 0.001, 'max_mask_ratio': 0.04}  # SAM-HQ auto label configuration
-
-    def get_taxonomy(self) -> dict:
-        """Get the image file name and plant species from CSV file"""
-        dataframe = pd.read_csv(self.csv_path, encoding='ISO-8859-1')  # load the dataframe from the CSV file
-        dataframe['Matrix_name'] = dataframe['Matrix_name'].fillna(dataframe['Name_submitted'])  # fill in the empty matrix names with submitted names
-        sample_ids = dataframe['Sample'].tolist()  # get sample, as each sample is uniquely mapped to a matrix name
-        species_names = dataframe['Matrix_name'].tolist()  # get full species names
-        species_names = [self.abbreviate_species(species_name.replace('_', ' ')) for species_name in species_names]  # abbreviate the species names
-        return dict(zip(sample_ids, species_names))
-
-    def rename_images(self) -> None:
-        """Copy images and txt files to 'Processed' and rename them"""
-        self.ensemble_files(self.input_dir, ['CellImages'], self.processed_dir, image_types, folder_rename=True)  # move files to 'Processed'
-        self.discard_files(os.path.join(self.input_dir.replace('//Original', ''), 'discard.txt'), self.processed_dir)  # remove unwanted images
-        species_dictionary = self.get_taxonomy()  # get the dictionary of species names and file names
-        new_names, species_names = [], []  # the store new names and species names
-        file_names = [os.path.basename(path) for path in get_paths(self.processed_dir, '.tif') + get_paths(self.processed_dir, '.png')]
-        for file_name in file_names:
-            species_name = 'Unknown'  # initialize the default value
-            for key in species_dictionary:
-                if str(key).replace('.', '-') in file_name or str(key) in file_name:
-                    species_name = species_dictionary.get(key, 'Unknown')  # get the corresponding species name
-            if species_name == 'A. sp.':
-                species_name = 'Adromischus sp'
-            if species_name == '0 spp':
-                species_name = 'C. wilmottianum'
-            new_names.append(f'{species_name} {self.source_name} {file_name}')  # get the image renaming
-            species_names.append(species_name)
-        self.batch_rename(self.processed_dir, file_names, new_names)  # rename
-        self.create_species_folders(self.processed_dir, set(species_names))  # group files by plant species
-        return None
-
-    def get_annotations(self, catergory: str = 'stoma', visualize: bool = False, random_color: bool = True) -> None:
-        """Generate ISAT annotations json files"""
-        print('Show the progress bar of species folders instead')
-        points_per_side, min_mask_ratio, max_mask_ratio = self.samhq_configs['points_per_side'], self.samhq_configs['min_mask_ratio'], self.samhq_configs['max_mask_ratio']  # get SAN-HQ auto mask configs
-        for species in tqdm(os.listdir(self.processed_dir), total=len(os.listdir(self.processed_dir))):
-            species_folder_dir = os.path.join(self.processed_dir, species)  # the species folder directory
-            image_paths = get_paths(species_folder_dir, '.tif') + get_paths(species_folder_dir, '.png')  # get the image paths under the species folder
-            for image_path in image_paths:
-                image, masks = imread_rgb(image_path), []  # load the image in RGB scale
-                try:
-                    auto_masks = SAMHQ(image_path=image_path, points_per_side=points_per_side, min_mask_ratio=min_mask_ratio, max_mask_ratio=max_mask_ratio).auto_label(ellipse_threshold=0.7)  # get the auto labelled masks
-                    masks = SAMHQ.isolate_masks(auto_masks)  # filter redundant masks
-                    if visualize:
-                        visual_masks = [mask['segmentation'] for mask in masks]  # get only bool masks
-                        SAMHQ.show_masks(image, visual_masks, random_color=random_color)  # visualize bool masks
-                    if len(masks) > 0:
-                        Anything2ISAT.from_samhq(masks, image, image_path, catergory=catergory)  # export the ISAT json file
-                except ValueError:
-                    pass
-        return None
-
-
-class WangRenninger2023(StomataPyData):
-    """
-    Wang and Renninger, 2023
-    Dataset source: https://doi.org/10.5281/zenodo.8271253
-
-    Rights and permissions:
-    Creative Commons Attribution 4.0 International License (https://creativecommons.org/licenses/by/4.0/)
-
-    You are free to:
-    Share — copy and redistribute the material in any medium or format for any purpose, even commercially.
-    Adapt — remix, transform, and build upon the material for any purpose, even commercially.
-    The licensor cannot revoke these freedoms as long as you follow the license terms.
-
-    Under the following terms:
-    Attribution — You must give appropriate credit , provide a link to the license, and indicate if changes were made.
-    You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
-    No additional restrictions — You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.
-
-    WangRenninger2023
-    ├── Original
-        ├── Labeled Stomatal Images
-            ├── STMHD0001.jpg
-            ├── STMHD0001.txt
-            ...
-            ├── STMPP3487.jpg
-            ├── STMPP3487.txt
-        ├── Labeled Stomatal Images.csv
-    ├── Processed
-        ├── A. rubrum
-        ├── D. palustris
-        ├── Fraxinus spp
-        ├── I. opaca
-        ├── Populus spp
-        ├── Q. michauxii
-        ├── Q. nigra
-        ├── Q. pagoda
-        ├── Q. phellos
-        ├── Q. shumardii
-        ├── Q. stellata
-        ├── Q. texana
-        ├── U. alata
-        ├── U. americana
-        ├── V. stamineum
-    ├── source.txt
-    ├── discard.txt
-
-    The annoation txt files are all in YOLO objection detection format {class, x_center, y_center, width, height} (checked):
-        For example:
-            0 0.025423 0.029762 0.047612 0.053822
-            1 0.325424 0.056191 0.077794 0.043736
-    where the class code is {0: 'stomata', 1: 'whole_stomata'} meaning {0: 'outer ledge', 1: 'stomata'}
-
-    1. Rename images
-    2. Dsicard unwanted / corrupt images and their annotations
-    3. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
-    4. Train custom models for auto labeling
-    5. Check every annotation
-    """
-    def __init__(self):
-        super().__init__()
-        self.input_dir = self.wangrenninger2023_dir  # input directory
-        self.processed_dir = self.input_dir.replace('Original', 'Processed')  # output directory
-        self.csv_path = os.path.join(self.input_dir, 'Labeled Stomatal Images.csv')  # CSV file path
-        self.images_dir = os.path.join(self.input_dir, 'Labeled Stomatal Images')  # images and txt annotations files paths
-        self.source_name = 'WangRenninger2023'  # source name
-        self.class_code_name = {0: 'outer ledge', 1: 'stomata'}  # class code name mapping
-        self.corrupt_files = ['STMPP0369.jpg', 'STMPP0387.jpg', 'STMPP0493.jpg',
-                              'STMPP0512.jpg', 'STMPP0604.jpg', 'STMPP0880.jpg',
-                              'STMPP1029.jpg', 'STMPP1093.jpg', 'STMPP2055.jpg',
-                              'STMPP2981.jpg']  # corrupt files
-        self.samhq_configs = {'points_per_side': (24,), 'min_mask_ratio': 0.0001, 'max_mask_ratio': 0.04}  # SAM-HQ auto label configuration
-
-    def get_taxonomy(self) -> dict:
-        """Get the image file name and plant species from CSV file"""
-        dataframe = pd.read_csv(self.csv_path)  # load the dataframe from the CSV file
-        file_names = dataframe['FileName'].tolist()  # get file names
-        species_names = dataframe['ScientificName'].tolist()  # get full species names
-        species_names = [self.abbreviate_species(species_name) for species_name in species_names]  # abbreviate the species names
-        return dict(zip(file_names, species_names))
-
-    def rename_images(self) -> None:
-        """Copy images and txt files to 'Processed' and rename them"""
-        self.ensemble_files(self.input_dir, ['Labeled Stomatal Images'], self.processed_dir, image_types + ['.txt'], folder_rename=True)  # move files to 'Processed'
-        for corrupt_file in self.corrupt_files:
-            os.remove(os.path.join(self.processed_dir, f"Labeled Stomatal Images {corrupt_file}"))  # remov the corrupt image
-            os.remove(os.path.join(self.processed_dir, f"Labeled Stomatal Images {corrupt_file}".replace('.jpg', '.txt')))  # and their annotations
-        self.discard_files(os.path.join(self.input_dir.replace('//Original', ''), 'discard.txt'), self.processed_dir)  # remove unwanted images
-        for txt_path in get_paths(self.processed_dir, '.txt'):
-            if not os.path.exists(txt_path.replace('.txt', '.jpg')):
-                os.remove(txt_path)
-        species_dictionary = self.get_taxonomy()  # get the dictionary of species names and file names
-        new_names, species_names = [], []  # the store new names and species names
-        file_names = [os.path.basename(path) for path in get_paths(self.processed_dir, '.jpg') + get_paths(self.processed_dir, '.txt')]
-        for file_name in file_names:
-            raw_name = os.path.splitext(file_name)[0].replace('Labeled Stomatal Images ', '')  # get the file name without extension
-            species_name = species_dictionary.get(raw_name, 'Unknown')  # get the corresponding species name
-            new_names.append(f'{species_name} {self.source_name} {file_name}')  # get the image renaming
-            species_names.append(species_name)
-        self.batch_rename(self.processed_dir, file_names, new_names)  # rename
-        self.create_species_folders(self.processed_dir, set(species_names))  # group files by plant species
-        return None
-
-    def get_annotations(self, species_list: list, bbbox_prompt: bool = True, catergory: str = 'stoma', visualize: bool = False, random_color: bool = True) -> None:
-        """Generate ISAT annotations json files"""
-        points_per_side, min_mask_ratio, max_mask_ratio = self.samhq_configs['points_per_side'], self.samhq_configs['min_mask_ratio'], self.samhq_configs['max_mask_ratio']  # get SAN-HQ auto mask configs
-        for species in species_list:
-            species_folder_dir = os.path.join(self.processed_dir, species)  # the species folder directory
-            image_paths = get_paths(species_folder_dir, '.jpg')  # get the image paths under the species folder
-            for image_path in tqdm(image_paths, total=len(image_paths)):
-                image, masks = imread_rgb(image_path), []  # load the image in RGB scale
-                try:
-                    auto_masks = SAMHQ(image_path=image_path, points_per_side=points_per_side, min_mask_ratio=min_mask_ratio, max_mask_ratio=max_mask_ratio).auto_label()  # get the auto labelled masks
-                    if bbbox_prompt and os.path.exists(image_path.replace('.jpg', '.txt')):
-                        isat_bboxes = []  # to store bboxes
-                        with open(image_path.replace('.jpg', '.txt'), 'r', encoding='utf-8') as file:
-                            for line in file:
-                                parts = line.strip().split()  # split the line
-                                isat_bboxes.append(UtilsISAT.bbox_convert(tuple(map(float, parts[1:5])), 'YOLO2ISAT', image.shape))  # to [x_min, y_min, x_max, y_max]
-                        if len(isat_bboxes) > 0:
-                            prompt_masks = SAMHQ(image_path=image_path).prompt_label(input_box=isat_bboxes, mode='multiple')  # get the bbox prompt masks
-                            masks = SAMHQ.isolate_masks(prompt_masks + auto_masks)  # filter redundant masks
-                    else:
-                        masks = SAMHQ.isolate_masks(auto_masks)  # filter redundant masks
-                    if visualize:
-                        visual_masks = [mask['segmentation'] for mask in masks]  # get only bool masks
-                        SAMHQ.show_masks(image, visual_masks, random_color=random_color)  # visualize bool masks
-                    if len(masks) > 0:
-                        Anything2ISAT.from_samhq(masks, image, image_path, catergory=catergory)  # export the ISAT json file
-                except ValueError:
-                    pass
-        return None
-
-
 # TODO
 class Xie2021(StomataPyData):
     """
@@ -2470,7 +1675,7 @@ class Xie2021(StomataPyData):
     You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
     No additional restrictions — You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.
 
-    Xie2021
+    2021 Xie et al
     ├── Original
         ├── 2016RIL_all_detection_result
             ├── 451_leaf1_1.tif.png
@@ -2587,7 +1792,7 @@ class Yang2021(StomataPyData):
     GNU General Public License for more details.
 
 
-    Yang2021
+    2021 Yang et al
     ├── Original
         ├── maize_20x
             ├── U-103-1.tif
@@ -2648,166 +1853,6 @@ class Yang2021(StomataPyData):
                         Anything2ISAT.from_samhq(masks, image, image_path, catergory=catergory)  # export the ISAT json file
                 except ValueError:
                     pass
-        return None
-
-
-class Yates2018(StomataPyData):
-    """
-    Yates et al., 2018  https://doi.org/10.1101/490029
-    Dataset source: provided by the authors
-
-    Rights and permissions:
-    Creative Commons Attribution 4.0 International License (https://creativecommons.org/licenses/by/4.0/)
-
-    You are free to:
-    Share — copy and redistribute the material in any medium or format for any purpose, even commercially.
-    Adapt — remix, transform, and build upon the material for any purpose, even commercially.
-    The licensor cannot revoke these freedoms as long as you follow the license terms.
-
-    Under the following terms:
-    Attribution — You must give appropriate credit , provide a link to the license, and indicate if changes were made.
-    You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
-    No additional restrictions — You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.
-
-    Yates2018
-    ├── Original
-        ├── ZENODO_pictures_2014
-            ├── ACHAT_2014_plot391_rep1.jpg
-            ...
-            ├── ZOBEL_2014_plot128_rep4.jpg
-        ├── ZENODO_text_2014
-            ├── ACHAT_2014_plot391_rep1
-            ...
-            ZOBEL_2014_plot128_rep4
-    ├── Processed
-        ├── T. aestivum
-    ├── source.txt
-    ├── discard.txt
-
-    1. Rename images
-    2. Dsicard unwanted images and their annotations
-    3. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
-    4. Train custom models for auto labeling
-    5. Check every annotation
-    """
-    def __init__(self):
-        super().__init__()
-        self.input_dir = self.yates_dir  # original dataset directory
-        self.processed_dir = self.input_dir.replace('Original', 'Processed')  # output directory
-        self.species_name = 'T. aestivum'  # plant species
-        self.source_name = 'Yates2018'  # source name
-        self.species_folder_dir = os.path.join(self.processed_dir, self.species_name)  # get the path of the species folder
-        self.samhq_configs = {'points_per_side': (32,), 'min_mask_ratio': 0.0002, 'max_mask_ratio': 0.001}  # SAM-HQ auto label configuration
-
-    def rename_images(self) -> None:
-        """Copy images to 'Processed' and rename them"""
-        self.ensemble_files(self.input_dir, ['ZENODO_pictures_2014'], self.processed_dir, image_types, folder_rename=True)  # move image files to 'Processed'
-        self.discard_files(os.path.join(self.input_dir.replace('//Original', ''), 'discard.txt'), self.processed_dir)  # remove unwanted images
-        file_names, new_names = [], []  # to store the old and new names
-        for image_path in get_paths(self.processed_dir, '.jpg'):
-            image_basename = os.path.basename(image_path)  # get the basename
-            file_names.append(image_basename)  # populate the file_names
-            new_names.append(f'{self.species_name} {self.source_name} {image_basename}')  # populate the new names
-        self.batch_rename(self.processed_dir, file_names, new_names)  # rename all images
-        self.create_species_folders(self.processed_dir, set([self.species_name]))  # create species folder
-        return None
-
-    def get_annotations(self, catergory: str = 'stoma', visualize: bool = False, random_color: bool = True) -> None:
-        """Generate ISAT annotations json files"""
-        points_per_side, min_mask_ratio, max_mask_ratio = self.samhq_configs['points_per_side'], self.samhq_configs['min_mask_ratio'], self.samhq_configs['max_mask_ratio']  # get SAN-HQ auto mask configs
-        image_paths = get_paths(self.species_folder_dir, '.jpg')  # get the image paths under the species folder
-        for image_path in tqdm(image_paths, total=len(image_paths)):
-            image, masks = imread_rgb(image_path), []  # load the image in RGB scale
-            try:
-                auto_masks = SAMHQ(image_path=image_path, points_per_side=points_per_side, min_mask_ratio=min_mask_ratio, max_mask_ratio=max_mask_ratio).auto_label()  # get the auto labelled masks
-                masks = SAMHQ.isolate_masks(auto_masks)  # filter redundant masks
-                if visualize:
-                    visual_masks = [mask['segmentation'] for mask in masks]  # get only bool masks
-                    SAMHQ.show_masks(image, visual_masks, random_color=random_color)  # visualize bool masks
-                if len(masks) > 0:
-                    Anything2ISAT.from_samhq(masks, image, image_path, catergory=catergory)  # export the ISAT json file
-            except ValueError:
-                pass
-        return None
-
-
-class Zhu2021(StomataPyData):
-    """
-    Zhu et al., 2021   https://doi.org/10.3389/fpls.2021.716784
-    Dataset source: https://github.com/WeizhenLiuBioinform/stomatal_index/releases/tag/wheat1.0
-
-    Rights and permissions:
-    BSD 3-Clause "New" or "Revised" License (https://github.com/WeizhenLiuBioinform/stomatal_index/blob/master/LICENSE).
-
-    Redistribution and use in source and binary forms, with or without
-    modification, are permitted provided that the following conditions are met:
-
-    1. Redistributions of source code must retain the above copyright notice, this
-    list of conditions and the following disclaimer.
-
-    2. Redistributions in binary form must reproduce the above copyright notice,
-    this list of conditions and the following disclaimer in the documentation
-    and/or other materials provided with the distribution.
-
-    3. Neither the name of the copyright holder nor the names of its
-    contributors may be used to endorse or promote products derived from
-    this software without specific prior written permission.
-
-    Zhu2021
-    ├── Original
-        ├── wheat10x
-            ├── images
-                ├── 10026.jpg
-                ...
-                ├── 12783.jpg
-        ├── wheat20x (ignored, as they are augmented form the the 10x images)
-    ├── Processed
-        ├── T. aestivum
-    ├── source.txt
-    ├── discard.txt
-
-    1. Rename images
-    2. Dsicard unwanted images and their annotations
-    3. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
-    4. Train custom models for auto labeling
-    5. Check every annotation
-    """
-    def __init__(self):
-        super().__init__()
-        self.input_dir = self.zhu2021_dir  # input directory
-        self.processed_dir = self.input_dir.replace('Original', 'Processed')  # output directory
-        self.data_dir = os.path.join(self.input_dir, 'wheat10x')  # data directory
-        self.source_name = 'Zhu2021'  # source name
-        self.species_name = 'T. aestivum'  # plant species name
-        self.species_folder_dir = os.path.join(self.processed_dir, self.species_name)  # get the path of the species folder
-        self.samhq_configs = {'points_per_side': (24,), 'min_mask_ratio': 0.0005, 'max_mask_ratio': 0.02}  # SAM-HQ auto label configuration
-
-    def rename_images(self) -> None:
-        """Copy images to 'Processed' and rename them"""
-        self.ensemble_files(self.data_dir, ['images'], self.processed_dir, ['.jpg'], folder_rename=True)  # move image files to a temporary subfolder
-        # self.discard_files(os.path.join(self.input_dir.replace('//Original', ''), 'discard.txt'), self.processed_dir)  # remove unwanted images
-        file_names = [os.path.basename(path) for path in get_paths(self.processed_dir, '.jpg')]  # get file basenames
-        new_names = [f'{self.species_name} {self.source_name} wheat10x {file_name}' for file_name in file_names]  # get renamings
-        self.batch_rename(self.processed_dir, file_names, new_names)  # rename all images
-        self.create_species_folders(self.processed_dir, set([self.species_name]))  # create species folder
-        return None
-
-    def get_annotations(self, catergory: str = 'stoma', visualize: bool = False, random_color: bool = True) -> None:
-        """Generate ISAT annotations json files"""
-        points_per_side, min_mask_ratio, max_mask_ratio = self.samhq_configs['points_per_side'], self.samhq_configs['min_mask_ratio'], self.samhq_configs['max_mask_ratio']  # get SAN-HQ auto mask configs
-        image_paths = get_paths(self.species_folder_dir, '.jpg')  # get the image paths under the species folder
-        for image_path in tqdm(image_paths, total=len(image_paths)):
-            image, masks = imread_rgb(image_path), []  # load the image in RGB scale
-            try:
-                auto_masks = SAMHQ(image_path=image_path, points_per_side=points_per_side, min_mask_ratio=min_mask_ratio, max_mask_ratio=max_mask_ratio).auto_label(ellipse_threshold=0.2)  # get the auto labelled masks
-                masks = SAMHQ.isolate_masks(auto_masks)  # filter redundant masks
-                if visualize:
-                    visual_masks = [mask['segmentation'] for mask in masks]  # get only bool masks
-                    SAMHQ.show_masks(image, visual_masks, random_color=random_color)  # visualize bool masks
-                if len(masks) > 0:
-                    Anything2ISAT.from_samhq(masks, image, image_path, catergory=catergory)  # export the ISAT json file
-            except ValueError:
-                pass
         return None
 
 
@@ -2927,4 +1972,721 @@ class Liang2022(StomataPyData):
                     Anything2ISAT.from_samhq(masks, image, image_path, catergory=catergory)  # export the ISAT json file
             except ValueError:
                 pass
+        return None
+
+
+class Dey2023(StomataPyData):
+    """
+    Dey et al., 2023   https://doi.org/10.1016/j.ecoinf.2023.102128
+    Dataset source: https://doi.org/10.17632/4brcwhmvyk.4
+
+    Rights and permissions:
+    Creative Commons Attribution 4.0 International License (https://creativecommons.org/licenses/by/4.0/)
+
+    You are free to:
+    Share — copy and redistribute the material in any medium or format for any purpose, even commercially.
+    Adapt — remix, transform, and build upon the material for any purpose, even commercially.
+    The licensor cannot revoke these freedoms as long as you follow the license terms.
+
+    Under the following terms:
+    Attribution — You must give appropriate credit , provide a link to the license, and indicate if changes were made.
+    You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
+    No additional restrictions — You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.
+
+    2023 Dey et al
+    ├── Original
+        ├── Code (ignored)
+        ├── Raw data
+            ├── rawdata
+                ├── Aglaia cucullata
+                    ├── 0118.jpg
+                    ...
+                    ├── 0200.jpg
+                ├── Barringtonia acutangula
+                    ├── Hijol (1).jpg
+                    ...
+                    ├── Hijol (81).jpg
+                ├── Bruguiera gymnorrhiza
+                    ├── Lal_kakra (1).jpg
+                    ...
+                    ├── Lal_kakra (100).jpg
+                ├── Bruguiera sexangula
+                    ├── SK (1).jpg
+                    ...
+                    ├── SK (176).jpg
+                ├── Cerbera manghas
+                    ├── 0002.jpg
+                    ...
+                    ├── vcc.jpg
+                ├── Ceriops decandra
+                    ├── Goran (1).jpg
+                    ...
+                    ├── Goran (101).jpg
+                ├── Excoecaria agallocha
+                    ├── Gewa (1).jpg
+                    ...
+                    ├── Gewa (60).jpg
+                ├── Heritiera fomes
+                    ├── 0001.jpg
+                    ...
+                    ├── 0083.jpg
+                ├── Pongamia pinnata
+                    ├── koroch (1).jpg
+                    ...
+                    ├── koroch (124).jpg
+                ├── Sonneratia apetala
+                    ├── kewra (1).jpg
+                    ...
+                    ├── kewra (52).jpg
+                ├── Xylocarpus moluccensis
+                    ├── pasur (1).jpg
+                    ...
+                    ├── pasur (106).jpg
+            ├── readme.csv
+        ├── Stomatal traits (ignored)
+        ├── Trained models (ignored)
+        ├── Stomata ISO19139 Metadata.xml (ignored)
+    ├── Processed
+        ├── A. cucullata
+        ├── B. acutangula
+        ├── B. gymnorrhiza
+        ├── B. sexangula
+        ├── C. decandra
+        ├── C. manghas
+        ├── E. agallocha
+        ├── P. pinnata
+        ├── S. apetala
+        ├── X. moluccensis
+    ├── source.txt
+    ├── discard.txt
+
+    1. Rename images
+    2. Dsicard unwanted images and their annotations
+    3. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
+    4. Train custom models for auto labeling
+    5. Check every annotation
+    """
+    def __init__(self):
+        super().__init__()
+        self.input_dir = self.dey2023_dir  # input directory
+        self.processed_dir = self.input_dir.replace('Original', 'Processed')  # output directory
+        self.data_dir = os.path.join(self.input_dir, 'Raw data', 'rawdata')  # data directory
+        self.source_name = 'Dey2023'  # source name
+        self.species_names = []  # to store species names
+        self.samhq_configs = {'points_per_side': (24,), 'min_mask_ratio': 0.0005, 'max_mask_ratio': 0.005}  # SAM-HQ auto label configuration
+
+    def rename_images(self) -> None:
+        """Copy images to 'Processed' and rename them"""
+        self.ensemble_files(self.data_dir, os.listdir(self.data_dir), self.processed_dir, image_types, folder_rename=True)  # move image files to 'Processed'
+        self.discard_files(os.path.join(self.input_dir.replace('//Original', ''), 'discard.txt'), self.processed_dir)  # remove unwanted images
+        file_names, new_names = [], []  # to store old and new names
+        for image_path in get_paths(self.processed_dir, '.jpg'):
+            image_basename = os.path.basename(image_path)  # get the image basename
+            file_names.append(image_basename)  # populate file names
+            for species_name in os.listdir(self.data_dir):
+                if species_name in image_path:
+                    species_name = self.abbreviate_species(species_name)  # abbreviate species name
+                    new_names.append(f'{species_name} {self.source_name} {image_basename}')  # populate the new names
+                    self.species_names.append(species_name)  # populate the species names
+        self.batch_rename(self.processed_dir, file_names, new_names)  # rename all images
+        self.create_species_folders(self.processed_dir, set(self.species_names))  # create species folder
+        return None
+
+    def load_xml_bbox(self, xml_file_path: str) -> np.ndarray:
+        """Load bbox of stomata from xml annotation files"""
+        root, bboxes = ET.parse(xml_file_path).getroot(), []  # to store information from xml annotations
+        for obj in root.findall('object'):
+            bbox = obj.find('bndbox')  # get each bbox
+            xmin = int(bbox.find('xmin').text)  # find the xmin
+            ymin = int(bbox.find('ymin').text)  # find the ymin
+            xmax = int(bbox.find('xmax').text)  # find the xmax
+            ymax = int(bbox.find('ymax').text)  # find the ymax
+            bboxes.append((xmin, ymin, xmax, ymax))  # collect bbox to the list
+        return np.array(bboxes)
+
+    def get_annotations(self, catergory: str = 'stoma', visualize: bool = False, random_color: bool = True) -> None:
+        """Generate ISAT annotations json files"""
+        points_per_side, min_mask_ratio, max_mask_ratio = self.samhq_configs['points_per_side'], self.samhq_configs['min_mask_ratio'], self.samhq_configs['max_mask_ratio']  # get SAN-HQ auto mask configs
+        for species_folder in set(os.listdir(self.processed_dir)):
+            image_paths = get_paths(os.path.join(self.processed_dir, species_folder), '.jpg')  # get the image paths under the species folder
+            for image_path in tqdm(image_paths, total=len(image_paths)):
+                image, masks = imread_rgb(image_path), []  # load the image in RGB scale
+                try:
+                    auto_masks = SAMHQ(image_path=image_path, points_per_side=points_per_side, min_mask_ratio=min_mask_ratio, max_mask_ratio=max_mask_ratio).auto_label(ellipse_threshold=0.7)  # get the auto labelled masks
+                    masks = SAMHQ.isolate_masks(auto_masks)  # filter redundant masks
+                    if visualize:
+                        visual_masks = [mask['segmentation'] for mask in masks]  # get only bool masks
+                        SAMHQ.show_masks(image, visual_masks, random_color=random_color)  # visualize bool masks
+                    if len(masks) > 0:
+                        Anything2ISAT.from_samhq(masks, image, image_path, catergory=catergory)  # export the ISAT json file
+                except ValueError:
+                    pass
+        return None
+
+
+class Li2023(StomataPyData):
+    """
+    Li et al., 2023  https://doi.org/10.1049/ipr2.12617
+    Dataset source: https://doi.org/10.5281/zenodo.6302921
+
+    Rights and permissions:
+    Creative Commons Attribution 4.0 International License (https://creativecommons.org/licenses/by/4.0/)
+
+    You are free to:
+    Share — copy and redistribute the material in any medium or format for any purpose, even commercially.
+    Adapt — remix, transform, and build upon the material for any purpose, even commercially.
+    The licensor cannot revoke these freedoms as long as you follow the license terms.
+
+    Under the following terms:
+    Attribution — You must give appropriate credit , provide a link to the license, and indicate if changes were made.
+    You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
+    No additional restrictions — You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.
+
+    2023 Li et al
+    ├── Original
+        ├── bean
+            ├── Capture_1.jpg
+            ...
+            ├── Capture_850.jpg
+        ├── validation dataset
+            ├── ��֤�����·��.txt (ignored)
+            ├── 001.jpg
+            ...
+            ├── 101.jpg
+            ├── ������ȡ�ļ���.bat (ignored)
+        ├── wheat
+            ├── 001.jpg
+            ...
+            ├── 160.jpg
+            ├── ������ȡ�ļ���.bat (ignored)
+            ├── С�����ݼ����·��.txt (ignored)
+    ├── Processed
+        ├── V. faba
+        ├── T. aestivum
+    ├── source.txt
+    ├── discard.txt
+
+    1. Rename images
+    2. Dsicard unwanted images and their annotations
+    3. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
+    4. Train custom models for auto labeling
+    5. Check every annotation
+    """
+    def __init__(self):
+        super().__init__()
+        self.input_dir = self.li2023_dir  # input directory
+        self.processed_dir = self.input_dir.replace('Original', 'Processed')  # output directory
+        self.source_name = 'Li2023'  # source name
+        self.species_names = ['V. faba', 'T. aestivum']  # to store species names
+        self.samhq_configs = {'points_per_side': (24,), 'min_mask_ratio': 0.005, 'max_mask_ratio': 0.05}  # SAM-HQ auto label configuration
+
+    def rename_images(self) -> None:
+        """Copy images to 'Processed' and rename them"""
+        self.ensemble_files(self.input_dir, os.listdir(self.input_dir), self.processed_dir, image_types, folder_rename=True)  # move image files to 'Processed'
+        self.discard_files(os.path.join(self.input_dir.replace('//Original', ''), 'discard.txt'), self.processed_dir)  # remove unwanted images
+        file_names, new_names = [], []  # to store the old and new names
+        for image_path in get_paths(self.processed_dir, '.jpg'):
+            image_basename = os.path.basename(image_path)  # get the basename
+            file_names.append(image_basename)  # populate the file_names
+            if 'bean' in image_path or 'validation dataset' in image_path:
+                new_names.append(f'V. faba {self.source_name} {image_basename}')  # populate the new names
+            elif 'wheat' in image_path:
+                new_names.append(f'T. aestivum {self.source_name} {image_basename}')  # populate the new names
+        self.batch_rename(self.processed_dir, file_names, new_names)  # rename all images
+        self.create_species_folders(self.processed_dir, set(self.species_names))  # create species folder
+        return None
+
+    def get_annotations(self, catergory: str = 'stoma', visualize: bool = False, random_color: bool = True) -> None:
+        """Generate ISAT annotations json files"""
+        points_per_side, min_mask_ratio, max_mask_ratio = self.samhq_configs['points_per_side'], self.samhq_configs['min_mask_ratio'], self.samhq_configs['max_mask_ratio']  # get SAN-HQ auto mask configs
+        for species_folder in set(os.listdir(self.processed_dir)):
+            image_paths = get_paths(os.path.join(self.processed_dir, species_folder), '.jpg')  # get the image paths under the species folder
+            for image_path in tqdm(image_paths, total=len(image_paths)):
+                image, masks = imread_rgb(image_path), []  # load the image in RGB scale
+                try:
+                    auto_masks = SAMHQ(image_path=image_path, points_per_side=points_per_side, min_mask_ratio=min_mask_ratio, max_mask_ratio=max_mask_ratio).auto_label()  # get the auto labelled masks
+                    masks = SAMHQ.isolate_masks(auto_masks)  # filter redundant masks
+                    if visualize:
+                        visual_masks = [mask['segmentation'] for mask in masks]  # get only bool masks
+                        SAMHQ.show_masks(image, visual_masks, random_color=random_color)  # visualize bool masks
+                    if len(masks) > 0:
+                        Anything2ISAT.from_samhq(masks, image, image_path, catergory=catergory)  # export the ISAT json file
+                except ValueError:
+                    pass
+        return None
+
+
+class Meng2023(StomataPyData):
+    """
+    Meng et al., 2023  https://doi.org/10.1007/s00425-023-04231-y
+    Dataset source: Kindly provided by Prof. Yoichiro Hoshino via email: hoshino@fsc.hokudai.ac.jp
+
+    Rights and permissions:
+    Data use rights granted by corresponding authors
+
+    2023 Meng et al
+    ├── Original
+        ├── large photos
+            ├── 0.jpg
+            ...
+            ├── 219.jpg
+        ├── labels_my-project-name_2023-11-01-09-45-08.json (ignored: only 15 images labeled)
+    ├── Processed
+        ├── L. caerulea
+    ├── source.txt
+    ├── discard.txt
+
+    1. Rename images
+    2. Dsicard unwanted images and their annotations
+    3. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
+    4. Train custom models for auto labeling
+    5. Check every annotation
+    """
+    def __init__(self):
+        super().__init__()
+        self.input_dir = self.meng2023_dir  # input directory
+        self.processed_dir = self.input_dir.replace('Original', 'Processed')  # output directory
+        self.source_name = 'Meng2023'  # source name
+        self.species_name = 'L. caerulea'  # to store species name
+        self.samhq_configs = {'points_per_side': (24,), 'min_mask_ratio': 0.0001, 'max_mask_ratio': 0.04}  # SAM-HQ auto label configuration
+
+    def rename_images(self) -> None:
+        """Copy images to 'Processed' and rename them"""
+        self.ensemble_files(self.input_dir, ['large photos'], self.processed_dir, image_types, folder_rename=True)  # move image files to 'Processed'
+        self.discard_files(os.path.join(self.input_dir.replace('//Original', ''), 'discard.txt'), self.processed_dir)  # remove unwanted images
+        file_names, new_names = [], []  # to store the old and new names
+        for image_path in get_paths(self.processed_dir, '.jpg'):
+            image_basename = os.path.basename(image_path)  # get the basename
+            file_names.append(image_basename)  # populate the file_names
+            new_names.append(f'{self.species_name} {self.source_name} {image_basename}')  # populate the new names
+        self.batch_rename(self.processed_dir, file_names, new_names)  # rename all images
+        self.create_species_folders(self.processed_dir, set([self.species_name]))  # create species folder
+        return None
+
+    def get_annotations(self, catergory: str = 'stoma', visualize: bool = False, random_color: bool = True) -> None:
+        """Generate ISAT annotations json files"""
+        points_per_side, min_mask_ratio, max_mask_ratio = self.samhq_configs['points_per_side'], self.samhq_configs['min_mask_ratio'], self.samhq_configs['max_mask_ratio']  # get SAN-HQ auto mask configs
+        image_paths = get_paths(os.path.join(self.processed_dir, self.species_name), '.jpg')  # get the image paths under the species folder
+        for image_path in tqdm(image_paths, total=len(image_paths)):
+            image, masks = imread_rgb(image_path), []  # load the image in RGB scale
+            try:
+                auto_masks = SAMHQ(image_path=image_path, points_per_side=points_per_side, min_mask_ratio=min_mask_ratio, max_mask_ratio=max_mask_ratio).auto_label()  # get the auto labelled masks
+                masks = SAMHQ.isolate_masks(auto_masks)  # filter redundant masks
+                if visualize:
+                    visual_masks = [mask['segmentation'] for mask in masks]  # get only bool masks
+                    SAMHQ.show_masks(image, visual_masks, random_color=random_color)  # visualize bool masks
+                if len(masks) > 0:
+                    Anything2ISAT.from_samhq(masks, image, image_path, catergory=catergory)  # export the ISAT json file
+            except ValueError:
+                pass
+        return None
+
+
+class Pathoumthong2023(StomataPyData):
+    """
+    Pathoumthong et al., 2023  https://doi.org/10.1186/s13007-023-01016-y
+    Dataset source: https://github.com/rapidmethodstomata/rapidmethodstomata
+
+    Rights and permissions:
+    Creative Commons Attribution 4.0 International License (https://creativecommons.org/licenses/by/4.0/)
+
+    You are free to:
+    Share — copy and redistribute the material in any medium or format for any purpose, even commercially.
+    Adapt — remix, transform, and build upon the material for any purpose, even commercially.
+    The licensor cannot revoke these freedoms as long as you follow the license terms.
+
+    Under the following terms:
+    Attribution — You must give appropriate credit , provide a link to the license, and indicate if changes were made.
+    You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
+    No additional restrictions — You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.
+
+    2023 Pathoumthong et al
+    ├── Original
+        ├── Arabidopsis (ignored: no images)
+        ├── Rice (ignored: no images)
+        ├── Tomato (ignored: no images)
+        ├── Wheat
+            ├── WheatAnalysedImages (ignored: no images)
+            ├── WheatImages
+                ── Wheat_Scepter_2_8_W_Ad_X400_20210923.jpg
+                ...
+                ├── Wheat_Scepter_4_10_W_Ad_X400_20210923.jpg
+            ├── WheatSegmentedImages
+                ├── J1-7_M_Rep1_P3.jpg-part1.jpg
+                ├── J1-7_M_Rep1_P3.jpg-part1.txt
+                ...
+                ├── J6_stb_IPO89011_Rep5.jpg-part4.jpg
+                ├── J6_stb_IPO89011_Rep5.jpg-part4.txt
+            ├── Bounding box extraction (ignored)
+            ├── Wheat Detection (100×) (ignored)
+            ├── Wheat Detection (200×) (ignored)
+            ├── Wheat Detection (400×) (ignored)
+            ├── Wheat Measurement (400×) (ignored)
+            ├── Wheat_detection_100x.pt (ignored)
+            ├── Wheat_detection_200x.pt.pt (ignored)
+            ├── Wheat_detection_400x.pt.pt (ignored)
+            ├── Wheat_measurement.pth (ignored)
+    ├── Processed
+        ├── T. aestivum
+    ├── source.txt
+    ├── discard.txt
+
+    1. Rename images
+    2. Dsicard unwanted images and their annotations
+    3. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
+    4. Train custom models for auto labeling
+    5. Check every annotation
+    """
+    def __init__(self):
+        super().__init__()
+        self.input_dir = self.pathoumthong2023_dir  # input directory
+        self.processed_dir = self.input_dir.replace('Original', 'Processed')  # output directory
+        self.data_dir = os.path.join(self.input_dir, 'Wheat')  # data directory
+        self.source_name = 'Pathoumthong2023'  # source name
+        self.species_name = 'T. aestivum'  # to store species name
+        self.species_folder_dir = os.path.join(self.processed_dir, self.species_name)  # get the path of the species folder
+        self.samhq_configs = {'points_per_side': (24,), 'min_mask_ratio': 0.0001, 'max_mask_ratio': 0.04}  # SAM-HQ auto label configuration
+
+    def rename_images(self) -> None:
+        """Copy images to 'Processed' and rename them"""
+        self.ensemble_files(self.data_dir, ['WheatImages', 'WheatSegmentedImages'], self.processed_dir, ['.jpg', '.txt'], folder_rename=True)  # move image files to 'Processed'
+        self.discard_files(os.path.join(self.input_dir.replace('//Original', ''), 'discard.txt'), self.processed_dir)  # remove unwanted images
+        file_names, new_names = [], []  # to store the old and new names
+        for file_path in get_paths(self.processed_dir, '.jpg') + get_paths(self.processed_dir, '.txt'):
+            file_basename = os.path.basename(file_path)  # get the basename
+            file_names.append(file_basename)  # populate the file_names
+            new_names.append(f'{self.species_name} {self.source_name} {file_basename}')  # populate the new names
+        self.batch_rename(self.processed_dir, file_names, new_names)  # rename all images
+        self.create_species_folders(self.processed_dir, set([self.species_name]))  # create species folder
+        return None
+
+    def get_annotations(self, bbbox_prompt: bool = True, catergory: str = 'stoma', visualize: bool = False, random_color: bool = True) -> None:
+        """Generate ISAT annotations json files"""
+        points_per_side, min_mask_ratio, max_mask_ratio = self.samhq_configs['points_per_side'], self.samhq_configs['min_mask_ratio'], self.samhq_configs['max_mask_ratio']  # get SAN-HQ auto mask configs
+        image_paths = get_paths(self.species_folder_dir, '.jpg')  # get the image paths under the species folder
+        for image_path in tqdm(image_paths, total=len(image_paths)):
+            image, masks = imread_rgb(image_path), []  # load the image in RGB scale
+            try:
+                auto_masks = SAMHQ(image_path=image_path, points_per_side=points_per_side, min_mask_ratio=min_mask_ratio, max_mask_ratio=max_mask_ratio).auto_label()  # get the auto labelled masks
+                if bbbox_prompt and os.path.exists(image_path.replace('.jpg', '.txt')):
+                    isat_bboxes = []  # to store bboxes
+                    with open(image_path.replace('.jpg', '.txt'), 'r', encoding='utf-8') as file:
+                        for line in file:
+                            parts = line.strip().split()  # split the line
+                            isat_bboxes.append(UtilsISAT.bbox_convert(tuple(map(float, parts[1:5])), 'YOLO2ISAT', image.shape))  # to [x_min, y_min, x_max, y_max]
+                    if len(isat_bboxes) > 0:
+                        prompt_masks = SAMHQ(image_path=image_path).prompt_label(input_box=isat_bboxes, mode='multiple')  # get the bbox prompt masks
+                        masks = SAMHQ.isolate_masks(prompt_masks + auto_masks)  # filter redundant masks
+                else:
+                    masks = SAMHQ.isolate_masks(auto_masks)  # filter redundant masks
+                if visualize:
+                    visual_masks = [mask['segmentation'] for mask in masks]  # get only bool masks
+                    SAMHQ.show_masks(image, visual_masks, random_color=random_color)  # visualize bool masks
+                if len(masks) > 0:
+                    Anything2ISAT.from_samhq(masks, image, image_path, catergory=catergory)  # export the ISAT json file
+            except ValueError:
+                pass
+        return None
+
+
+class Sun2023(StomataPyData):
+    """
+    Sun et al., 2023  https://doi.org/10.1016/j.compag.2023.108120
+    Dataset source: Kindly provided by the PhD student of Prof. Dong Jiang, Zhuangzhuang Sun via email: jiangd@njau.edu.cn
+
+    Rights and permissions:
+    Data use rights granted by corresponding authors
+
+    2023 Sun et al
+    ├── Original
+        ├── stomata
+            ├── 0001.jpg
+            ├── 0001.xml
+            ...
+            ├── 02190.jpg
+            ├── 02190.xml
+    ├── Processed
+        ├── T. aestivum
+    ├── source.txt
+    ├── discard.txt
+
+    1. Rename images
+    2. Dsicard unwanted images and their annotations
+    3. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
+    4. Train custom models for auto labeling
+    5. Check every annotation
+    """
+    def __init__(self):
+        super().__init__()
+        self.input_dir = self.sun2023_dir  # directory of Sun2023  # input directory
+        self.processed_dir = self.input_dir.replace('Original', 'Processed')  # output directory
+        self.source_name = 'Sun2023'  # source name
+        self.species_name = 'T. aestivum'  # to store species name
+        self.species_folder_dir = os.path.join(self.processed_dir, self.species_name)  # get the path of the species folder
+        self.samhq_configs = {'points_per_side': (24,), 'min_mask_ratio': 0.001, 'max_mask_ratio': 0.04}  # SAM-HQ auto label configuration
+
+    def rename_images(self) -> None:
+        """Copy images to 'Processed' and rename them"""
+        self.ensemble_files(self.input_dir, ['stomata'], self.processed_dir, ['.jpg', '.xml'], folder_rename=True)  # move image files to 'Processed'
+        self.discard_files(os.path.join(self.input_dir.replace('//Original', ''), 'discard.txt'), self.processed_dir)  # remove unwanted images
+        for xml_path in get_paths(self.processed_dir, '.xml'):
+            if not os.path.exists(xml_path.replace('.xml', '.jpg')):
+                os.remove(xml_path)  # remove unwanted xml files
+        file_names, new_names = [], []  # to store the old and new names
+        for file_path in get_paths(self.processed_dir, '.jpg') + get_paths(self.processed_dir, '.xml'):
+            file_basename = os.path.basename(file_path)  # get the basename
+            file_names.append(file_basename)  # populate the file_names
+            new_names.append(f'{self.species_name} {self.source_name} {file_basename}')  # populate the new names
+        self.batch_rename(self.processed_dir, file_names, new_names)  # rename all images
+        self.create_species_folders(self.processed_dir, set([self.species_name]))  # create species folder
+        return None
+
+    def load_xml_bbox(self, xml_file_path: str) -> np.ndarray:
+        """Load bbox of stomata from xml annotation files"""
+        root, bboxes = ET.parse(xml_file_path).getroot(), []  # to store information from xml annotations
+        for obj in root.findall('object'):
+            bbox = obj.find('bndbox')  # get each bbox
+            xmin = int(bbox.find('xmin').text)  # find the xmin
+            ymin = int(bbox.find('ymin').text)  # find the ymin
+            xmax = int(bbox.find('xmax').text)  # find the xmax
+            ymax = int(bbox.find('ymax').text)  # find the ymax
+            bboxes.append((xmin, ymin, xmax, ymax))  # collect bbox to the list
+        return np.array(bboxes)
+
+    def get_annotations(self, bbbox_prompt: bool = True, catergory: str = 'stoma', visualize: bool = False, random_color: bool = True) -> None:
+        """Generate ISAT annotations json files"""
+        points_per_side, min_mask_ratio, max_mask_ratio = self.samhq_configs['points_per_side'], self.samhq_configs['min_mask_ratio'], self.samhq_configs['max_mask_ratio']  # get SAN-HQ auto mask configs
+        image_paths = get_paths(self.species_folder_dir, '.jpg')  # get the image paths under the species folder
+        for image_path in tqdm(image_paths, total=len(image_paths)):
+            image, masks = imread_rgb(image_path), []  # load the image in RGB scale
+            xml_path = image_path.replace('.jpg', '.xml')  # the corresponding xml annotation file path
+            try:
+                auto_masks = SAMHQ(image_path=image_path, points_per_side=points_per_side, min_mask_ratio=min_mask_ratio, max_mask_ratio=max_mask_ratio).auto_label()  # get the auto labelled masks
+                if bbbox_prompt and os.path.exists(xml_path):
+                    isat_bboxes = self.load_xml_bbox(xml_path)  # try to get the bboxes
+                    if len(isat_bboxes) > 0:
+                        prompt_masks = SAMHQ(image_path=image_path).prompt_label(input_box=isat_bboxes, mode='multiple')  # get the bbox prompt masks
+                        masks = SAMHQ.isolate_masks(prompt_masks + auto_masks)  # filter redundant masks
+                else:
+                    masks = SAMHQ.isolate_masks(auto_masks)  # filter redundant masks
+                if visualize:
+                    visual_masks = [mask['segmentation'] for mask in masks]  # get only bool masks
+                    SAMHQ.show_masks(image, visual_masks, random_color=random_color)  # visualize bool masks
+                if len(masks) > 0:
+                    Anything2ISAT.from_samhq(masks, image, image_path, catergory=catergory)  # export the ISAT json file
+            except ValueError:
+                pass
+        return None
+
+
+class Takagi2023(StomataPyData):
+    """
+    Takagi et al., 2023  https://doi.org/10.1093/pcp/pcad018
+    Dataset source: https://doi.org/10.5281/zenodo.7549842
+
+    Rights and permissions:
+    Creative Commons Attribution 4.0 International License (https://creativecommons.org/licenses/by/4.0/)
+
+    You are free to:
+    Share — copy and redistribute the material in any medium or format for any purpose, even commercially.
+    Adapt — remix, transform, and build upon the material for any purpose, even commercially.
+    The licensor cannot revoke these freedoms as long as you follow the license terms.
+
+    Under the following terms:
+    Attribution — You must give appropriate credit , provide a link to the license, and indicate if changes were made.
+    You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
+    No additional restrictions — You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.
+
+    2023 Takagi et al
+    ├── Original
+        ├── microscope_test_images
+            ├── 20190507_Disk_Dark_DMSO_18.jpg
+            ...
+            ├── 20190507_Disk_Light_DMSO_10.jpg
+        ├── test_images_with_mask (ignored)
+        ├── 221121_micro_seg.onnx (ignored)
+        ├── 221121_micro_yolox_s1920.onnx (ignored)
+        ├── readme.txt (ignored)
+    ├── Processed
+        ├── A. thaliana
+    ├── source.txt
+    ├── discard.txt
+
+    1. Rename images
+    2. Dsicard unwanted images and their annotations
+    3. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
+    4. Train custom models for auto labeling
+    5. Check every annotation
+    """
+    def __init__(self):
+        super().__init__()
+        self.input_dir = self.takagi2023_dir  # directory of Sun2023  # input directory
+        self.processed_dir = self.input_dir.replace('Original', 'Processed')  # output directory
+        self.source_name = 'Takagi2023'  # source name
+        self.species_name = 'A. thaliana'  # to store species name
+        self.species_folder_dir = os.path.join(self.processed_dir, self.species_name)  # get the path of the species folder
+        self.samhq_configs = {'points_per_side': (24,), 'min_mask_ratio': 0.0001, 'max_mask_ratio': 0.01}  # SAM-HQ auto label configuration
+
+    def rename_images(self) -> None:
+        """Copy images to 'Processed' and rename them"""
+        self.ensemble_files(self.input_dir, ['microscope_test_images'], self.processed_dir, image_types, folder_rename=True)  # move image files to 'Processed'
+        self.discard_files(os.path.join(self.input_dir.replace('//Original', ''), 'discard.txt'), self.processed_dir)  # remove unwanted images
+        file_names, new_names = [], []  # to store the old and new names
+        for file_path in get_paths(self.processed_dir, '.jpg'):
+            file_basename = os.path.basename(file_path)  # get the basename
+            file_names.append(file_basename)  # populate the file_names
+            new_names.append(f'{self.species_name} {self.source_name} {file_basename}')  # populate the new names
+        self.batch_rename(self.processed_dir, file_names, new_names)  # rename all images
+        self.create_species_folders(self.processed_dir, set([self.species_name]))  # create species folder
+        return None
+
+    def get_annotations(self, catergory: str = 'stoma', visualize: bool = False, random_color: bool = True) -> None:
+        """Generate ISAT annotations json files"""
+        points_per_side, min_mask_ratio, max_mask_ratio = self.samhq_configs['points_per_side'], self.samhq_configs['min_mask_ratio'], self.samhq_configs['max_mask_ratio']  # get SAN-HQ auto mask configs
+        image_paths = get_paths(self.species_folder_dir, '.jpg')  # get the image paths under the species folder
+        for image_path in tqdm(image_paths, total=len(image_paths)):
+            image, masks = imread_rgb(image_path), []  # load the image in RGB scale
+            try:
+                auto_masks = SAMHQ(image_path=image_path, points_per_side=points_per_side, min_mask_ratio=min_mask_ratio, max_mask_ratio=max_mask_ratio).auto_label()  # get the auto labelled masks
+                masks = SAMHQ.isolate_masks(auto_masks)  # filter redundant masks
+                if visualize:
+                    visual_masks = [mask['segmentation'] for mask in masks]  # get only bool masks
+                    SAMHQ.show_masks(image, visual_masks, random_color=random_color)  # visualize bool masks
+                if len(masks) > 0:
+                    Anything2ISAT.from_samhq(masks, image, image_path, catergory=catergory)  # export the ISAT json file
+            except ValueError:
+                pass
+        return None
+
+
+class WangRenninger2023(StomataPyData):
+    """
+    Wang and Renninger, 2023
+    Dataset source: https://doi.org/10.5281/zenodo.8271253
+
+    Rights and permissions:
+    Creative Commons Attribution 4.0 International License (https://creativecommons.org/licenses/by/4.0/)
+
+    You are free to:
+    Share — copy and redistribute the material in any medium or format for any purpose, even commercially.
+    Adapt — remix, transform, and build upon the material for any purpose, even commercially.
+    The licensor cannot revoke these freedoms as long as you follow the license terms.
+
+    Under the following terms:
+    Attribution — You must give appropriate credit , provide a link to the license, and indicate if changes were made.
+    You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
+    No additional restrictions — You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.
+
+    2023 Wang and Renninger
+    ├── Original
+        ├── Labeled Stomatal Images
+            ├── STMHD0001.jpg
+            ├── STMHD0001.txt
+            ...
+            ├── STMPP3487.jpg
+            ├── STMPP3487.txt
+        ├── Labeled Stomatal Images.csv
+    ├── Processed
+        ├── A. rubrum
+        ├── D. palustris
+        ├── Fraxinus spp
+        ├── I. opaca
+        ├── Populus spp
+        ├── Q. michauxii
+        ├── Q. nigra
+        ├── Q. pagoda
+        ├── Q. phellos
+        ├── Q. shumardii
+        ├── Q. stellata
+        ├── Q. texana
+        ├── U. alata
+        ├── U. americana
+        ├── V. stamineum
+    ├── source.txt
+    ├── discard.txt
+
+    The annoation txt files are all in YOLO objection detection format {class, x_center, y_center, width, height} (checked):
+        For example:
+            0 0.025423 0.029762 0.047612 0.053822
+            1 0.325424 0.056191 0.077794 0.043736
+    where the class code is {0: 'stomata', 1: 'whole_stomata'} meaning {0: 'outer ledge', 1: 'stomata'}
+
+    1. Rename images
+    2. Dsicard unwanted / corrupt images and their annotations
+    3. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
+    4. Train custom models for auto labeling
+    5. Check every annotation
+    """
+    def __init__(self):
+        super().__init__()
+        self.input_dir = self.wangrenninger2023_dir  # input directory
+        self.processed_dir = self.input_dir.replace('Original', 'Processed')  # output directory
+        self.csv_path = os.path.join(self.input_dir, 'Labeled Stomatal Images.csv')  # CSV file path
+        self.images_dir = os.path.join(self.input_dir, 'Labeled Stomatal Images')  # images and txt annotations files paths
+        self.source_name = 'WangRenninger2023'  # source name
+        self.class_code_name = {0: 'outer ledge', 1: 'stomata'}  # class code name mapping
+        self.corrupt_files = ['STMPP0369.jpg', 'STMPP0387.jpg', 'STMPP0493.jpg',
+                              'STMPP0512.jpg', 'STMPP0604.jpg', 'STMPP0880.jpg',
+                              'STMPP1029.jpg', 'STMPP1093.jpg', 'STMPP2055.jpg',
+                              'STMPP2981.jpg']  # corrupt files
+        self.samhq_configs = {'points_per_side': (24,), 'min_mask_ratio': 0.0001, 'max_mask_ratio': 0.04}  # SAM-HQ auto label configuration
+
+    def get_taxonomy(self) -> dict:
+        """Get the image file name and plant species from CSV file"""
+        dataframe = pd.read_csv(self.csv_path)  # load the dataframe from the CSV file
+        file_names = dataframe['FileName'].tolist()  # get file names
+        species_names = dataframe['ScientificName'].tolist()  # get full species names
+        species_names = [self.abbreviate_species(species_name) for species_name in species_names]  # abbreviate the species names
+        return dict(zip(file_names, species_names))
+
+    def rename_images(self) -> None:
+        """Copy images and txt files to 'Processed' and rename them"""
+        self.ensemble_files(self.input_dir, ['Labeled Stomatal Images'], self.processed_dir, image_types + ['.txt'], folder_rename=True)  # move files to 'Processed'
+        for corrupt_file in self.corrupt_files:
+            os.remove(os.path.join(self.processed_dir, f"Labeled Stomatal Images {corrupt_file}"))  # remov the corrupt image
+            os.remove(os.path.join(self.processed_dir, f"Labeled Stomatal Images {corrupt_file}".replace('.jpg', '.txt')))  # and their annotations
+        self.discard_files(os.path.join(self.input_dir.replace('//Original', ''), 'discard.txt'), self.processed_dir)  # remove unwanted images
+        for txt_path in get_paths(self.processed_dir, '.txt'):
+            if not os.path.exists(txt_path.replace('.txt', '.jpg')):
+                os.remove(txt_path)
+        species_dictionary = self.get_taxonomy()  # get the dictionary of species names and file names
+        new_names, species_names = [], []  # the store new names and species names
+        file_names = [os.path.basename(path) for path in get_paths(self.processed_dir, '.jpg') + get_paths(self.processed_dir, '.txt')]
+        for file_name in file_names:
+            raw_name = os.path.splitext(file_name)[0].replace('Labeled Stomatal Images ', '')  # get the file name without extension
+            species_name = species_dictionary.get(raw_name, 'Unknown')  # get the corresponding species name
+            new_names.append(f'{species_name} {self.source_name} {file_name}')  # get the image renaming
+            species_names.append(species_name)
+        self.batch_rename(self.processed_dir, file_names, new_names)  # rename
+        self.create_species_folders(self.processed_dir, set(species_names))  # group files by plant species
+        return None
+
+    def get_annotations(self, species_list: list, bbbox_prompt: bool = True, catergory: str = 'stoma', visualize: bool = False, random_color: bool = True) -> None:
+        """Generate ISAT annotations json files"""
+        points_per_side, min_mask_ratio, max_mask_ratio = self.samhq_configs['points_per_side'], self.samhq_configs['min_mask_ratio'], self.samhq_configs['max_mask_ratio']  # get SAN-HQ auto mask configs
+        for species in species_list:
+            species_folder_dir = os.path.join(self.processed_dir, species)  # the species folder directory
+            image_paths = get_paths(species_folder_dir, '.jpg')  # get the image paths under the species folder
+            for image_path in tqdm(image_paths, total=len(image_paths)):
+                image, masks = imread_rgb(image_path), []  # load the image in RGB scale
+                try:
+                    auto_masks = SAMHQ(image_path=image_path, points_per_side=points_per_side, min_mask_ratio=min_mask_ratio, max_mask_ratio=max_mask_ratio).auto_label()  # get the auto labelled masks
+                    if bbbox_prompt and os.path.exists(image_path.replace('.jpg', '.txt')):
+                        isat_bboxes = []  # to store bboxes
+                        with open(image_path.replace('.jpg', '.txt'), 'r', encoding='utf-8') as file:
+                            for line in file:
+                                parts = line.strip().split()  # split the line
+                                isat_bboxes.append(UtilsISAT.bbox_convert(tuple(map(float, parts[1:5])), 'YOLO2ISAT', image.shape))  # to [x_min, y_min, x_max, y_max]
+                        if len(isat_bboxes) > 0:
+                            prompt_masks = SAMHQ(image_path=image_path).prompt_label(input_box=isat_bboxes, mode='multiple')  # get the bbox prompt masks
+                            masks = SAMHQ.isolate_masks(prompt_masks + auto_masks)  # filter redundant masks
+                    else:
+                        masks = SAMHQ.isolate_masks(auto_masks)  # filter redundant masks
+                    if visualize:
+                        visual_masks = [mask['segmentation'] for mask in masks]  # get only bool masks
+                        SAMHQ.show_masks(image, visual_masks, random_color=random_color)  # visualize bool masks
+                    if len(masks) > 0:
+                        Anything2ISAT.from_samhq(masks, image, image_path, catergory=catergory)  # export the ISAT json file
+                except ValueError:
+                    pass
         return None
