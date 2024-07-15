@@ -5,7 +5,7 @@ import os  # interact with the operating system
 import shutil  # for copying files
 import json  # manipulate json files
 import random  # for random sampling
-from typing import Literal, Tuple  # to support type hints
+from typing import Literal  # to support type hints
 import numpy as np  # NumPy
 from PIL import Image  # Pillow image processing
 from tqdm import tqdm  # progress bar
@@ -49,33 +49,6 @@ class Data4Training:
         valid_aims = ['semantic segmentation', 'object detection', 'instance segmentation']
         assert self.aim in valid_aims, f'Invalid aim value. Must be one of {valid_aims}'
 
-    @staticmethod
-    def calculate_optimal_slicing(slice_width: int, slice_height: int, overlap_ratio: float, num_width_slices: int, num_height_slices: int) -> Tuple[int, int]:
-        """
-        Calculate the minimum image dimensions required to fit a specified number of slices with overlaps.
-
-        Parameters:
-        - slice_width (int): the width of each slice in pixels
-        - slice_height (int): the height of each slice in pixels
-        - overlap_ratio (float): the ratio of overlap between slices (e.g., 0.2 for 20% overlap)
-        - num_width_slices (int): the desired number of slices along the width of the image
-        - num_height_slices (int): the desired number of slices along the height of the image
-
-        Returns:
-        - target_image_dimensions (tuple): a tuple containing the calculated minimum image width and height in pixels to accommodate the slices.
-        """
-        overlap_width, overlap_height = int(slice_width * overlap_ratio), int(slice_height * overlap_ratio)  # calculate the overlap in pixels
-        effective_width, effective_height = slice_width - overlap_width, slice_height - overlap_height  # calculate the non-overlapping effective area of each slice
-        if num_width_slices > 1:
-            image_width = slice_width + (num_width_slices - 1) * effective_width  # calculate the minimum dimensions of the image to fit the desired number of slices
-        else:
-            image_width = slice_width
-        if num_height_slices > 1:
-            image_height = slice_height + (num_height_slices - 1) * effective_height  # same for the height
-        else:
-            image_height = slice_height
-        return (image_width, image_height)  # f(1280, 1024, 0.2, 4, 2) = (4352, 1844)
-
     def get_padded_bbox(self, bbox: list, image_width: int, image_height: int, padding=9) -> list:
         """Padding bbox for cropping image"""
         xmin, ymin, width, height = bbox  # MSCOCO format
@@ -94,7 +67,7 @@ class Data4Training:
         images = coco_data['images']  # get 'images', e.g. {'license': None, 'url': None, 'file_name': 'xxx.png', 'height': 1920, 'width': 2560, 'date_captured': None, 'id': 0}
         color_mapping = {'pavement cell': Cell_Colors[5].mask_rgb, 'stomatal complex': Cell_Colors[1].mask_rgb, 'stoma': Cell_Colors[2].mask_rgb,
                          'outer ledge': Cell_Colors[3].mask_rgb, 'pore': Cell_Colors[4].mask_rgb}  # mapping segmentation classes with assigned colors
-        palette = [seg_color.mask_rgb for seg_color in Cell_Colors]  # the one-hot color mapping
+
         os.makedirs(os.path.join(input_dir, 'images'), exist_ok=True); os.makedirs(os.path.join(input_dir, 'labels'), exist_ok=True)  # noqa: create folders for images and labels
         for image in tqdm(images, total=len(images)):
             mask = np.zeros((image['height'], image['width'], 3), dtype=np.uint8)  # create empty black mask
@@ -133,9 +106,9 @@ class Data4Training:
                     cropped_mask_onehot[np.all(cropped_mask == np.array(seg_color.mask_rgb), axis=-1)] = seg_color.class_encoding  # RGB to one-hot encoding
                 cropped_mask_onehot = Image.fromarray(cropped_mask_onehot)  # convert the numpy array back to a PIL imag
                 output_name = f"{os.path.splitext(image_name)[0]} object id {annotation['id']}.png"  # names for output
-                # palette = []  # palette for visualization
-                # for idx in np.unique(cropped_mask_onehot).tolist():
-                #     palette.extend(Cell_Colors[idx].mask_rgb)
+                palette = []  # palette for visualization
+                for idx in np.unique(cropped_mask_onehot).tolist():
+                    palette.extend(Cell_Colors[idx].mask_rgb)
                 cropped_mask_onehot.putpalette(np.array(palette, dtype=np.uint8))  # for visualize mask
                 cropped_image.save(os.path.join(input_dir, 'images', output_name))  # save cropped image
                 cropped_mask_onehot.save(os.path.join(input_dir, 'labels', output_name))  # save cropped mask
@@ -236,8 +209,6 @@ class Data4Training:
         elif self.aim == 'semantic segmentation':
             if self.remove_pore:
                 UtilsISAT.select_class(input_copy_dir, category='pore', action='remove')  # remove all 'pore' annotations
-            if if_resize_isat:
-                UtilsISAT.resize_isat(input_copy_dir, new_width=self.new_width, new_height=self.new_height, if_keep_ratio=True)  # resize images and annotations
             output_name = 'Stomata_segmentation'  # for semantic segmentation
 
         output_dir = os.path.join(os.path.split(input_copy_dir)[0], output_name)  # COCO json output dir
@@ -245,7 +216,7 @@ class Data4Training:
         UtilsISAT.data_split(input_copy_dir, output_dir, r_train=self.r_train)  # split train and val
         for directory in [train_dir, val_dir]:
             ISAT2Anything.to_coco(directory, output_dir=os.path.join(directory, 'COCO.json'))  # convert train/val ISAT json files to COCO
-            if self.use_sahi and self.aim != 'semantic segmentation':
+            if self.use_sahi:
                 output_dir = f'{directory}_sahi'  # the output_dir
                 slice_coco(
                     coco_annotation_file_path=os.path.join(directory, 'COCO.json'),
@@ -258,8 +229,8 @@ class Data4Training:
                     overlap_width_ratio=self.sahi_overlap_ratio,
                     min_area_ratio=0.2
                 )  # slice the MSCOCO images and annotations
-                shutil.rmtree(directory)  # remove the orginal COCO directory
-                self.remove_black_images(coco_json_path=os.path.join(output_dir, 'sahi_coco.json'), coco_images_dir=output_dir, threshold=0.5)  # filter out images contain mostlt black pixels
+            shutil.rmtree(directory)  # remove the orginal COCO directory
+            self.remove_black_images(coco_json_path=os.path.join(output_dir, 'sahi_coco.json'), coco_images_dir=output_dir, threshold=0.5)  # filter out images contain mostlt black pixels
         if self.remove_copy:
             shutil.rmtree(input_copy_dir)  # remove copied foder
 
