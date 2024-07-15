@@ -2,12 +2,13 @@
 
 # pylint: disable=line-too-long, multiple-statements, c-extension-no-member, relative-beyond-top-level, wildcard-import
 import os  # interact with the operating system
+import time  # waiting for file to be closed if necessary
 import shutil  # for copying files
 import json  # manipulate json files
 import random  # for random sampling
 from typing import Literal, Tuple  # to support type hints
 import numpy as np  # NumPy
-from PIL import Image  # Pillow image processing
+from PIL import Image, ImageFile; ImageFile.LOAD_TRUNCATED_IMAGES = True  # noqa: Pillow image processing
 from tqdm import tqdm  # progress bar
 import torch  # PyTorch
 from sahi.slicing import slice_coco  # slice COCO dataset images and annotations into grids
@@ -182,31 +183,41 @@ class Data4Training:
         """
 
         def check_black_pixels(image_path: str, threshold: float = 0.5) -> bool:
-            """Helper function to check the ratio of black pixels in an image."""
+            """Helper function to check the ratio of black pixels in an image"""
             with Image.open(image_path) as image:
                 image = np.array(image)  # load the image
                 black_pixels = np.all(image == 0, axis=-1)  # compute the number of black pixels
-                black_ratio = np.sum(black_pixels) / black_pixels.size  # computer the black pixels ratio
-                return black_ratio > threshold
+                black_ratio = np.sum(black_pixels) / black_pixels.size  # compute the black pixels ratio
+            return black_ratio > threshold
+
+        def safe_remove(image_path):
+            """Attempt to remove the file with retries."""
+            for _ in range(5):  # retry up to 5 times
+                try:
+                    os.remove(image_path)  # remove the file
+                    # print(f"Successfully deleted {image_path}")
+                    return
+                except PermissionError:
+                    # print(f"Permission error deleting {image_path}:, retrying...")
+                    time.sleep(1)  # wait a bit for the file to be released
+            print(f'Failed to delete {image_path} after several attempts')
 
         with open(coco_json_path, 'r', encoding='utf-8') as file:
             coco_data = json.load(file)  # load the COCO.json file
 
-        images_to_keep, annotations_to_keep, images_to_remove = [], [], []  # to store the final annotations set
+        images_to_keep, annotations_to_keep = [], []  # to store the final annotations set
+        annotations_map = {ann['image_id']: [] for ann in coco_data['annotations']}
+        for ann in coco_data['annotations']:
+            annotations_map[ann['image_id']].append(ann)
 
         for image in coco_data['images']:
             image_path = os.path.join(coco_images_dir, image['file_name'])  # get the image path from COCO.json
             if os.path.exists(image_path):
                 if check_black_pixels(image_path, threshold):
-                    images_to_remove.append(image_path)  # remove images where black pixels > threshold
+                    safe_remove(image_path)  # remove images where black pixels > threshold using safe remove
                 else:
                     images_to_keep.append(image)  # keep the other images
-                    for annotation in coco_data['annotations']:
-                        if annotation['image_id'] == image['id']:
-                            annotations_to_keep.append(annotation)   # collect annotations for the images to keep
-
-        for image_path in images_to_remove:
-            os.remove(image_path)  # remove mostly black images
+                    annotations_to_keep.extend(annotations_map.get(image['id'], []))
 
         new_coco_data = {
             'images': images_to_keep,
