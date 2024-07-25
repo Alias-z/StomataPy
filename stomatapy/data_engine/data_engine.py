@@ -1254,8 +1254,8 @@ class Li2022(StomataPyData):
     ├── source.txt
     ├── discard.txt
 
-    1. Rename images
-    2. Dsicard unwanted images and their annotations
+    1. Unfiy file structures
+    2. Resize F5_ABC_ground_truth from 696 x 520 back to 1392 x 1040
     3. Convert segmentation masks to ISAT with watershed
     4. Check every annotation
     """
@@ -1312,6 +1312,11 @@ class Li2022(StomataPyData):
         for subfolder in os.listdir(self.processed_dir):
             mask_folder_dir = os.path.join(self.processed_dir, subfolder, 'label')  # the directory containing the segmentation masks
             mask_paths = get_paths(mask_folder_dir, '.png')  # get the paths of all the masks
+            if subfolder == 'F5_ABC':
+                for mask_path in mask_paths:
+                    with Image.open(mask_path) as image:
+                        resized_img = image.resize((1392, 1040), Image.ANTIALIAS)  # resize F5_ABC_ground_truth from 696 x 520 back to 1392 x 1040
+                        resized_img.save(mask_path)  # save change in position
             for mask_path in tqdm(mask_paths, total=len(mask_paths)):
                 label_image = imread_rgb(mask_path)  # load the original mask
                 masks = self.label2mask(mask_path)  # convert the orginal mask to bool masks
