@@ -1315,7 +1315,7 @@ class Li2022(StomataPyData):
             if subfolder == 'F5_ABC':
                 for mask_path in mask_paths:
                     with Image.open(mask_path) as image:
-                        resized_img = image.resize((1392, 1040), Image.ANTIALIAS)  # resize F5_ABC_ground_truth from 696 x 520 back to 1392 x 1040
+                        resized_img = image.resize((1392, 1040), Image.LANCZOS)  # resize F5_ABC_ground_truth from 696 x 520 back to 1392 x 1040
                         resized_img.save(mask_path)  # save change in position
             for mask_path in tqdm(mask_paths, total=len(mask_paths)):
                 label_image = imread_rgb(mask_path)  # load the original mask
