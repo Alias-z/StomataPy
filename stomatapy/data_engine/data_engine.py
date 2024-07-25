@@ -1342,7 +1342,7 @@ class Li2022(StomataPyData):
                     }
                     with open(f"{os.path.splitext(mask_path.replace('label', 'sample'))[0]}.json", 'w', encoding='utf-8') as file:
                         json.dump({'info': info, 'objects': objects}, file, indent=4)
-            return None
+        return None
 
     def rename_files(self) -> None:
         """Rename the images and ISAT annotations"""
