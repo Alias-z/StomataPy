@@ -5,13 +5,14 @@ import os  # interact with the operating system
 import shutil  # for copying files
 import json  # manipulate json files
 import re  # regular expression operations
-from typing import Literal  # to support type hints
+from typing import Literal, List  # to support type hints
 import xml.etree.ElementTree as ET  # to load xml annotation files
 import cv2  # OpenCV
 from PIL import Image, ImageDraw  # Pillow image processing
 import numpy as np  # NumPy
 from tqdm import tqdm  # progress bar
 import pandas as pd  # for Excel sheet and CSV file
+from skimage import measure  # to measure properties of labeled image regions
 from matplotlib import pyplot as plt  # for image visualization
 from ..models.sam_hq import SAMHQ  # Segment Anything in High Quality
 from ..core.core import image_types, get_paths, imread_rgb  # import core functions
@@ -57,6 +58,7 @@ class StomataPyData:
         self.jayakody2017_dir = 'Datasets//Jayakody2017//Original'  # directory of Jayakody2017
         self.koheler2023_dir = 'Datasets//Koheler2023//Original'  # directory of Koheler2023
         self.koheler2024_dir = 'Datasets//Koheler2024//Original'  # directory of Koheler2024
+        self.li2022_dir = 'Datasets//Li2022//Original'  # directory of Li2022
         self.li2023_dir = 'Datasets//Li2023//Original'  # directory of Li2023
         self.meeus2020_dir = 'Datasets//Meeus2020//Original'  # directory of Meeus2020
         self.meng2023_dir = 'Datasets//Meng2023//Original'  # directory of Meng2023
@@ -1182,6 +1184,204 @@ class Koheler2024(StomataPyData):
                     Anything2ISAT.from_samhq(masks, image, image_path, catergory=catergory)  # export the ISAT json file
             except ValueError:
                 pass
+        return None
+
+
+class Li2022(StomataPyData):
+    """
+    Li et al., 2022  https://doi.org/10.1093/plcell/koac021
+    Dataset source: https://leafnet.whu.edu.cn/suppdata
+
+    Claimed open source in the publication https://doi.org/10.1093/plcell/koac021
+    "
+    We believe that the plant community needs more well-labeled datasets,and thus we shared all our training datasets,
+    testing datasets, and the results from LeafNet and existing tools in the Download page of the LeafNet web server.
+    "
+
+    Li2022
+    ├── Original
+        ├── F1_training_data
+            ├── label
+                ├── 0.png
+                ...
+                ├── 139.png
+            ├── sample
+                ├── 0.png
+                ...
+                ├── 139.png
+        ├── F2_validation_data
+            ├── label
+                ├── 0.png
+                ...
+                ├── 29.png
+            ├── sample
+                ├── 0.png
+                ...
+                ├── 29.png
+        ├── F5_ABC_ground_truth
+            ├── 0.png
+                ...
+            ├── 13.png
+        ├── F5_ABC_raw
+            ├── 0.png
+                ...
+            ├── 13.png
+        ├── F5_E_training_data
+            ├── label
+                ├── 0.png
+                ...
+                ├── 5.png
+            ├── sample
+                ├── 0.png
+                ...
+                ├── 5.png
+        ├── F5_FGH_ground_truth
+            ├── 0.png
+            ├── 1.png
+        ├── F5_FGH_raw
+            ├── z-projection
+                ├── 0.png
+                ├── 1.png
+            ├── 0.tif (ignored)
+            ├── 1.tif (ignored)
+        ├── F7_ABCD_raw_data (ignored)
+        ├── F7_ABCD_visualized_segmentation (ignored)
+        ├── F7_EF_raw_data (ignored)
+        ├── F7_EF_visualized_segmentation (ignored)
+    ├── Processed
+        ├── A. thaliana
+        ├── N. tabacum
+    ├── source.txt
+    ├── discard.txt
+
+    1. Rename images
+    2. Dsicard unwanted images and their annotations
+    3. Convert segmentation masks to ISAT with watershed
+    4. Check every annotation
+    """
+    def __init__(self):
+        super().__init__()
+        self.input_dir = self.li2022_dir  # input directory
+        self.processed_dir = self.input_dir.replace('Original', 'Processed')  # output directory
+        self.source_name = 'Li2022'  # source name
+        self.species_names = ['A. thaliana', 'N. tabacum']  # to store species names
+
+    def unify_folders(self) -> None:
+        """Unify the images and labels structes for all the folders"""
+        f5_adb_dir = os.path.join(self.processed_dir, 'F5_ABC')  # temporary F5_ABC directory
+        f5_adb_sample_dir, f5_adb_label_dir = os.path.join(f5_adb_dir, 'sample'), os.path.join(f5_adb_dir, 'label')  # F5_ABC sample and label directories
+        shutil.copytree(os.path.join(self.input_dir, 'F5_ABC_raw'), f5_adb_sample_dir)  # copy the F5_ABC label folder
+        shutil.copytree(os.path.join(self.input_dir, 'F5_ABC_ground_truth'), f5_adb_label_dir)  # copy the F5_ABC label folder
+        f5_fgh_dir = os.path.join(self.processed_dir, 'F5_FGH')  # temporary F5_FGH directory
+        f5_fgh_sample_dir, f5_fgh_label_dir = os.path.join(f5_fgh_dir, 'sample'), os.path.join(f5_fgh_dir, 'label')  # F5_FGH sample and label directories
+        shutil.copytree(os.path.join(self.input_dir, 'F5_FGH_raw', 'z-projection'), f5_fgh_sample_dir)  # copy the F5_FGH label folder
+        shutil.copytree(os.path.join(self.input_dir, 'F5_FGH_ground_truth'), f5_fgh_label_dir)  # copy the F5_FGH label folder
+        for folder in ['F1_training_data', 'F2_validation_data', 'F5_E_training_data']:
+            source_dir = os.path.join(self.input_dir, folder)  # source directory to be copied
+            destination_dir = os.path.join(self.processed_dir, folder)  # destination directory to be pasted
+            shutil.copytree(source_dir, destination_dir)  # copy the source directory to the destination directory
+        return None
+
+    def label2mask(self, mask_path: str) -> List[np.ndarray]:
+        """Convert the segmentation mask of LeafNet to ISAT mask"""
+        mask_image = imread_rgb(mask_path)  # load the mask image
+        region_masks = []  # to collect masks for each region
+        strict_black_mask = (mask_image[:, :, 0] == 0) & (mask_image[:, :, 1] == 0) & (mask_image[:, :, 2] == 0)  # define a mask where all RGB values are zero
+        labeled_strict_black, _ = measure.label(strict_black_mask, background=0, return_num=True, connectivity=2)  # label connected components in this strict black mask
+        regions = measure.regionprops(labeled_strict_black)  # collect region properties and generate masks
+        for region in regions:
+            segmentation = labeled_strict_black == region.label  # create a bool mask for the current region
+            bbox = UtilsISAT.boolmask2bbox(segmentation)  # get the bbox
+            if np.sum(segmentation) > 4 and (bbox[2] - bbox[0] > 1) and (bbox[3] - bbox[1] > 1):  # Check bbox dimensions
+                mask = {'segmentation': segmentation, 'area': np.sum(segmentation), 'bbox': bbox, 'category': 'pavement cell'}  # get mask information
+                region_masks.append(mask)  # collect the bool mask
+        blue_only_mask = (mask_image[:, :, 0] == 0) & (mask_image[:, :, 1] == 0) & (mask_image[:, :, 2] > 200)  # for stomata
+        labeled_blue_only, _ = measure.label(blue_only_mask, background=0, return_num=True, connectivity=2)  # label stomata
+        regions = measure.regionprops(labeled_blue_only)  # collect region properties and generate masks
+        for region in regions:
+            segmentation = labeled_blue_only == region.label  # create a bool mask for the stomata
+            bbox = UtilsISAT.boolmask2bbox(segmentation)  # get the bbox
+            if np.sum(segmentation) > 4 and (bbox[2] - bbox[0] > 1) and (bbox[3] - bbox[1] > 1):  # Check bbox dimensions
+                mask = {'segmentation': segmentation, 'area': np.sum(segmentation), 'bbox': bbox, 'category': 'stoma'}  # get mask information
+                region_masks.append(mask)  # collect the bool mask
+        return region_masks
+
+    def mask2isat(self) -> None:
+        """Convert the original maks to ISAT json format"""
+        self.unify_folders()  # unify the file structure
+        for subfolder in os.listdir(self.processed_dir):
+            mask_folder_dir = os.path.join(self.processed_dir, subfolder, 'label')  # the directory containing the segmentation masks
+            mask_paths = get_paths(mask_folder_dir, '.png')  # get the paths of all the masks
+            for mask_path in tqdm(mask_paths, total=len(mask_paths)):
+                label_image = imread_rgb(mask_path)  # load the original mask
+                masks = self.label2mask(mask_path)  # convert the orginal mask to bool masks
+                objects, group_bboxes, layer = [], [], 1.0  # to store information, initialize layer as a floating point number
+                group = 0  # initialize group value
+                for mask in masks:
+                    group += 1  # ensure every mask is in a different group
+                    if group == len(group_bboxes) + 1:
+                        group_bboxes.append(mask['bbox'])  # populate with bbox
+                    objects.append({
+                        'category': mask['category'],  # 'pavemt cell' or 'stoma'
+                        'group': group,  # group increases if the bbox is not within another
+                        'segmentation': UtilsISAT.mask2segmentation(mask['segmentation']),  # bool mask to ISAT segmentation
+                        'area': int(mask['area']),
+                        'layer': layer,  # increment layer for each object
+                        'bbox': mask['bbox'].tolist(),  # from np.array to list
+                        'iscrowd': False,
+                        'note': 'Auto'})
+                    layer += 1.0  # increment the layer
+                    info = {
+                        'description': 'ISAT',
+                        'folder': os.path.dirname(mask_path),  # output directory
+                        'name': os.path.basename(mask_path),  # image basename
+                        'width': label_image.shape[1],  # image width
+                        'height': label_image.shape[0],  # image height
+                        'depth': label_image.shape[2],  # image depth
+                        'note': 'Anomocytic_Peels_Brightfield_MQ_2.2'  # scale bar is obtained from the supplemental Figure S8 (C)
+                    }
+                    with open(f"{os.path.splitext(mask_path.replace('label', 'sample'))[0]}.json", 'w', encoding='utf-8') as file:
+                        json.dump({'info': info, 'objects': objects}, file, indent=4)
+            return None
+
+    def rename_files(self) -> None:
+        """Rename the images and ISAT annotations"""
+        def remove_palette(file_path: str) -> None:
+            """Remove the PNG file palette"""
+            with Image.open(file_path) as image:
+                if image.mode == 'P':  # check if image is in palette mode
+                    image = image.convert('RGB')
+                    image.save(file_path)  # save the converted image back to the same file path
+            return None
+
+        subfolder_dirs = []  # to delete the subfolders later
+        for subfolder in os.listdir(self.processed_dir):
+            subfolder_dir = os.path.join(self.processed_dir, subfolder)  # get the subfolder dir
+            subfolder_dirs.append(subfolder_dir)  # collect the subfolder dir
+            self.ensemble_files(subfolder_dir, ['sample'], subfolder_dir, image_types + ['.json'], folder_rename=True)  # move sample image files out
+        self.ensemble_files(self.processed_dir, os.listdir(self.processed_dir), self.processed_dir, image_types + ['.json'], folder_rename=True)  # ensemle all the files under
+
+        for subfolder_dir in subfolder_dirs:
+            shutil.rmtree(subfolder_dir)  # delete the subfolder directory
+
+        file_names, new_names = [], []  # to store the old and new names
+        for file_path in get_paths(self.processed_dir, '.png') + get_paths(self.processed_dir, '.json'):
+            file_basename = os.path.basename(file_path)  # get the basename
+            file_names.append(file_basename)  # populate the file_names
+            if 'F5_ABC' in file_path:
+                new_names.append(f'N. tabacum {self.source_name} {file_basename}')  # populate the new names with N. tabacum
+            else:
+                new_names.append(f'A. thaliana {self.source_name} {file_basename}')  # populate the new names with A. thaliana
+        self.batch_rename(self.processed_dir, file_names, new_names)  # rename all images
+        self.create_species_folders(self.processed_dir, set(self.species_names))  # create species folder
+
+        for species_folder in os.listdir(self.processed_dir):
+            input_dir = os.path.join(self.processed_dir, species_folder)  # to organize annoations
+            png_file_paths = get_paths(input_dir, '.png')  # get the paths of all PNG files
+            for png_file_path in png_file_paths:
+                remove_palette(png_file_path)  # remove the PNG file palette
+            UtilsISAT.quality_check(input_dir)  # check the annotation quality
+            UtilsISAT.sort_group(input_dir, if2rgb=False)  # sort categories
         return None
 
 
