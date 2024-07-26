@@ -1292,8 +1292,12 @@ class Li2022(StomataPyData):
         for region in regions:
             segmentation = labeled_strict_black == region.label  # create a bool mask for the current region
             bbox = UtilsISAT.boolmask2bbox(segmentation)  # get the bbox
-            if np.sum(segmentation) > 4 and (bbox[2] - bbox[0] > 1) and (bbox[3] - bbox[1] > 1):  # Check bbox dimensions
-                mask = {'segmentation': segmentation, 'area': np.sum(segmentation), 'bbox': bbox, 'category': 'pavement cell'}  # get mask information
+            if (bbox[2] - bbox[0] > 1) and (bbox[3] - bbox[1] > 1):
+                segmentation_isat = UtilsISAT.mask2segmentation(segmentation)  # convert the bool masks the ISAT format
+                points = [[x, y] for x, y in segmentation_isat]  # get the segmentation coordinates
+                if len(points) < 5:
+                    continue
+                mask = {'segmentation': segmentation_isat, 'area': np.sum(segmentation), 'bbox': bbox, 'category': 'pavement cell'}  # get mask information
                 region_masks.append(mask)  # collect the bool mask
         blue_only_mask = (mask_image[:, :, 0] == 0) & (mask_image[:, :, 1] == 0) & (mask_image[:, :, 2] > 200)  # for stomata
         labeled_blue_only, _ = measure.label(blue_only_mask, background=0, return_num=True, connectivity=2)  # label stomata
@@ -1301,8 +1305,12 @@ class Li2022(StomataPyData):
         for region in regions:
             segmentation = labeled_blue_only == region.label  # create a bool mask for the stomata
             bbox = UtilsISAT.boolmask2bbox(segmentation)  # get the bbox
-            if np.sum(segmentation) > 4 and (bbox[2] - bbox[0] > 1) and (bbox[3] - bbox[1] > 1):  # Check bbox dimensions
-                mask = {'segmentation': segmentation, 'area': np.sum(segmentation), 'bbox': bbox, 'category': 'stoma'}  # get mask information
+            if (bbox[2] - bbox[0] > 1) and (bbox[3] - bbox[1] > 1):
+                segmentation_isat = UtilsISAT.mask2segmentation(segmentation)  # convert the bool masks the ISAT format
+                points = [[x, y] for x, y in segmentation_isat]  # get the segmentation coordinates
+                if len(points) < 5:
+                    continue
+                mask = {'segmentation': segmentation_isat, 'area': np.sum(segmentation), 'bbox': bbox, 'category': 'stoma'}  # get mask information
                 region_masks.append(mask)  # collect the bool mask
         return region_masks
 
@@ -1329,7 +1337,7 @@ class Li2022(StomataPyData):
                     objects.append({
                         'category': mask['category'],  # 'pavemt cell' or 'stoma'
                         'group': group,  # group increases if the bbox is not within another
-                        'segmentation': UtilsISAT.mask2segmentation(mask['segmentation']),  # bool mask to ISAT segmentation
+                        'segmentation': mask['segmentation'],  # bool mask to ISAT segmentation
                         'area': int(mask['area']),
                         'layer': layer,  # increment layer for each object
                         'bbox': mask['bbox'].tolist(),  # from np.array to list
@@ -1387,6 +1395,7 @@ class Li2022(StomataPyData):
                 remove_palette(png_file_path)  # remove the PNG file palette
             UtilsISAT.quality_check(input_dir)  # check the annotation quality
             UtilsISAT.sort_group(input_dir, if2rgb=False)  # sort categories
+            UtilsISAT.shapely_valid_transform(input_dir)  # ensure valid polygons
         return None
 
 
