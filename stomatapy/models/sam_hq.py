@@ -3,11 +3,10 @@
 # pylint: disable=line-too-long, multiple-statements, c-extension-no-member, relative-beyond-top-level, no-member, too-many-function-args, wrong-import-position
 import os  # interact with the operating system
 import re  # regular expression operations
-from typing import Literal, List  # to support type hints
+from typing import Literal  # to support type hints
 import warnings; warnings.filterwarnings('ignore', category=UserWarning, module='segment_anything_hq.modeling.tiny_vit_sam')  # noqa: suppress SAM-HQ import warnings
 import numpy as np  # NumPy
 import torch  # PyTorch
-import cv2
 from matplotlib import pyplot as plt  # for image visualization
 from segment_anything_hq import sam_model_registry, SamAutomaticMaskGenerator, SamPredictor  # import SAM-HQ functions
 from ..core.core import device, imread_rgb, get_checkpoints, suppress_stdout  # import core elements
@@ -22,7 +21,7 @@ class SAMHQ:
                  image_path: str = None,
                  checkpoint_path: str = 'Checkpoints/SAM-HQ/sam_hq_vit_h.pth',
                  points_per_side: tuple = (23, 24),
-                 pred_iou_thresh: float = 0.0,
+                 pred_iou_thresh: float = 0.7,
                  box_nms_thresh: float = 1.0,
                  crop_n_layers: int = 0,
                  min_mask_ratio: float = 0.02,
@@ -44,70 +43,21 @@ class SAMHQ:
             get_checkpoints('https://huggingface.co/lkeab/hq-sam/resolve/main/sam_hq_vit_h.pth', self.checkpoint_path)  # download the checkpoint if not exist
             assert os.path.exists(self.checkpoint_path), 'Checkpoint download failed.'  # in case download failure
 
-    # @staticmethod
-    # def isolate_masks(masks: list) -> list:
-    #     """When two masks' bboxes intersect, keep the most elliptical mask"""
-    #     to_remove = set()  # to store redundant masks
-    #     for idx, mask_1 in enumerate(masks):
-    #         for idx_j, mask_2 in enumerate(masks):
-    #             if idx >= idx_j:
-    #                 continue  # avoid redundant comparisons
-    #             if UtilsISAT.bbox_intersection(mask_1['bbox'], mask_2['bbox'], threshold=0.9):
-    #                 if mask_1['ellipse_iou'] > mask_2['ellipse_iou']:
-    #                     to_remove.add(idx_j)  # compare scores and mark the mask with the lower score for removal
-    #                 else:
-    #                     to_remove.add(idx)
-    #     masks = [mask for idx, mask in enumerate(masks) if idx not in to_remove]  # remove noisy masks
-    #     return masks
     @staticmethod
-    def isolate_masks(masks: List[dict]) -> List[dict]:
-        """
-        First isolates the largest contour from each mask's segmentation, then removes smaller masks 
-        that overlap substantially with larger masks. The process is streamlined to perform within a 
-        single function to enhance clarity and maintainability.
-
-        Parameters:
-            masks (List[dict]): A list of mask dictionaries, each containing:
-                'segmentation': A boolean array representing the mask.
-
-        Returns:
-            List[dict]: A list of masks, each refined to only include the largest contour and filtered to remove noisy overlaps.
-        """
-        if not masks:
-            return []
-
-        # Initialize variables to keep processed masks and their areas
-        processed_masks = []
-        areas = []
-
-        # Process each mask to find and keep only the largest contour
-        for mask in masks:
-            mask_data = (mask['segmentation'] * 255).astype(np.uint8)  # Convert boolean to uint8
-            contours, _ = cv2.findContours(mask_data, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-            if contours:
-                largest_contour = max(contours, key=cv2.contourArea)
-                new_mask = np.zeros_like(mask_data)
-                cv2.drawContours(new_mask, [largest_contour], -1, 1, thickness=cv2.FILLED)
-            else:
-                new_mask = np.zeros_like(mask_data)
-
-            processed_masks.append(new_mask.astype(bool))
-            areas.append(np.sum(new_mask))
-
-        n = len(processed_masks)
-        to_remove = set()
-
-        # Determine which masks to remove based on overlaps and size comparisons
-        for i in range(n):
-            for j in range(i + 1, n):
-                if np.any(np.logical_and(processed_masks[i], processed_masks[j])):
-                    if areas[i] < areas[j]:
-                        to_remove.add(i)
+    def isolate_masks(masks: list) -> list:
+        """When two masks' bboxes intersect, keep the most elliptical mask"""
+        to_remove = set()  # to store redundant masks
+        for idx, mask_1 in enumerate(masks):
+            for idx_j, mask_2 in enumerate(masks):
+                if idx >= idx_j:
+                    continue  # avoid redundant comparisons
+                if UtilsISAT.bbox_intersection(mask_1['bbox'], mask_2['bbox'], threshold=0.9):
+                    if mask_1['ellipse_iou'] > mask_2['ellipse_iou']:
+                        to_remove.add(idx_j)  # compare scores and mark the mask with the lower score for removal
                     else:
-                        to_remove.add(j)
-
-        # Create a final list of masks excluding those marked for removal
-        return [masks[idx] for idx in range(n) if idx not in to_remove]
+                        to_remove.add(idx)
+        masks = [mask for idx, mask in enumerate(masks) if idx not in to_remove]  # remove noisy masks
+        return masks
 
     _model_cache = {}  # check if the model is already loaded
 
