@@ -270,7 +270,7 @@ class Data4Training:
                     min_area_ratio=0.2
                 )  # slice the MSCOCO images and annotations
                 shutil.rmtree(directory)  # remove the orginal COCO directory
-                self.remove_black_images(coco_json_path=os.path.join(output_dir, 'sahi_coco.json'), coco_images_dir=output_dir, threshold=0.5)  # filter out images contain mostlt black pixels
+                self.remove_black_images(coco_json_path=os.path.join(output_dir, 'sahi_coco.json'), coco_images_dir=output_dir, threshold=0.3)  # filter out images contain mostlt black pixels
         if self.remove_copy:
             shutil.rmtree(input_copy_dir)  # remove copied foder
 
