@@ -943,7 +943,7 @@ class Anything2ISAT:
         return None
 
     @staticmethod
-    def from_samhq(masks: list, image: np.ndarray, image_path: str, catergory: str = 'stoma') -> None:
+    def from_samhq(masks: list, image: np.ndarray, image_path: str, catergory: str = 'stoma', if_remove_overlapping_masks: bool = True) -> None:
         """
         Converts a list of SAM-HQ segmentation masks to ISAT JSON format
         The function processes each mask, determining its group based on overlap with existing groups, and formats each mask's data into ISAT's JSON structure
@@ -957,6 +957,40 @@ class Anything2ISAT:
         Returns:
         - None: saves a JSON file in ISAT format containing the image and objects information
         """
+        def remove_overlapping_masks(masks: List[dict]) -> List[dict]:
+            """
+            Eliminates overlapping masks, keeping only the largest mask in cases of overlap
+
+            Args:
+            - masks (List[Dict[str, Any]]): List of masks containing segmentation data and other properties
+
+            Returns:
+            - List[Dict[str, Any]]: List of filtered masks with overlapping smaller masks removed
+            """
+            def check_overlap(poly1: Polygon, poly2: Polygon) -> bool:
+                """Check if two polygons overlap"""
+                return poly1.intersects(poly2)
+
+            polygons, keep = [], []  # to collect polygons
+            for idx, mask in enumerate(masks):
+                poly = Polygon(mask['segmentation'])  # convert the segmentation coordinates to shapley polygon
+                if not poly.is_valid:
+                    poly = make_valid(poly)  # attempt to fix the polygon
+                polygons.append((poly, mask['area'], idx))  # collect the corrected polygons
+            polygons.sort(key=lambda x: x[1], reverse=True)  # sort polygons by area in descending order
+
+            for poly_1, area_1, idx_1 in polygons:
+                overlap = False  # initialize not overlapping as value
+                for poly_2, _, _ in keep:
+                    if check_overlap(poly_1, poly_2):
+                        overlap = True; break  # noqa: if two polygon overlap
+                if not overlap:
+                    keep.append((poly_1, area_1, idx_1))  # collect the polygons to be kept
+
+            keep_indices = [idx for _, _, idx in keep]  # get the indices of the polygons to keep
+            filtered_masks = [masks[idx] for idx in keep_indices]  # filter the masks to keep only the largest non-overlapping ones
+            return filtered_masks
+
         objects, group_bboxes, layer = [], [], 1.0  # to store information, initialize layer as a floating point number
         for mask in masks:
             group = next((idx for idx, group_bbox in enumerate(group_bboxes, 1) if UtilsISAT.bbox_within(mask['bbox'], group_bbox)), len(group_bboxes) + 1)  # iterate through all existing groups and their corresponding bboxes
@@ -971,6 +1005,8 @@ class Anything2ISAT:
                 'bbox': mask['bbox'].tolist(),  # from np.array to list
                 'iscrowd': False,
                 'note': 'Auto'})
+            if if_remove_overlapping_masks:
+                objects = remove_overlapping_masks(objects)  # remove the overlapping polygons (inlcusion)
             layer += 1.0  # increment the layer
             info = {
                 'description': 'ISAT',
