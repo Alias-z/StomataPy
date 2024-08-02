@@ -5,3 +5,6 @@
 	path = mmsegmentation
 	url = https://github.com/Alias-z/mmsegmentation.git
 	branch = Rein
+[submodule "sam-hq"]
+	path = sam-hq
+	url = https://github.com/Alias-z/sam-hq.git
