@@ -229,7 +229,7 @@ class Data4Training:
             json.dump(new_coco_data, new_file)  # replace the old COCO.json file
         return None
 
-    def data4training(self, if_resize_isat: bool = True) -> None:
+    def data4training(self, if_resize_isat: bool = True, output_rename: str = None) -> None:
         """Generate data for training from ISAT json files"""
         input_copy_dir = self.input_dir + ' - Copy'  # folder copy dir
         UtilsISAT.copy_folder(self.input_dir, input_copy_dir)  # create a copy
@@ -250,6 +250,9 @@ class Data4Training:
             if if_resize_isat:
                 UtilsISAT.resize_isat(input_copy_dir, new_width=self.new_width, new_height=self.new_height, if_keep_ratio=True)  # resize images and annotations
             output_name = 'Stomata_segmentation'  # for semantic segmentation
+
+        if output_rename is not None:
+            output_name = output_rename  # rename the output directory
 
         output_dir = os.path.join(os.path.split(input_copy_dir)[0], output_name)  # COCO json output dir
         train_dir, val_dir = os.path.join(output_dir, 'train'), os.path.join(output_dir, 'val')  # COCO json train /val directory
