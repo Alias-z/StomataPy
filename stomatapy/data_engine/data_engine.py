@@ -1080,7 +1080,7 @@ class Koheler2023(StomataPyData):
     def rename_images(self) -> None:
         """Copy images to 'Processed' and rename them"""
         self.ensemble_files(self.input_dir, ['All'], self.processed_dir, image_types, folder_rename=True)  # move image files to 'Processed'
-        # self.discard_files(os.path.join(self.input_dir.replace('//Original', ''), 'discard.txt'), self.processed_dir)  # remove unwanted images
+        self.discard_files(os.path.join(self.input_dir.replace('//Original', ''), 'discard.txt'), self.processed_dir)  # remove unwanted images
         file_names, new_names = [], []  # to store the old and new names
         for image_path in get_paths(self.processed_dir, '.tif'):
             image_basename = os.path.basename(image_path)  # get the basename
