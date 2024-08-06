@@ -3,6 +3,7 @@
 # pylint: disable=line-too-long, multiple-statements, c-extension-no-member, relative-beyond-top-level, wildcard-import, no-member, too-many-function-args, cell-var-from-loop
 import os  # interact with the operating system
 import json  # manipulate json files
+import warnings; warnings.filterwarnings(action='ignore', category=FutureWarning, message='The behavior of DataFrame concatenation with empty or all-NA entries is deprecated.')  # noqa: suppress pandas warning
 import shutil  # for copy files
 import pandas as pd  # for Excel sheet and CSV file
 from ..core.core import get_paths  # import core functions
