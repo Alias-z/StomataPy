@@ -6,7 +6,7 @@ import copy  # for deepcopy
 import cv2  # OpenCV
 import numpy as np  # NumPy
 from matplotlib import pyplot as plt  # show images and plot figures
-from .core import color_select, get_contour
+from ..core.core import color_select, get_contour
 
 
 class GetDiameter:
@@ -21,7 +21,7 @@ class GetDiameter:
         self.line_thickness = line_thickness  # the line thickness for drawing lines
 
     def get_bbox_rotate(self, show_bbox: bool = False, show_bbox_shrink: bool = False) -> tuple:
-        """find the rotated min-area bounding box for a stomatal contour mask"""
+        """Find the rotated min-area bounding box for a stomatal contour mask"""
         stoma_contour = color_select(self.stomatal_contour_mask, self.stomatal_contour_mask, [255, 255, 255])  # get only white cell wall [255, 255, 255]
         stoma_center = copy.deepcopy(stoma_contour)  # maks a copy of our cell wall image
         white_pixels = np.where(get_contour(stoma_contour, thickness=4)[0][:, :, 0] == 255)  # get the location of cell wall
@@ -43,7 +43,7 @@ class GetDiameter:
             width, height = height, width  # assumes height is longer than width
         return stoma_xy_int, stoma_center, width, height, points
 
-    def pca(self, show_result: bool = False) -> tuple:
+    def pca(self, show_result: bool = False) -> dict:
         """PCA for a given colored RGB mask to find symmetrical lines"""
         stoma_xy_int, stoma_center, width, height, _ = self.get_bbox_rotate()  # get results from shrinked mini-area bbox
         white_pixels = np.where(stoma_center[:, :, 0] == 255)  # extract the cell wall within
@@ -101,4 +101,12 @@ class GetDiameter:
         cv2.line(self.stomatal_contour_mask, p_3, p_4, (0, 0, 255), self.line_thickness)  # draw the width
         if show_result:
             plt.imshow(self.stomatal_contour_mask); plt.show()  # noqa: for debugging
-        return stoma_lenghth, stoma_width, self.stomatal_contour_mask, angle_principal_component
+        dimension = {
+            'length': stoma_lenghth,
+            'length_points': (p_1, p_2),
+            'width': stoma_width,
+            'width_points': (p_3, p_4),
+            'visualization': self.stomatal_contour_mask,
+            'angle': angle_principal_component,
+        }
+        return dimension
