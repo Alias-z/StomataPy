@@ -378,10 +378,13 @@ class UtilsISAT:
             objects = data.get('objects', [])  # get the objects information
             grouped_objects = {}  # to store the grouped objects
             for obj in objects:
+                area = obj.get('area', None)  # get the area
                 group = obj.get('group', 0)  # get the group of the object, default to 0
                 if group not in grouped_objects:
                     grouped_objects[group] = []  # to store the group
                 grouped_objects[group].append(obj)  # add group to the group list
+                if area < 40:
+                    print(f'object area < 40 in group {group} in {json_path}')  # if small area
 
             for group, objs in grouped_objects.items():
                 categories = set()  # to store the categories
@@ -466,6 +469,56 @@ class UtilsISAT:
         y_indices, x_indices = np.where(mask_bool)  # find the indices of all true values in the mask
         xmin, xmax, ymin, ymax = np.min(x_indices), np.max(x_indices), np.min(y_indices), np.max(y_indices)  # calculate xmin, ymin, xmax, ymax
         return [int(xmin), int(ymin), int(xmax), int(ymax)]
+
+    @staticmethod
+    def pad_bbox(bbox: np.ndarray, padding: int, max_width: int, max_height: int, allow_negative_crop: bool = False) -> np.ndarray:
+        """
+        Expand the bbox by a specified padding while ensuring it stays within the image boundaries unless negative cropping is allowed.
+
+        Args:
+        - bbox (np.ndarray): the original bbox as a 1D array [x_min, y_min, x_max, y_max]
+        - padding (int): the amount of padding to add to each side of the bbox
+        - max_width (int): the maximum allowable width (image width)
+        - max_height (int): the maximum allowable height (image height)
+        - allow_negative_crop (bool): whether to allow cropping outside of the image boundaries
+
+        Returns:
+        - padded_bbox (np.ndarray): the padded bbox as a 1D array [x_min_padded, y_min_padded, x_max_padded, y_max_padded]
+        """
+        if allow_negative_crop:
+            x_min_padded, x_max_padded = bbox[0] - padding, bbox[2] + padding
+            y_min_padded, y_max_padded = bbox[1] - padding, bbox[3] + padding
+        else:
+            x_min_padded, x_max_padded = max(bbox[0] - padding, 0), min(bbox[2] + padding, max_width)
+            y_min_padded, y_max_padded = max(bbox[1] - padding, 0), min(bbox[3] + padding, max_height)
+        return np.array([x_min_padded, y_min_padded, x_max_padded, y_max_padded], dtype=np.int32)
+
+    @staticmethod
+    def crop_image_with_padding(image: np.ndarray, bbox: np.ndarray, padding: int, allow_negative_crop: bool = False, pad_value: int = 0) -> np.ndarray:
+        """
+        Crop image patches based on provided bounding boxes with added padding. This function can conditionally allow for negative cropping.
+
+        Args:
+        - image (np.ndarray): the image from which patches are to be cropped (height, width, channels)
+        - bbox (np.ndarray): a 2D array of bbox in [x_min, y_min, x_max, y_max]
+        - padding (int): the amount of padding to add around the bbox
+        - allow_negative_crop (bool): whether to allow cropping outside of the original image bounds
+        - pad_value (int): the value to use for padding outside the original image bounds
+
+        Returns:
+        - crop (np.ndarray): a cropped image patch as a NumPy array
+        """
+        max_height, max_width = image.shape[:2]  # get the image dimensions
+        padded_bbox = UtilsISAT.pad_bbox(bbox, padding, max_width, max_height, allow_negative_crop)  # get the padded bbox
+
+        if allow_negative_crop:
+            pad_width = max(padding, -min(padded_bbox[0], padded_bbox[1], 0))  # get the padding width
+            padded_image = np.pad(image, ((pad_width, pad_width), (pad_width, pad_width), (0, 0)), 'constant', constant_values=pad_value)  # pad the image to ensure we can crop outside the original bounds
+            padded_bbox = padded_bbox + pad_width  # adjust the bounding box coordinates for the added padding
+        else:
+            padded_image = image  # nomarl mode
+        crop = padded_image[padded_bbox[1]:padded_bbox[3], padded_bbox[0]:padded_bbox[2]]  # crop the image using the adjusted (and potentially padded) bounding box
+        return crop
 
     @staticmethod
     def bbox_convert(bbox: np.ndarray, flag: Literal['COCO2ISAT', 'ISAT2COCO', 'YOLO2ISAT'] = 'COCO2ISAT', image_shape: tuple = None) -> np.ndarray:
