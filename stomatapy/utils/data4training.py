@@ -55,7 +55,7 @@ class Data4Training:
         """
         Calculate the minimum image dimensions required to fit a specified number of slices with overlaps.
 
-        Parameters:
+        Args:
         - slice_width (int): the width of each slice in pixels
         - slice_height (int): the height of each slice in pixels
         - overlap_ratio (float): the ratio of overlap between slices (e.g., 0.2 for 20% overlap)
