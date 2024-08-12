@@ -45,7 +45,7 @@ class CellPose:
         self.annnotation_category = annnotation_category  # the annotation category in ISAT json file
 
     def training(self, isat2cellpose: bool = True) -> str:
-        """Traiing models based on the CellPose 'general' model"""
+        """Traiing models based on the CellPose models"""
         if isat2cellpose:
             print('converting ISAT .json files to CellPose .npy files')
             ISAT2Anything(annotations_dir=self.train_dir).to_cellpose(category=self.annnotation_category)  # convert ISAT json files to CellPose npy file
