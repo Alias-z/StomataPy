@@ -229,16 +229,17 @@ class Data4Training:
             json.dump(new_coco_data, new_file)  # replace the old COCO.json file
         return None
 
-    def data4training(self, if_resize_isat: bool = True, output_rename: str = None) -> None:
+    def data4training(self, remove_subgroups: bool = True, if_resize_isat: bool = True, output_rename: str = None) -> None:
         """Generate data for training from ISAT json files"""
         input_copy_dir = self.input_dir + ' - Copy'  # folder copy dir
         UtilsISAT.copy_folder(self.input_dir, input_copy_dir)  # create a copy
         if self.aim != 'semantic segmentation':
-            UtilsISAT.select_class(input_copy_dir, action='rename class', source_class='stoma', destination_class='stomatal complex', allow_remove_source_class=True)  # replace non-duplicated stoma with stomatal complex
+            UtilsISAT.select_class(input_copy_dir, action='rename class', source_class='stoma', destination_class='stomatal complex')  # replace non-duplicated stoma with stomatal complex
             output_name = 'Epidermal_segmentation' if self.aim == 'instance segmentation' else 'Stomata_detection'  # output directory name
-            classes2remove = ['outer ledge', 'pore'] if self.aim == 'instance segmentation' else ['outer ledge', 'pore', 'pavement cell']  # the catergories to be removed
-            for category in classes2remove:
-                UtilsISAT.select_class(input_copy_dir, category=category, action='remove')  # remove catergoreis that are not 'stomatal complex' or 'pavement cell'
+            classes2remove = ['stoma', 'outer ledge', 'pore'] if self.aim == 'instance segmentation' else ['stoma','outer ledge', 'pore', 'pavement cell']  # the catergories to be removed
+            if remove_subgroups:
+                for category in classes2remove:
+                    UtilsISAT.select_class(input_copy_dir, category=category, action='remove')  # remove catergoreis that are not 'stomatal complex' or 'pavement cell'
             if if_resize_isat:
                 UtilsISAT.resize_isat(input_copy_dir, new_width=self.new_width, new_height=self.new_height, if_keep_ratio=True)  # resize images and annotations
             if self.use_sahi:
