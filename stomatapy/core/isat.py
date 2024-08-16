@@ -167,8 +167,7 @@ class UtilsISAT:
                      category: str = 'pore',
                      action: Literal['remove', 'select', 'remove groups', 'rename class'] = 'remove',
                      source_class: str = 'stoma',
-                     destination_class: str = 'stomatal complex',
-                     allow_remove_source_class: bool = False) -> None:
+                     destination_class: str = 'stomatal complex') -> None:
         """
         Modifies object categories in JSON files based on the specified action
 
@@ -183,7 +182,6 @@ class UtilsISAT:
         'rename class' args:
             - source_class (str): the original class to be renamed if action is 'rename class'. Default is 'stoma'
             - destination_class (str): the new class name if action is 'rename class'. Default is 'stomatal complex'
-            - allow_remove_source_class (bool): if True, allows removal of source class objects in the presence of destination class in the same group
 
         Returns:
         - None: The function writes modifications directly to the original JSON files.
@@ -206,9 +204,7 @@ class UtilsISAT:
                 destination_groups = {obj['group'] for obj in data['objects'] if obj['category'] == destination_class}  # to track destination class presence in groups
                 new_objects = []  # to store the final objects
                 for obj in data['objects']:
-                    if obj['category'] == source_class:
-                        if obj['group'] in destination_groups and allow_remove_source_class:
-                            continue  # skip this object if its group has a destination class object
+                    if obj['group'] not in destination_groups and obj['category'] == source_class:
                         obj['category'] = destination_class
                     new_objects.append(obj)
                 data['objects'] = new_objects  # Updated list after processing
@@ -485,10 +481,10 @@ class UtilsISAT:
         Returns:
         - padded_bbox (np.ndarray): the padded bbox as a 1D array [x_min_padded, y_min_padded, x_max_padded, y_max_padded]
         """
-        if allow_negative_crop:
+        if allow_negative_crop:  # crop outside of the image boundaries, for object dimensions
             x_min_padded, x_max_padded = bbox[0] - padding, bbox[2] + padding
             y_min_padded, y_max_padded = bbox[1] - padding, bbox[3] + padding
-        else:
+        else:  # to restore back the back to the original image
             x_min_padded, x_max_padded = max(bbox[0] - padding, 0), min(bbox[2] + padding, max_width)
             y_min_padded, y_max_padded = max(bbox[1] - padding, 0), min(bbox[3] + padding, max_height)
         return np.array([x_min_padded, y_min_padded, x_max_padded, y_max_padded], dtype=np.int32)
@@ -512,7 +508,7 @@ class UtilsISAT:
         padded_bbox = UtilsISAT.pad_bbox(bbox, padding, max_width, max_height, allow_negative_crop)  # get the padded bbox
 
         if allow_negative_crop:
-            pad_width = max(padding, -min(padded_bbox[0], padded_bbox[1], 0))  # get the padding width
+            pad_width = int(max(padding, -min(padded_bbox[0], padded_bbox[1], 0)))  # get the padding width
             padded_image = np.pad(image, ((pad_width, pad_width), (pad_width, pad_width), (0, 0)), 'constant', constant_values=pad_value)  # pad the image to ensure we can crop outside the original bounds
             padded_bbox = padded_bbox + pad_width  # adjust the bounding box coordinates for the added padding
         else:
