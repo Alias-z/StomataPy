@@ -236,7 +236,7 @@ class Data4Training:
         if self.aim != 'semantic segmentation':
             UtilsISAT.select_class(input_copy_dir, action='rename class', source_class='stoma', destination_class='stomatal complex')  # replace non-duplicated stoma with stomatal complex
             output_name = 'Epidermal_segmentation' if self.aim == 'instance segmentation' else 'Stomata_detection'  # output directory name
-            classes2remove = ['stoma', 'outer ledge', 'pore'] if self.aim == 'instance segmentation' else ['stoma','outer ledge', 'pore', 'pavement cell']  # the catergories to be removed
+            classes2remove = ['stoma', 'outer ledge', 'pore'] if self.aim == 'instance segmentation' else ['stoma', 'outer ledge', 'pore', 'pavement cell']  # the catergories to be removed
             if remove_subgroups:
                 for category in classes2remove:
                     UtilsISAT.select_class(input_copy_dir, category=category, action='remove')  # remove catergoreis that are not 'stomatal complex' or 'pavement cell'
