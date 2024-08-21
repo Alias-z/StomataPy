@@ -255,7 +255,7 @@ class Aono2021(StomataPyData):
     1. Rename images
     2. Dsicard unwanted images
     3. Map the patches from "Positive" back to renamed images to generate json fiels with bounding boxes
-    4. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
+    4. Generate segmentation masks with SAM-HQ, mannually adjust them
     5. Train custom models for auto labeling
     6. Check every annotation
     """
@@ -369,7 +369,7 @@ class CasadoGarcia2020(StomataPyData):
 
     1. Combine 'test' and 'train' under 'all'
     2. Since the 'all' folder does not indicating species names, we need to find them from 'bean' and 'commonBean' as images in 'bearley' (Barley) could be patches
-    3. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
+    3. Generate segmentation masks with SAM-HQ, mannually adjust them
     4. Train custom models for auto labeling
     5. Check every annotation
     """
@@ -540,7 +540,7 @@ class Dey2023(StomataPyData):
 
     1. Rename images
     2. Dsicard unwanted images and their annotations
-    3. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
+    3. Generate segmentation masks with SAM-HQ, mannually adjust them
     4. Train custom models for auto labeling
     5. Check every annotation
     """
@@ -642,7 +642,7 @@ class Ferguson2021(StomataPyData):
     # [2. Since the most common prefix consists of 8 patches, we stich them with 2 x 4 pattern and save only the stiched images.]
     2. Stiching leads to too small stomata, so we enlarge the image instead
     3. Dsicard unwanted images and their annotations
-    4. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
+    4. Generate segmentation masks with SAM-HQ, mannually adjust them
     5. Train custom models for auto labeling
     6. Check every annotation
     """
@@ -818,7 +818,7 @@ class Fetter2019(StomataPyData):
 
     1. Rename images
     2. Dsicard unwanted images
-    4. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
+    4. Generate segmentation masks with SAM-HQ, mannually adjust them
     5. Train custom models for auto labeling
     6. Check every annotation
     """
@@ -981,7 +981,7 @@ class Jayakody2017(StomataPyData):
     1. Combine 'raw_dataset_1' and 'raw_dataset_1', then Copy the images to 'Processed', and rename them with f'V. vinifera Jayakody2017 {orginal file name}'
     2. Dsicard unwanted images
     3. Map the patches from "Positive" back to renamed images to generate json fiels with bounding boxes
-    4. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
+    4. Generate segmentation masks with SAM-HQ, mannually adjust them
     5. Train custom models for auto labeling
     6. Check every annotation
     """
@@ -1064,7 +1064,7 @@ class Koheler2023(StomataPyData):
 
     1. Rename images
     2. Dsicard unwanted images and their annotations
-    3. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
+    3. Generate segmentation masks with SAM-HQ, mannually adjust them
     4. Train custom models for auto labeling
     5. Check every annotation
     """
@@ -1142,7 +1142,7 @@ class Koheler2024(StomataPyData):
 
     1. Rename images
     2. Dsicard unwanted images and their annotations
-    3. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
+    3. Generate segmentation masks with SAM-HQ, mannually adjust them
     4. Train custom models for auto labeling
     5. Check every annotation
     """
@@ -1443,7 +1443,7 @@ class Li2023(StomataPyData):
 
     1. Rename images
     2. Dsicard unwanted images and their annotations
-    3. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
+    3. Generate segmentation masks with SAM-HQ, mannually adjust them
     4. Train custom models for auto labeling
     5. Check every annotation
     """
@@ -1539,7 +1539,7 @@ class Meeus2020(StomataPyData):
     1. Rename images
     2. Dsicard unwanted images
     3. Map the patches from "Positive" back to renamed images to generate json fiels with bounding boxes
-    4. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
+    4. Generate segmentation masks with SAM-HQ, mannually adjust them
     5. Train custom models for auto labeling
     6. Check every annotation
     """
@@ -1630,7 +1630,7 @@ class Meng2023(StomataPyData):
 
     1. Rename images
     2. Dsicard unwanted images and their annotations
-    3. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
+    3. Generate segmentation masks with SAM-HQ, mannually adjust them
     4. Train custom models for auto labeling
     5. Check every annotation
     """
@@ -1816,7 +1816,7 @@ class Sultana2021(StomataPyData):
     1. Rename images
     2. Dsicard unwanted images and their annotations
     3. Load the YOLO format bbox annotations as SAM-HQ prompt inputs
-    4. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
+    4. Generate segmentation masks with SAM-HQ, mannually adjust them
     5. Train custom models for auto labeling
     6. Check every annotation
     """
@@ -1913,9 +1913,9 @@ class Sun2021(StomataPyData):
     ├── source.txt
     ├── discard.txt
 
-    1. Rename images
+    1. Rename images and resize to 1600 x 1200
     2. Dsicard unwanted images and their annotations
-    3. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
+    3. Generate segmentation masks with SAM-HQ, mannually adjust them
     4. Train custom models for auto labeling
     5. Check every annotation
     """
@@ -1950,6 +1950,12 @@ class Sun2021(StomataPyData):
                 continue
             else:
                 os.remove(mask_path)  # remove these unwanted mask files
+        file_paths = get_paths(self.species_folder_dir, '.jpg')  # get image paths
+        for file_path in file_paths:
+            image = imread_rgb(file_path)  # load the image for resizing
+            enlarged_image = cv2.resize(image, (1600, 1200), interpolation=cv2.INTER_LANCZOS4)  # resize the image
+            cv2.imwrite(file_path, cv2.cvtColor(enlarged_image, cv2.COLOR_RGB2BGR))  # save the resized image in position
+        shutil.rmtree(self.orginal_masks_dir)  # remove the orginal masks directory
         return None
 
     def get_annotations(self, catergory: str = 'stoma', visualize: bool = False, random_color: bool = True) -> None:
@@ -1992,9 +1998,9 @@ class Sun2023(StomataPyData):
     ├── source.txt
     ├── discard.txt
 
-    1. Rename images
+    1. Rename images and resize to 1600 x 1200
     2. Dsicard unwanted images and their annotations
-    3. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
+    3. Generate segmentation masks with SAM-HQ, mannually adjust them
     4. Train custom models for auto labeling
     5. Check every annotation
     """
@@ -2021,6 +2027,11 @@ class Sun2023(StomataPyData):
             new_names.append(f'{self.species_name} {self.source_name} {file_basename}')  # populate the new names
         self.batch_rename(self.processed_dir, file_names, new_names)  # rename all images
         self.create_species_folders(self.processed_dir, set([self.species_name]))  # create species folder
+        file_paths = get_paths(self.species_folder_dir, '.jpg')  # get image paths
+        for file_path in file_paths:
+            image = imread_rgb(file_path)  # load the image for resizing
+            enlarged_image = cv2.resize(image, (1600, 1200), interpolation=cv2.INTER_LANCZOS4)  # resize the image
+            cv2.imwrite(file_path, cv2.cvtColor(enlarged_image, cv2.COLOR_RGB2BGR))  # save the resized image in position
         return None
 
     def load_xml_bbox(self, xml_file_path: str) -> np.ndarray:
@@ -2096,7 +2107,7 @@ class Takagi2023(StomataPyData):
 
     1. Rename images
     2. Dsicard unwanted images and their annotations
-    3. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
+    3. Generate segmentation masks with SAM-HQ, mannually adjust them
     4. Train custom models for auto labeling
     5. Check every annotation
     """
@@ -2174,9 +2185,9 @@ class ThathapalliPrakash2021(StomataPyData):
     ├── source.txt
     ├── discard.txt
 
-    1. Rename images.
+    1. Resize and rename images
     2. Dsicard unwanted images and their annotations
-    3. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
+    3. Generate segmentation masks with SAM-HQ, mannually adjust them
     4. Train custom models for auto labeling
     5. Check every annotation
     """
@@ -2193,9 +2204,14 @@ class ThathapalliPrakash2021(StomataPyData):
         """Copy images to 'Processed' and rename them"""
         self.ensemble_files(os.path.join(self.input_dir, 'Stomatal_density_leaf_surface_scan_images'), ['Stomatal scans export images tiff'], self.processed_dir, image_types, folder_rename=True)  # move image files to 'Processed'
         self.discard_files(os.path.join(self.input_dir.replace('//Original', ''), 'discard.txt'), self.processed_dir)  # remove unwanted images
-        file_names = [os.path.basename(path) for path in get_paths(self.processed_dir, '.tif')]  # get file basenames
-        new_names = [f'{self.species_name} {self.source_name} {file_name}' for file_name in file_names]  # get file new basenames
-        self.batch_rename(self.processed_dir, file_names, new_names)  # rename all images
+        file_paths = get_paths(self.processed_dir, '.tif')  # get image path names
+        for file_path in file_paths:
+            image = imread_rgb(file_path)  # load the image for resizing
+            height, width = image.shape[:2]  # the original dimensions
+            enlarged_image = cv2.resize(image, (width * 4, height * 4), interpolation=cv2.INTER_LANCZOS4)  # resize the image
+            cv2.imwrite(file_path, cv2.cvtColor(enlarged_image, cv2.COLOR_RGB2BGR))  # save the resized image in position
+            new_basename = f'{self.species_name} {self.source_name} {os.path.basename(file_path)}'  # get new path basename
+            os.rename(file_path, os.path.join(self.processed_dir, new_basename))  # rename and move to the speceis folder
         self.create_species_folders(self.processed_dir, set([self.species_name]))  # create species folder
         return None
 
@@ -2257,7 +2273,7 @@ class Toda2018(StomataPyData):
     ├── discard.txt
 
     1. Rename images with f'C. benghalensis Toda2018 {orginal file name}'
-    2. Generate segmentation masks with SAM-HQ and Cellpose; then mannually adjust them
+    2. Generate segmentation masks with SAM-HQ; then mannually adjust them
     """
     def __init__(self):
         super().__init__()
@@ -2341,7 +2357,7 @@ class Toda2021(StomataPyData):
     1. Rename images
     2. Dsicard unwanted images and their annotations
     3. Load the json format bbox annotations as SAM-HQ prompt inputs
-    4. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
+    4. Generate segmentation masks with SAM-HQ, mannually adjust them
     5. Train custom models for auto labeling
     6. Check every annotation
     """
@@ -2466,7 +2482,7 @@ class Vofely2019(StomataPyData):
 
     1. Rename images
     2. Dsicard unwanted / corrupt images and their annotations
-    3. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
+    3. Generate segmentation masks with SAM-HQ, mannually adjust them
     4. Train custom models for auto labeling
     5. Check every annotation
     """
@@ -2584,9 +2600,9 @@ class WangRenninger2023(StomataPyData):
             1 0.325424 0.056191 0.077794 0.043736
     where the class code is {0: 'stomata', 1: 'whole_stomata'} meaning {0: 'outer ledge', 1: 'stomata'}
 
-    1. Rename images
+    1. Rename images and resize every image to 2048 x 1536
     2. Dsicard unwanted / corrupt images and their annotations
-    3. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
+    3. Generate segmentation masks with SAM-HQ, mannually adjust them
     4. Train custom models for auto labeling
     5. Check every annotation
     """
@@ -2631,6 +2647,11 @@ class WangRenninger2023(StomataPyData):
             new_names.append(f'{species_name} {self.source_name} {file_name}')  # get the image renaming
             species_names.append(species_name)
         self.batch_rename(self.processed_dir, file_names, new_names)  # rename
+        file_paths = get_paths(self.processed_dir, '.jpg')  # to resize the image
+        for file_path in file_paths:
+            image = imread_rgb(file_path)  # load the image for resizing
+            enlarged_image = cv2.resize(image, (2048, 1536), interpolation=cv2.INTER_LANCZOS4)  # resize the image
+            cv2.imwrite(file_path, cv2.cvtColor(enlarged_image, cv2.COLOR_RGB2BGR))  # save the resized image in position
         self.create_species_folders(self.processed_dir, set(species_names))  # group files by plant species
         return None
 
@@ -2819,7 +2840,7 @@ class Yang2021(StomataPyData):
 
     1. Rename images
     2. Dsicard unwanted images and their annotations
-    3. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
+    3. Generate segmentation masks with SAM-HQ, mannually adjust them
     4. Check every annotation
     """
     def __init__(self):
@@ -2900,7 +2921,7 @@ class Yates2018(StomataPyData):
 
     1. Rename images
     2. Dsicard unwanted images and their annotations
-    3. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
+    3. Generate segmentation masks with SAM-HQ, mannually adjust them
     4. Train custom models for auto labeling
     5. Check every annotation
     """
@@ -2982,7 +3003,7 @@ class Zhu2021(StomataPyData):
 
     1. Rename images
     2. Dsicard unwanted images and their annotations
-    3. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
+    3. Generate segmentation masks with SAM-HQ, mannually adjust them
     4. Train custom models for auto labeling
     5. Check every annotation
     """
@@ -3076,7 +3097,7 @@ class Liang2022(StomataPyData):
     1. Rename images
     2. Dsicard unwanted images and their annotations
     3. Load the YOLO format bbox annotations as SAM-HQ prompt inputs
-    4. Generate segmentation masks with SAM-HQ and Cellpose, mannually adjust them
+    4. Generate segmentation masks with SAM-HQ, mannually adjust them
     5. Train custom models for auto labeling
     6. Check every annotation
     """
