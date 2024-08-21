@@ -35,15 +35,15 @@ class DataStatistics:
         species_names = list(set(species_names))  # get the unique species names
         return sorted(species_names, key=str.casefold), list(set(species_dirs))
 
-    def select_species_folders(self, pavements_only: bool = False, ensemble_files: bool = False) -> dict:
+    def select_species_folders(self, pavements_only: bool = False, ensemble_files: bool = False, ensemble_by_modality: bool = True) -> dict:
         """Retuern the summarized information cross all selected species folders"""
         def check_dataset(cell, dataset):
             datasets = [dataset.strip() for dataset in cell.split(';')]
             return dataset in datasets
 
         if ensemble_files:
-            destination_dir = os.path.join(self.root_dir, 'Ensemble')  # the directory of ensembled files
-            os.makedirs(destination_dir, exist_ok=True)  # create the ensemble files directory
+            destination_root = os.path.join(self.root_dir, 'Ensemble')  # the directory of ensembled files
+            os.makedirs(destination_root, exist_ok=True)  # create the ensemble files directory
 
         reference = pd.read_excel(self.reference_table_path, sheet_name='S2. Plant species', header=13)
 
@@ -74,12 +74,19 @@ class DataStatistics:
                     if 'pavement cell' not in categories:
                         continue
 
+                stomata_type, sampling_method, microscopy, image_quality, image_scale = note.split('_')  # note format
+                image_scale = pd.NA if image_scale.strip() == 'NA' else float(image_scale.strip())
+                image_modality = f'{sampling_method}_{microscopy}'  # get the image modality
+
                 if ensemble_files:
+                    if ensemble_by_modality:
+                        destination_dir = os.path.join(destination_root, image_modality)
+                        if not os.path.exists(destination_dir):
+                            os.makedirs(destination_dir, exist_ok=True)  # create the modality folder if needed
+                    else:
+                        destination_dir = destination_root  # use default directory if not grouping by image modality
                     shutil.copy2(image_path, os.path.join(destination_dir, os.path.basename(image_path)))  # copy the image to the ensembled files directory
                     shutil.copy2(json_path, os.path.join(destination_dir, os.path.basename(json_path)))  # copy the json file to the ensembled files directory
-
-                stomata_type, sampling_method, image_modality, image_quality, image_scale = note.split('_')  # note format
-                image_scale = pd.NA if image_scale.strip() == 'NA' else float(image_scale.strip())
 
                 species = os.path.basename(species_folder_dir)  # get the species name
                 dataset_species = f'{dataset_name} - {species}'
@@ -135,7 +142,7 @@ class DataStatistics:
                     'Image name': image_name,
                     'image_path': image_path,
                     'Sampling method': sampling_method,
-                    'Image modality': image_modality,
+                    'Microscopy': microscopy,
                     'Image quality': image_quality,
                     'Image scale (pixels/\u03BCm)': image_scale,
                     'Image width': image_width,
