@@ -2458,10 +2458,10 @@ class Vofely2019(StomataPyData):
         ├── README_for_SampleTable.txt
         ├── SampleTable.csv
         ├── Table S1.xlsx
-    ├── Processed
-        ├── A. caudatus
+    ── Processed
+        ├── A. aurea
         ...
-        ├── Z. officinale
+        ├── V. officinalis
     ├── source.txt
     ├── discard.txt
 

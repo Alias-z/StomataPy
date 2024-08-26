@@ -65,13 +65,13 @@ class OpenMMlab(Data4Training):
         self.seg_onehot_mapping = seg_onehot_mapping  # segmentation one-hot code against class_name
         self.seg_color_mapping = {cell_color.class_name: cell_color.mask_rgb for cell_color in Cell_Colors}  # mapp the segmentation class names to their colors
 
-    def detect_stomata(self,
-                       image_paths: List[str],
-                       if_resize_image: bool = True,
-                       if_keep_ratio: bool = True,
-                       if_visualize: bool = False,
-                       if_auto_label: bool = False,
-                       if_standard_pred: bool = False) -> List[np.ndarray]:
+    def detect_cell(self,
+                    image_paths: List[str],
+                    if_resize_image: bool = True,
+                    if_keep_ratio: bool = True,
+                    if_visualize: bool = False,
+                    if_auto_label: bool = False,
+                    if_standard_pred: bool = False) -> List[np.ndarray]:
         """
         Detect objects in a list of images and return their bounding boxes and masks
         Each image is processed through an object detection model
@@ -86,6 +86,7 @@ class OpenMMlab(Data4Training):
         Returns:
         - valid_predictions (List[dict]): a list of dictionaries containing detection results per image with keys 'image_path', 'category_id', 'category_name', 'bboxes', 'masks'
         """
+
         def visualize_detections(image: np.ndarray, valid_prediction: dict) -> None:
             """Visualizes detection results on an image using bounding boxes and optional masks
 
@@ -200,9 +201,21 @@ class OpenMMlab(Data4Training):
                     'category_id': np.array([item['category_id'] for item in result], dtype=np.int64),
                     'category_name': [item['category_name'] for item in result],
                     'bboxes': np.array([UtilsISAT.bbox_convert(item['bbox'], 'COCO2ISAT') for item in result], dtype=np.int32),
-                    'masks': [UtilsISAT.coco_mask2isat_mask(mask[0]) for mask in masks] if len(masks[0]) > 0 else None
+                    'masks': [UtilsISAT.coco_mask2isat_mask(mask[0]) for mask in masks] if len(masks[0]) > 0 else None,
                 }  # collect prediction metadata
                 valid_predictions.append(result_dict)  # append the bboxes of each image
+
+        for valid_prediction in valid_predictions:
+            indices_to_remove = []  # to filter out masks that are tiny or uncomplete due to sahi slicing
+            for idx, mask in enumerate(valid_prediction['masks']):
+                area = Anything2ISAT().isat_area(mask)  # get the mask area
+                if area < 40:
+                    indices_to_remove.append(idx)  # remove tiny masks
+            for idx in sorted(indices_to_remove, reverse=True):
+                valid_prediction['category_name'].pop(idx)  # remove the corresponding mask catergory name
+                valid_prediction['category_id'] = np.delete(valid_prediction['category_id'], idx, axis=0)  # same for the category id
+                valid_prediction['bboxes'] = np.delete(valid_prediction['bboxes'], idx, axis=0)  # remove the corresponding bbox
+                valid_prediction['masks'].pop(idx)  # and remove the mask itself
 
         if if_resize_image:
             for idx, prediction in enumerate(valid_predictions):
@@ -237,12 +250,12 @@ class OpenMMlab(Data4Training):
                 visualize_detections(image, valid_predictions[idx])  # plot the detection results
         return valid_predictions
 
-    def segment_stomata(self,
-                        image_paths: List[str],
-                        if_resize_image: bool = True,
-                        if_keep_ratio: bool = True,
-                        if_visualize: bool = False,
-                        if_auto_label: bool = False) -> List[np.ndarray]:
+    def segment_cell(self,
+                     image_paths: List[str],
+                     if_resize_image: bool = True,
+                     if_keep_ratio: bool = True,
+                     if_visualize: bool = False,
+                     if_auto_label: bool = False) -> List[np.ndarray]:
         """
         Segment objects within the detected bboxes (padded)
 
@@ -256,54 +269,17 @@ class OpenMMlab(Data4Training):
         Returns:
         - List[dict]: a list of dictionaries containing detection results per image with keys 'image_path', 'category_id', 'category_name', 'bboxes', 'masks'
         """
-        def pad_bbox(bbox: np.ndarray, padding: int, max_width: int, max_height: int) -> np.ndarray:
-            """
-            Expand the bbox by a specified padding while ensuring it stays within the image boundaries
 
-            Args:
-            - bbox (np.ndarray): the original bbox as a 1D array [x_min, y_min, x_max, y_max]
-            - padding (int): the amount of padding to add to each side of the bbox
-            - max_width (int): the maximum allowable width (image width)
-            - max_height (int): the maximum allowable height (image height)
-
-            Returns:
-            - padded_bbox (np.ndarray): the padded bbox as a 1D array [x_min_padded, y_min_padded, x_max_padded, y_max_padded]
-            """
-            x_min, y_min, x_max, y_max = bbox  # get the bbox coordinates
-            x_min_padded, x_max_padded = max(x_min - padding, 0), min(x_max + padding, max_width)  # calculate padding values of x axis
-            y_min_padded, y_max_padded = max(y_min - padding, 0), min(y_max + padding, max_height)  # same for the y axis
-            padded_bbox = np.array([x_min_padded, y_min_padded, x_max_padded, y_max_padded], dtype=np.int32)  # get the padded bbox
-            return padded_bbox
-
-        def crop_image_with_padding(image: np.ndarray, bboxes: np.ndarray, padding: int) -> List[np.ndarray]:
-            """
-            Crop image patches based on provided bounding boxes with added padding, ensuring none exceed the image's dimensions.
-
-            Args:
-            - image (np.ndarray): the image from which patches are to be cropped (height, width, channels)
-            - bboxes (np.ndarray): a 2D array of bounding boxes, each row being [x_min, y_min, x_max, y_max]
-            - padding (int): the amount of padding to add around each bounding box
-
-            Returns:
-            - padded_patches (List[np.ndarray]): a list of cropped image patches as NumPy arrays
-            """
-            padded_patches = []  # to collect the padded patches
-            max_height, max_width = image.shape[:2]  # get the image height and width
-            for bbox in bboxes:
-                padded_bbox = pad_bbox(bbox, padding, max_width, max_height)  # pad the bbox
-                crop = image[padded_bbox[1]:padded_bbox[3], padded_bbox[0]:padded_bbox[2]]  # crop the image using the padded bounding box
-                padded_patches.append(crop)  # collect the padded patches
-            return padded_patches
 
         set_seeds(42); segmentor = mmseg_apis_init_model(self.segmentor_config_path, self.segmentor_weight_path, device='cpu')   # noqa: initialize a segmentor from config file
-        valid_predictions = self.detect_stomata(image_paths, if_resize_image=if_resize_image, if_keep_ratio=if_keep_ratio, if_visualize=if_visualize, if_auto_label=False)  # detect stomata
+        valid_predictions = self.detect_cell(image_paths, if_resize_image=if_resize_image, if_keep_ratio=if_keep_ratio, if_visualize=if_visualize, if_auto_label=False)  # detect stomata
         segmentor.to(device)  # move segmentor to device ('cuda')
 
         for valid_prediction in valid_predictions:
             image_path = valid_prediction['image_path']  # get the image path
             image = imread_rgb(image_path)  # load the image
             bboxes = valid_prediction['bboxes']  # get the predicted bboxes
-            stoma_patches = crop_image_with_padding(image, bboxes, padding=self.crop_padding_value)  # crop the image with padded bbox for bigger fild of view
+            stoma_patches = [UtilsISAT.crop_image_with_padding(image, bbox, self.crop_padding_value) for bbox in bboxes]  # crop the image with padded bbox for bigger fild of view
             for stoma_patch in stoma_patches:
                 resized_patch, _, _ = resize_and_pad_image(stoma_patch, initial_padding_ratio=0, target_size=(512, 512))  # resized and pad the image to target dimensions
                 mmseg_utils_register_all_modules(init_default_scope=True)  # initialize mmmseg scope

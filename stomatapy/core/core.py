@@ -169,6 +169,7 @@ def restore_original_dimensions(image: Image.Image, padding: Tuple[int, int, int
     """
     Restore an image to its original dimensions before it was resized and padded
     Reversing an initial outward padding of 20% applied to each edge, and the subsequent padding and scaling
+
     Args:
     - image (Image.Image): the pil image object to be restored
     - padding (Tuple[int, int, int, int]): the padding value from each side of the image as (left_pad, top_pad, right_pad, bottom_pad)
