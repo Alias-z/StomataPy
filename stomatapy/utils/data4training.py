@@ -27,7 +27,7 @@ class Data4Training:
                  new_width: int = 4352,
                  new_height: int = 1844,
                  r_train: float = 0.8,
-                 crop_padding_value: int = 30,
+                 crop_padding_ratio: float = 0.2,
                  use_sahi: bool = True,
                  slice_width: int = 1280,
                  slice_height: int = 1024,
@@ -39,7 +39,7 @@ class Data4Training:
         self.new_width = new_width  # new width after resizing
         self.new_height = new_height  # new height after resizing
         self.r_train = r_train  # ratio of training data
-        self.crop_padding_value = crop_padding_value  # to padding value after cropping (for segmentation)
+        self.crop_padding_ratio = crop_padding_ratio  # to padding value after cropping (for segmentation)
         self.use_sahi = use_sahi  # if use sahi to slice the images and annotations (for detection)
         self.slice_width = slice_width  # the target slice width
         self.slice_height = slice_height  # the target slice height
@@ -126,7 +126,10 @@ class Data4Training:
             for annotation in annotation2crop:
                 image_name = image['file_name']  # get the image name
                 image_pil = Image.open(os.path.join(input_dir, image_name))  # open image
-                padded_bbox = self.get_padded_bbox(bbox=annotation['bbox'], image_width=image_pil.width, image_height=image_pil.height, padding=self.crop_padding_value)  # get padded bbox
+                bbox = annotation['bbox']  # get the annotation bbox
+                _, _, width, height = bbox
+                padding = int(self.crop_padding_ratio * max(width, height))
+                padded_bbox = self.get_padded_bbox(bbox=annotation['bbox'], image_width=image_pil.width, image_height=image_pil.height, padding=padding)  # get padded bbox
                 cropped_image = image_pil.crop(padded_bbox)  # crop image with padded bbox
                 cropped_mask = np.array(Image.fromarray(mask, 'RGB').crop(padded_bbox))  # RGB
                 cropped_mask_onehot = np.zeros(cropped_mask.shape[:2], dtype=np.uint8)  # create an empty grayscale mask with the same size

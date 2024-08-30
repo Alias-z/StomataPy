@@ -138,16 +138,17 @@ def resize_and_pad_image(image: np.ndarray, initial_padding_ratio: float = 0.2, 
 
     Returns:
     - resized_and_padded_image (np.ndarray): the image after adjustments
-    - padding_values (Tuple[int, int, int, int]): padding applied on each side
-    - scale_factor (float): the scale used to adjust the image size initially
+    - final_padding (Tuple[int, int, int, int]): the final padding applied to each side of the image as (left, top, right, bottom).
+    - padded_dimension Tuple[int, int]: the padded dimension before resizing
+    - initial_padding_amount (Tuple[int, int]): the intial padding value applied to the original image
     """
     image = Image.fromarray(image)  # convert np.ndarray to pil image
     initial_padding_amount = (int(image.width * initial_padding_ratio), int(image.height * initial_padding_ratio))  # calculate n% padding
     padded_image = ImageOps.expand(image, border=initial_padding_amount, fill=0)  # apply initial padding
 
-    temp_target_size = (int(target_size[0] * 1.1), int(target_size[1] * 1.1))  # calculate 10% larger than the final target size
-    scale_width = temp_target_size[0] / padded_image.width  # calculate the width scaling factor
-    scale_height = temp_target_size[1] / padded_image.height  # calculate the height scaling factor
+    scale_width = target_size[0] / padded_image.width  # calculate the width scaling factor
+    scale_height = target_size[1] / padded_image.height  # calculate the height scaling factor
+    padded_dimension = (padded_image.width, padded_image.height)
     scale = min(scale_width, scale_height)  # determine the minimum scaling factor
     new_width, new_height = int(padded_image.width * scale), int(padded_image.height * scale)  # apply the scaling factor
     resized_image = padded_image.resize((new_width, new_height), Image.Resampling.LANCZOS)  # resize the image based on current ratio
@@ -162,34 +163,29 @@ def resize_and_pad_image(image: np.ndarray, initial_padding_ratio: float = 0.2, 
     final_padded_image = ImageOps.expand(resized_image, final_padding)  # apply final padding
 
     final_padded_image = np.array(final_padded_image)  # convert the final padded image back to numpy array
-    return final_padded_image, final_padding, scale
+    return final_padded_image, final_padding, padded_dimension, initial_padding_amount
 
 
-def restore_original_dimensions(image: Image.Image, padding: Tuple[int, int, int, int], scale: float) -> Image.Image:
+def restore_original_dimensions(image: np.ndarray, final_padding: Tuple[int, int, int, int], padded_dimension: Tuple[int, int], initial_padding_amount: Tuple[int, int]) -> np.ndarray:
     """
-    Restore an image to its original dimensions before it was resized and padded
-    Reversing an initial outward padding of 20% applied to each edge, and the subsequent padding and scaling
+    Restore an image to its original dimensions by reversing the resize and padding process.
 
     Args:
-    - image (Image.Image): the pil image object to be restored
-    - padding (Tuple[int, int, int, int]): the padding value from each side of the image as (left_pad, top_pad, right_pad, bottom_pad)
-    - scale (float): the scale factor used when the image was resized, to reverse the resizing effect
+    - image (np.ndarray): The image to be restored, as a numpy array.
+    - final_padding (Tuple[int, int, int, int]): the final padding applied to each side of the image as (left, top, right, bottom).
+    - padded_dimension Tuple[int, int]: the padded dimension before resizing
+    - initial_padding_amount (Tuple[int, int]): the intial padding value applied to the original image
 
     Returns:
-    - restored_image (Image.Image): the pil image object after reversing the padding and scaling
+    - restored_image (np.ndarray): The numpy array of the image after reversing the padding and scaling.
     """
-    # calculate coordinates for cropping to remove the additional padding first
-    initial_padding = int(max(image.width, image.height) * 0.2)  # 20% of the larger dimension for consistent initial padding
-    crop_left = padding[0] + initial_padding  # add initial padding to left
-    crop_top = padding[1] + initial_padding  # add initial padding to top
-    crop_right = image.width - (padding[2] + initial_padding)  # subtract initial padding from right
-    crop_bottom = image.height - (padding[3] + initial_padding)  # subtract initial padding from bottom
-    cropped_image = image.crop((crop_left, crop_top, crop_right, crop_bottom))  # crop the image to remove all padding
-    original_width = int(cropped_image.width / scale)  # reverse width scaling based on original scale
-    original_height = int(cropped_image.height / scale)  # reverse height scaling based on original scale
-    restored_image = cropped_image.resize((original_width, original_height), Image.Resampling.LANCZOS)  # resize the cropped image back to its original dimensions
-
-    return restored_image
+    image = Image.fromarray(image)  # Convert np.ndarray to PIL Image
+    left_pad, top_pad, right_pad, bottom_pad = final_padding  # get the final padding
+    image_cropped = image.crop((left_pad, top_pad, image.width - right_pad, image.height - bottom_pad))  # remove the final padding
+    image_resized = image_cropped.resize(padded_dimension, Image.Resampling.LANCZOS)
+    padding_x, padding_y = initial_padding_amount  # get the intial padding value
+    restored_image = image_resized.crop((padding_x, padding_y, padded_dimension[0] - padding_x, padded_dimension[1] - padding_y))  # remove the intial padding
+    return np.array(restored_image)  # convert back to np.ndarray
 
 
 def get_checkpoints(download_url: str = None, destination_file_path: str = None) -> bool:

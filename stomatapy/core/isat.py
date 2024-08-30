@@ -798,7 +798,7 @@ class Anything2ISAT:
         return 0.5 * np.abs(np.dot(x, np.roll(y, -1)) - np.dot(y, np.roll(x, -1)))
 
     @staticmethod
-    def seg2isat(info_dict: dict, objects_list: dict, output_filename: str) -> None:
+    def seg2isat(info_dict: dict, objects_list: list, output_filename: str) -> None:
         """
         Converts segmentation results into ISAT JSON format
         This function takes a dictionary containing image information, a list of objects each described in a dictionary format, and an output filename
@@ -1215,7 +1215,7 @@ class Anything2ISAT:
                 Anything2ISAT.create_empty_json(image_path)  # create an empty ISAT json file if not exists
             with open(json_path, 'r', encoding='utf-8') as file:
                 data = json.load(file)  # load the json data
-            if data['info']['note'] != '':
+            if data['info']['note'] != '' or valid_prediction['masks'] is None:
                 continue  # only convert unchecked ISAT json files
             for idx, _ in enumerate(valid_prediction['masks']):
                 data = populate_objects(data, valid_prediction, idx)  # populate the objects setction

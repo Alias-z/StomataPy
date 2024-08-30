@@ -1,12 +1,15 @@
 """Module providing functions autolabeling images with OpenMMlab models"""
 
-# pylint: disable=line-too-long, import-error, multiple-statements, c-extension-no-member, relative-beyond-top-level, no-member, too-many-function-args, wrong-import-position, undefined-loop-variable, unused-import
+# pylint: disable=line-too-long, import-error, multiple-statements, c-extension-no-member, relative-beyond-top-level, no-member, too-many-function-args, wrong-import-position, undefined-loop-variable, unused-import, no-name-in-module
 import os  # interact with the operating system
+import json  # manipulate json files
 import random  # suppress xformers to generate random predictions results
 from typing import List  # to support type hints
 import warnings; warnings.filterwarnings('ignore', message='.*in an upcoming release, it will be required to pass the indexing argument.*'); warnings.filterwarnings('ignore', message='Failed to add*'); warnings.filterwarnings('ignore', message='xFormers is available'); warnings.filterwarnings('ignore', module=r'.*dino_layers.*'); warnings.filterwarnings('ignore', message='The current default scope .* is not .*')  # noqa: supress warning messages
 import numpy as np  # NumPy
 from PIL import Image  # Pillow image processing
+from scipy import ndimage as ndi  # for hole filling
+from skimage.measure import label  # for using instance segmentation results as detected objects
 import torch  # PyTorch
 from tqdm import tqdm  # progress bar
 from matplotlib import pyplot as plt  # for image visualization
@@ -19,8 +22,7 @@ from sahi.predict import get_sliced_prediction  # sahi sliced prediction
 from mmseg.utils import register_all_modules as mmseg_utils_register_all_modules  # register mmseg modules
 from mmseg.apis import init_model as mmseg_apis_init_model  # initialize mmseg model
 from mmseg.apis import inference_model as mmseg_apis_inference_model  # mmseg inference segmentor
-from mmseg.apis import show_result_pyplot as mmseg_apis_show_result_pyplot  # visualize segment results
-from ..core.core import device, Cell_Colors, imread_rgb, resize_and_pad_image  # import core elements
+from ..core.core import device, Cell_Colors, imread_rgb, resize_and_pad_image, restore_original_dimensions  # import core elements
 from ..core.isat import UtilsISAT, Anything2ISAT  # to interact with ISAT jason files
 from ..utils.data4training import Data4Training  # the traning processing pipelines
 
@@ -64,13 +66,14 @@ class OpenMMlab(Data4Training):
         self.segmentor_weight_path = segmentor_weight_path  # semantic segmentation weight path
         self.seg_onehot_mapping = seg_onehot_mapping  # segmentation one-hot code against class_name
         self.seg_color_mapping = {cell_color.class_name: cell_color.mask_rgb for cell_color in Cell_Colors}  # mapp the segmentation class names to their colors
+        set_seeds(42); self.segmentor = mmseg_apis_init_model(self.segmentor_config_path, self.segmentor_weight_path, device='cpu')   # noqa: initialize a segmentor from config file
 
     def detect_cell(self,
                     image_paths: List[str],
                     if_resize_image: bool = True,
                     if_keep_ratio: bool = True,
                     if_visualize: bool = False,
-                    if_auto_label: bool = False,
+                    if_auto_label: bool = True,
                     if_standard_pred: bool = False) -> List[np.ndarray]:
         """
         Detect objects in a list of images and return their bounding boxes and masks
@@ -201,7 +204,7 @@ class OpenMMlab(Data4Training):
                     'category_id': np.array([item['category_id'] for item in result], dtype=np.int64),
                     'category_name': [item['category_name'] for item in result],
                     'bboxes': np.array([UtilsISAT.bbox_convert(item['bbox'], 'COCO2ISAT') for item in result], dtype=np.int32),
-                    'masks': [UtilsISAT.coco_mask2isat_mask(mask[0]) for mask in masks] if len(masks[0]) > 0 else None,
+                    'masks': [UtilsISAT.coco_mask2isat_mask(mask[0]) for mask in masks] if masks and len(masks[0]) > 0 else []
                 }  # collect prediction metadata
                 valid_predictions.append(result_dict)  # append the bboxes of each image
 
@@ -223,18 +226,18 @@ class OpenMMlab(Data4Training):
                 adjusted_bboxes, adjusted_masks = [], []  # to collect the adjusted bboxes and masks back to orginal image
                 for bbox in prediction['bboxes']:
                     x1, y1, x2, y2 = bbox  # load each individual object bbox
-                    adj_x1 = int((x1 - metadata['padding_horizontal']) / metadata['width_ratio'])  # adjust x1
-                    adj_y1 = int((y1 - metadata['padding_vertical']) / metadata['height_ratio'])  # adjust y1
-                    adj_x2 = int((x2 - metadata['padding_horizontal']) / metadata['width_ratio'])  # adjust x2
-                    adj_y2 = int((y2 - metadata['padding_vertical']) / metadata['height_ratio'])  # adjust y2
+                    adj_x1 = max(0, int((x1 - metadata['padding_horizontal']) / metadata['width_ratio']))  # adjust x1
+                    adj_y1 = max(0, int((y1 - metadata['padding_vertical']) / metadata['height_ratio']))  # adjust y1
+                    adj_x2 = max(0, int((x2 - metadata['padding_horizontal']) / metadata['width_ratio']))  # adjust x2
+                    adj_y2 = max(0, int((y2 - metadata['padding_vertical']) / metadata['height_ratio']))  # adjust y2
                     adjusted_bboxes.append([adj_x1, adj_y1, adj_x2, adj_y2])  # append the update bbox
 
                 for mask in prediction['masks']:
                     if mask is not None:
                         updated_points = []  # to collect all points
                         for point in mask:
-                            point[0] = (point[0] - metadata['padding_horizontal']) / metadata['width_ratio']   # update x coordinate
-                            point[1] = (point[1] - metadata['padding_vertical']) / metadata['height_ratio']   # update y coordinate
+                            point[0] = max(0, (point[0] - metadata['padding_horizontal']) / metadata['width_ratio'])   # update x coordinate
+                            point[1] = max(0, (point[1] - metadata['padding_vertical']) / metadata['height_ratio'])   # update y coordinate
                             updated_points.append([point[0], point[1]])  # collect the updated points
                         adjusted_masks.append(updated_points)  # append the update mask
                 valid_predictions[idx]['bboxes'] = np.array(adjusted_bboxes, dtype=np.int32)  # update the all bboxes for the given image
@@ -251,43 +254,90 @@ class OpenMMlab(Data4Training):
         return valid_predictions
 
     def segment_cell(self,
-                     image_paths: List[str],
-                     if_resize_image: bool = True,
-                     if_keep_ratio: bool = True,
+                     json_paths: List[str],
                      if_visualize: bool = False,
-                     if_auto_label: bool = False) -> List[np.ndarray]:
+                     if_auto_label: bool = True) -> List[np.ndarray]:
         """
         Segment objects within the detected bboxes (padded)
 
         Args:
         - image_paths (List[str]): list of image paths
-        - if_resize_image (bool): if True, resize and pad image to target dimension before predictions
-        - if_keep_ratio (bool): if True, maintains aspect ratio while resizing
         - if_visualize (bool): if True, visualize the detection results
         - if_auto_label (bool): if True, convet predictions to ISAT json files as well
 
         Returns:
-        - List[dict]: a list of dictionaries containing detection results per image with keys 'image_path', 'category_id', 'category_name', 'bboxes', 'masks'
+        - objects_list (List[dict]): a list of dictionaries containing segmentation results per image with keys 'category', 'group', 'segmentation', 'bbox', etc
         """
+        def fill_holes(binary_mask: np.ndarray) -> np.ndarray:
+            """fill holes in binary mask"""
+            if not np.any(binary_mask > 0):
+                return binary_mask  # if blank
+            labeled_mask = label(ndi.binary_fill_holes(binary_mask), connectivity=2)  # fill in labels and label regions
+            label_counts = np.bincount(labeled_mask.ravel())  # count number of regions
+            if len(label_counts) <= 1:
+                return None
+            largest_label = label_counts[1:].argmax() + 1  # find the largest label
+            largest_mask = labeled_mask == largest_label  # find the largest mask
+            return largest_mask
 
+        self.segmentor.to(device)  # move segmentor to device ('cuda')
 
-        set_seeds(42); segmentor = mmseg_apis_init_model(self.segmentor_config_path, self.segmentor_weight_path, device='cpu')   # noqa: initialize a segmentor from config file
-        valid_predictions = self.detect_cell(image_paths, if_resize_image=if_resize_image, if_keep_ratio=if_keep_ratio, if_visualize=if_visualize, if_auto_label=False)  # detect stomata
-        segmentor.to(device)  # move segmentor to device ('cuda')
-
-        for valid_prediction in valid_predictions:
-            image_path = valid_prediction['image_path']  # get the image path
+        for json_path in tqdm(json_paths, total=len(json_paths)):
+            with open(json_path, 'r', encoding='utf-8') as file:
+                data = json.load(file)  # load the json data
+            image_extension = os.path.splitext(data['info']['name'])[1]  # get the image path
+            image_path = os.path.splitext(json_path)[0] + image_extension  # get the image path
             image = imread_rgb(image_path)  # load the image
-            bboxes = valid_prediction['bboxes']  # get the predicted bboxes
-            stoma_patches = [UtilsISAT.crop_image_with_padding(image, bbox, self.crop_padding_value) for bbox in bboxes]  # crop the image with padded bbox for bigger fild of view
-            for stoma_patch in stoma_patches:
-                resized_patch, _, _ = resize_and_pad_image(stoma_patch, initial_padding_ratio=0, target_size=(512, 512))  # resized and pad the image to target dimensions
+            max_height, max_width = image.shape[:2]  # get the image dimensions
+            objects_list, layer = [], 1.0  # to store objects for the json file
+            for idx, obj in enumerate(data['objects']):
+                if 'stoma' not in obj['category']:
+                    continue
+                x_min, y_min, x_max, y_max = obj['bbox']
+                padded_bbox = UtilsISAT.pad_bbox(obj['bbox'], int(self.crop_padding_ratio * max((x_max - x_min), (y_max - y_min))), max_width, max_height)
+                stoma_patch = UtilsISAT.crop_image_with_padding(image, padded_bbox, 0, allow_negative_crop=False)  # crop the image with padded bbox for bigger fild of view
+                resized_patch, final_padding, padded_dimension, initial_padding_amount = resize_and_pad_image(stoma_patch, initial_padding_ratio=0, target_size=(1024, 1024))  # resized and pad the image to target dimensions
                 mmseg_utils_register_all_modules(init_default_scope=True)  # initialize mmmseg scope
-                result = mmseg_apis_inference_model(segmentor, resized_patch)  # inference on the given image
-                if if_visualize:
-                    vis_img = mmseg_apis_show_result_pyplot(segmentor, resized_patch, result)  # visualize the segmentation results
-                    plt.imshow(vis_img); plt.axis('off'); plt.show()  # noqa: visualization the segmentation results
-        return result.pred_sem_seg.data.cpu().numpy()
+                prediction = mmseg_apis_inference_model(self.segmentor, resized_patch)  # inference on the given image (batch inference is not supported)
+                prediction = prediction.pred_sem_seg.data.cpu().numpy()[0]  # move prediction from GPU to CPU
+                unique_classes = np.unique(prediction)  # fetch the unique classes
+                resized_masks = []  # resizing the segmentation masks
+                for cls in unique_classes:
+                    class_mask = prediction == cls  # get the one-hot class mask
+                    resized_boolean_mask = restore_original_dimensions(class_mask, final_padding, padded_dimension, initial_padding_amount)  # resize the bool mask
+                    class_values_mask = resized_boolean_mask * cls  # ressign class code to the bool mask
+                    resized_masks.append(class_values_mask)  # collect the resized mask
+                prediction = np.max(np.stack(resized_masks, axis=0), axis=0)
+                seg_mask = np.zeros([prediction.shape[0], prediction.shape[1], 3], dtype=np.uint8)  # create a black image
 
-    # def unit_test(self):
-    #     """Test the combination of detction and segmentation"""0
+                for idx_j in np.unique(prediction):
+                    class_name = self.seg_onehot_mapping.get(idx_j, None)  # get the class name
+                    color = self.seg_color_mapping.get(class_name, [0, 0, 0])  # pick the color other wise balck background
+                    mask = prediction == idx_j  # pick the prediction class
+                    for idx_k in range(3):
+                        seg_mask[:, :, idx_k] = np.where(mask, color[idx_k], seg_mask[:, :, idx_k])  # fill in colors for the predicted class
+                if if_visualize:
+                    plt.imshow(seg_mask); plt.show()  # noqa: show the segmentation visualization
+                for seg_class in ['stomatal complex', 'stoma', 'outer ledge', 'pore']:
+                    if seg_class in self.seg_onehot_mapping.values():
+                        x_1, y_1, x_2, y_2 = padded_bbox  # stoma location
+                        seg_class_region = np.all(seg_mask == self.seg_color_mapping.get(seg_class), axis=-1)
+                        if np.all(seg_class_region == 0):
+                            continue
+                        seg_class_region = fill_holes(np.all(seg_mask == self.seg_color_mapping.get(seg_class), axis=-1))  # get the class bool segmentation mask
+                        full_mask = np.zeros(image.shape[:2], dtype=bool)  # create a empty full image bool mask
+                        full_mask[y_1:y_2, x_1:x_2] = seg_class_region  # map the cropped path segmentation back to the entire image
+                        if np.sum(full_mask) > 3:
+                            obj = {
+                                'category': seg_class,  # assign the segmentation class
+                                'group': data['objects'][idx]['group'],  # same as the patch number
+                                'segmentation': UtilsISAT.mask2segmentation(full_mask),  # convert bool mask to ISAT segmentations
+                                'area': int(np.sum(full_mask)),
+                                'layer': layer,  # the overlay layer
+                                'bbox': UtilsISAT.mask2bbox(full_mask),  # compute the bbox
+                                'iscrowd': False,
+                                'note': 'Auto'}
+                            objects_list.append(obj); layer += 1.0  # noqa
+            if if_auto_label:
+                Anything2ISAT.seg2isat(info_dict=data['info'], objects_list=objects_list, output_filename=json_path)
+        return objects_list
