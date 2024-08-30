@@ -1,3 +1,7 @@
+[submodule "mmdetection"]
+	path = mmdetection
+	url = https://github.com/Alias-z/mmdetection.git
+	branch = Rein
 [submodule "mmsegmentation"]
 	path = mmsegmentation
 	url = https://github.com/Alias-z/mmsegmentation.git
