@@ -2686,7 +2686,6 @@ class WangRenninger2023(StomataPyData):
         return None
 
 
-# TODO
 class Xie2021(StomataPyData):
     """
     Xie et al, 2021  https://doi.org/10.1093/plphys/kiab299
@@ -2746,6 +2745,7 @@ class Xie2021(StomataPyData):
         self.source_name = 'Xie2021'  # source name
         self.species_name = 'Z. mays'  # plant species name
         self.species_folder_dir = os.path.join(self.processed_dir, self.species_name)  # get the path of the species folder
+        self.samhq_configs = {'points_per_side': (24,), 'min_mask_ratio': 0.001, 'max_mask_ratio': 0.04}  # SAM-HQ auto label configuration
 
     def rename_images(self) -> None:
         """Copy images to 'Processed' and rename them"""
@@ -2758,41 +2758,24 @@ class Xie2021(StomataPyData):
         for image_path in get_paths(self.species_folder_dir, '.tif'):
             gray_image = Image.open(image_path).convert('L')  # open the 8 bit image
             rgb_image = Image.merge("RGB", (gray_image, gray_image, gray_image))  # merge 3 times to RGB so SAM-HQ can work
-            rgb_image.save(image_path)  # replace the 8 bit image with synthetic RGB image
+            rgb_image.save(image_path)  # replace the 8 bit image with synthetic RGB
+        file_paths = get_paths(self.species_folder_dir, '.tif')  # get the image paths
+        for file_path in file_paths:
+            image = imread_rgb(file_path)  # load the image for resizing
+            enlarged_image = cv2.resize(image, (image.shape[0] * 4, image.shape[1] * 4), interpolation=cv2.INTER_LANCZOS4)  # resize the image
+            cv2.imwrite(file_path, cv2.cvtColor(enlarged_image, cv2.COLOR_RGB2BGR))  # save the resized image in position
         return None
 
-    def get_annotations(self, bbbox_prompt: bool = True, catergory: str = 'stoma', visualize: bool = False, random_color: bool = True) -> None:
+    def get_annotations(self, catergory: str = 'stoma', visualize: bool = False, random_color: bool = True) -> None:
         """Generate ISAT annotations json files"""
-        def load_coco_bbox(coco_json_path: str) -> dict:
-            """Split the COCO json file for many images into json files for each image"""
-            with open(coco_json_path, 'r', encoding='utf-8') as file:
-                coco_data = json.load(file)  # load the json file
-            image_bboxes = {}  # to stor image bboxes
-            id_to_filename = {str(image['id']): image['file_name'] for image in coco_data['images']}  # map image ids to image names
-            for annotation in coco_data['annotations']:
-                image_name = id_to_filename.get(str(annotation['image_id']))  # get the image name
-                if image_name:
-                    bbox = annotation.get('bbox')  # get the bbox
-                    if bbox:
-                        if image_name not in image_bboxes:
-                            image_bboxes[image_name] = []  # to store all bboxes of the given image
-                        image_bboxes[image_name].append(bbox)  # collect these bboxes
-            return image_bboxes
-
-        test_bboxes = load_coco_bbox(os.path.join(self.input_dir, 'test_coco.json'))  # load the bboxes from test_coco.json
+        print('Show the progress bar of species folders instead')
         points_per_side, min_mask_ratio, max_mask_ratio = self.samhq_configs['points_per_side'], self.samhq_configs['min_mask_ratio'], self.samhq_configs['max_mask_ratio']  # get SAN-HQ auto mask configs
-        image_paths = get_paths(self.species_folder_dir, '.jpg')  # get the image paths under the species folder
+        image_paths = get_paths(self.species_folder_dir, '.tif')  # get the image paths under the species folder
         for image_path in tqdm(image_paths, total=len(image_paths)):
             image, masks = imread_rgb(image_path), []  # load the image in RGB scale
             try:
-                auto_masks = SAMHQ(image_path=image_path, points_per_side=points_per_side, min_mask_ratio=min_mask_ratio, max_mask_ratio=max_mask_ratio).auto_label()  # get the auto labelled masks
-                if bbbox_prompt and os.path.exists(image_path.replace('.jpg', '.txt')):
-                    isat_bboxes = test_bboxes.get(os.path.basename(image_path), [])  # try to get the bboxes
-                    if len(isat_bboxes) > 0:
-                        prompt_masks = SAMHQ(image_path=image_path).prompt_label(input_box=isat_bboxes, mode='multiple')  # get the bbox prompt masks
-                        masks = SAMHQ.isolate_masks(prompt_masks + auto_masks)  # filter redundant masks
-                else:
-                    masks = SAMHQ.isolate_masks(auto_masks)  # filter redundant masks
+                auto_masks = SAMHQ(image_path=image_path, points_per_side=points_per_side, min_mask_ratio=min_mask_ratio, max_mask_ratio=max_mask_ratio).auto_label(ellipse_threshold=0.9)  # get the auto labelled masks
+                masks = SAMHQ.isolate_masks(auto_masks)  # filter redundant masks
                 if visualize:
                     visual_masks = [mask['segmentation'] for mask in masks]  # get only bool masks
                     SAMHQ.show_masks(image, visual_masks, random_color=random_color)  # visualize bool masks

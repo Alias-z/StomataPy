@@ -73,6 +73,8 @@ class DataStatistics:
                     categories = set([obj['category'] for obj in data['objects']])  # get all categories
                     if 'pavement cell' not in categories:
                         continue
+                    if len(categories) == 1:
+                        continue
 
                 stomata_type, sampling_method, microscopy, image_quality, image_scale = note.split('_')  # note format
                 image_scale = pd.NA if image_scale.strip() == 'NA' else float(image_scale.strip())
