@@ -1,6 +1,10 @@
 resume = None
 load_from = 'https://download.openmmlab.com/mmdetection/v3.0/mask2former/mask2former_swin-s-p4-w7-224_8xb2-lsj-50e_coco/mask2former_swin-s-p4-w7-224_8xb2-lsj-50e_coco_20220504_001756-c9d0c4f2.pth'
-load_from = 'Models/Swin-S_Mask2Former_Hvulgare0906/best_coco_segm_mAP_epoch_297.pth'
+# load_from = 'Models/Swin-S_Mask2Former_Mixed01_2406/best_coco_segm_mAP_epoch_78.pth'
+# load_from = 'Models/Swin-S_Mask2Former_2906_SanteliaPeels/best_coco_segm_mAP_epoch_220.pth'
+load_from = None
+output_dir = 'det_Swin-S_Mask2Former_EP_0830'
+
 val_interval = 1
 log_processor = dict(type='LogProcessor', window_size=50, by_epoch=True)
 
@@ -8,16 +12,16 @@ fp16 = dict(loss_scale='dynamic')
 with_cp = True  # for FSDP: the checkpoint needs to be controlled by the checkpoint_check_fn.
 optimizer_config = dict(type='GradientCumulativeOptimizerHook', cumulative_iters=4)
 
-# classes = ('stomatal complex', 'pavement cell')
-classes = ('stomatal complex', )
+classes = ('stomatal complex', 'pavement cell')
+# classes = ('stomatal complex', )
 num_stuff_classes = 0
 num_things_classes = len(classes)
 num_classes = num_things_classes + num_stuff_classes
 
 dataset_type = 'CocoDataset'
-data_root = 'Stomata_detection//'
-# data_root = 'Epidermal_segmentation//'
-output_dir = 'Swin-S_Mask2Former_Hvulgare1206'
+# data_root = 'Stomata_detection//'
+data_root = 'Epidermal_segmentation//'
+
 work_dir = 'Models//' + output_dir
 wandb_project = 'StomataPy'
 
@@ -57,7 +61,8 @@ checkpoint = 'https://github.com/SwinTransformer/storage/releases/download/v1.0.
 # num_heads = [6, 12, 24, 48]
 # checkpoint = 'https://github.com/SwinTransformer/storage/releases/download/v1.0.0/swin_large_patch4_window12_384_22k.pth'
 
-crop_size = (1280, 1024)
+# crop_size = (1280, 1024)
+crop_size = (1024, 1024)
 image_size = (1024, 1024)
 
 
@@ -125,12 +130,13 @@ load_pipeline = [
     #     keymap={'img': 'image', 'gt_masks': 'masks', 'gt_bboxes': 'bboxes'},
     #     skip_img_without_anno=True
     # )
+    dict(type='Resize', scale=(crop_size[0], crop_size[1]), keep_ratio=True),
 ]
 
 
 train_pipeline = [
-    dict(type='CopyPaste', max_num_pasted=10, bbox_occluded_thr=10, mask_occluded_thr=100, selected=True, paste_by_box=False),
-    dict(type='FilterAnnotations', min_gt_bbox_wh=(10, 10), min_gt_mask_area=100, by_mask=True),
+    # dict(type='CopyPaste', max_num_pasted=5, bbox_occluded_thr=50, mask_occluded_thr=1000, selected=True, paste_by_box=False),
+    dict(type='FilterAnnotations', min_gt_bbox_wh=(10, 10), min_gt_mask_area=10, by_mask=True),
     dict(
         type='PackDetInputs',
         meta_keys=('img_path', 'img', 'gt_bboxes', 'gt_ignore_flags', 'gt_bboxes_labels', 'gt_masks'))
@@ -156,7 +162,8 @@ train_dataset = dict(
         metainfo=dict(classes=classes),
         data_root=data_root,
         ann_file=train_ann_file,
-        data_prefix=dict(img='train_sahi/', seg='annotations/panoptic_train2017/'),
+        # data_prefix=dict(img='train_sahi/', seg='annotations/panoptic_train2017/'),
+        data_prefix=dict(img='train_sahi/'),
         pipeline=load_pipeline,
         filter_cfg=dict(filter_empty_gt=True, min_size=32),
         backend_args=None),
@@ -181,7 +188,8 @@ val_dataloader = dict(
         metainfo=dict(classes=classes),
         data_root=data_root,
         ann_file=val_ann_file,
-        data_prefix=dict(img='val_sahi/', seg='annotations/panoptic_val2017/'),
+        # data_prefix=dict(img='val_sahi/', seg='annotations/panoptic_val2017/'),
+        data_prefix=dict(img='val_sahi/'),
         pipeline=test_pipeline,
         test_mode=False,
         backend_args=None)
@@ -336,7 +344,7 @@ batch_augments = [
         img_pad_value=0,
         pad_mask=True,
         mask_pad_value=0,
-        pad_seg=True,
+        pad_seg=False,
         seg_pad_value=255)
 ]
 
@@ -348,7 +356,7 @@ data_preprocessor = dict(
     pad_size_divisor=32,
     pad_mask=True,
     mask_pad_value=0,
-    pad_seg=True,
+    pad_seg=False,
     seg_pad_value=255,
     batch_augments=batch_augments)
 

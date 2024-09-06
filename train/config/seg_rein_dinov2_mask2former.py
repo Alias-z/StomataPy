@@ -4,20 +4,20 @@ resume = None
 load_from = None
 val_interval = 1
 log_processor = dict(by_epoch=True)
-dinov2_checkpoint = 'checkpoints/dinov2_converted.pth'
+dinov2_checkpoint = 'Checkpoints/DINOv2/dinov2_converted.pth'
 
 fp16 = dict(loss_scale='dynamic')
 optimizer_config = dict(type='GradientCumulativeOptimizerHook', cumulative_iters=8)
 
-classes = ('background', 'stomatal complex')
+classes = ('background', 'stomatal complex', 'stoma', 'outer ledge', 'pore', 'pavement cell')
 num_classes = len(classes)
 class_weight = [1.0] * num_classes + [0.1]
 
 model_crop_size = (512, 512)
 dataset_type = 'StomataDataset'
-data_root = '..//Stomata_segmentation//'
-output_dir = f'Rein_Dinov2_Mask2Former_{model_crop_size[0]}x{model_crop_size[0]}_Gmax'
-work_dir = '..//Models//' + output_dir
+data_root = 'Stomata_segmentation//'
+output_dir = 'seg_Li2023_0830'
+work_dir = 'Models//' + output_dir
 wandb_project = 'StomataPy'
 
 batch_size = 8
@@ -25,7 +25,7 @@ n_gpus = 4
 num_workers = 16
 original_batch_size = 4
 original_lr = 0.0001
-original_n_gpus = 4
+original_n_gpus = 8
 lr = original_lr * (n_gpus / original_n_gpus) * (batch_size / original_batch_size) / 10
 auto_scale_lr = dict(base_batch_size=16, enable=False)
 
@@ -35,7 +35,7 @@ max_epochs = 250
 warmup_epochs = 30
 
 
-crop_size = (448, 448)
+crop_size = (512, 512)
 # crop_size = (1024, 1024)
 
 # -------------------------------- Data augmentation --------------------------------
