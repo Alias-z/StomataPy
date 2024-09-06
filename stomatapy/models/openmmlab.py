@@ -168,7 +168,7 @@ class OpenMMlab(Data4Training):
                         'bboxes': np.array(prediction.pred_instances.bboxes[valid_indices].cpu().numpy(), dtype=np.int32),
                         'masks': [UtilsISAT.mask2segmentation(mask) for mask in masks] if masks is not None else None
                     }  # collect prediction metadata
-                valid_predictions.append(result_dict)
+                    valid_predictions.append(result_dict)
 
         elif self.use_sahi:
             detector = AutoDetectionModel.from_pretrained(
@@ -248,7 +248,7 @@ class OpenMMlab(Data4Training):
         if if_auto_label:
             Anything2ISAT().from_openmmlab(valid_predictions=valid_predictions)  # convert detection results to ISAT json files
 
-        if if_visualize:
+        if if_visualize and len(valid_predictions) > 0:
             for idx, image in enumerate(images):
                 visualize_detections(image, valid_predictions[idx])  # plot the detection results
         return valid_predictions
