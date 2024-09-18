@@ -90,16 +90,16 @@ class OpenMMlab(Data4Training):
         - valid_predictions (List[dict]): a list of dictionaries containing detection results per image with keys 'image_path', 'category_id', 'category_name', 'bboxes', 'masks'
         """
 
-        def visualize_detections(image: np.ndarray, valid_prediction: dict) -> None:
+        def visualize_detections(valid_prediction: dict) -> None:
             """Visualizes detection results on an image using bounding boxes and optional masks
 
             Args:
-            - image (np.ndarray): the image on which to overlay detections.
             - valid_prediction (dict): containing 'bboxes' [x_min, y_min, x_max, y_max] and optionally 'masks' [[x1, y1], [x2, y2], ..., [xn, yn]]
 
             Returns:
             - None. Just plot the detection results
             """
+            image = imread_rgb(valid_prediction['image_path'])  # load the image
             _, ax = plt.subplots(1); ax.imshow(image)  # noqa: add the imag to plot
             if valid_prediction['masks'] is not None:
                 for mask in valid_prediction['masks']:
@@ -198,13 +198,23 @@ class OpenMMlab(Data4Training):
                     slice_export_prefix=None,  # prefix for the exported slices. Defaults to None
                     slice_dir=None,  # directory to save the slices. Defaults to None
                 ).to_coco_annotations()  # get the prediction results in MSCOCO format
-                masks = [item['segmentation'] for item in result]  # get the segmentation masks in MSCOCO format
+
+                valid_items = []
+                for item in result:
+                    try:
+                        UtilsISAT.bbox_convert(np.array(item['bbox'], dtype=np.float32), 'COCO2ISAT')
+                        valid_items.append(item)  # filter out items with invalid boxes
+                    except Exception:
+                        pass
+
+                masks = [item['segmentation'] for item in valid_items]  # get the segmentation masks in MSCOCO format
+                bboxes = [np.array(item['bbox'], dtype=np.float32) for item in valid_items]  # the bboxes in MSCOCO format
                 result_dict = {
                     'image_path': image_paths[idx],
-                    'category_id': np.array([item['category_id'] for item in result], dtype=np.int64),
-                    'category_name': [item['category_name'] for item in result],
-                    'bboxes': np.array([UtilsISAT.bbox_convert(item['bbox'], 'COCO2ISAT') for item in result], dtype=np.int32),
-                    'masks': [UtilsISAT.coco_mask2isat_mask(mask[0]) for mask in masks] if masks and len(masks[0]) > 0 else []
+                    'category_id': np.array([item['category_id'] for item in valid_items], dtype=np.int64),
+                    'category_name': [item['category_name'] for item in valid_items],
+                    'bboxes': np.array([UtilsISAT.bbox_convert(bbox, 'COCO2ISAT') for bbox in bboxes], dtype=np.int32) if bboxes else np.array([], dtype=np.int32),
+                    'masks': [UtilsISAT.coco_mask2isat_mask(mask[0]) for mask in masks if mask and len(mask) > 0] if masks else []
                 }  # collect prediction metadata
                 valid_predictions.append(result_dict)  # append the bboxes of each image
 
@@ -249,14 +259,15 @@ class OpenMMlab(Data4Training):
             Anything2ISAT().from_openmmlab(valid_predictions=valid_predictions)  # convert detection results to ISAT json files
 
         if if_visualize and len(valid_predictions) > 0:
-            for idx, image in enumerate(images):
-                visualize_detections(image, valid_predictions[idx])  # plot the detection results
+            for valid_prediction in valid_predictions:
+                visualize_detections(valid_prediction)  # plot the detection results
         return valid_predictions
 
     def segment_cell(self,
                      json_paths: List[str],
                      if_visualize: bool = False,
-                     if_auto_label: bool = True) -> List[np.ndarray]:
+                     if_auto_label: bool = True,
+                     resize_to: tuple = (2048, 2048)) -> List[np.ndarray]:
         """
         Segment objects within the detected bboxes (padded)
 
@@ -296,7 +307,7 @@ class OpenMMlab(Data4Training):
                 x_min, y_min, x_max, y_max = obj['bbox']
                 padded_bbox = UtilsISAT.pad_bbox(obj['bbox'], int(self.crop_padding_ratio * max((x_max - x_min), (y_max - y_min))), max_width, max_height)
                 stoma_patch = UtilsISAT.crop_image_with_padding(image, padded_bbox, 0, allow_negative_crop=False)  # crop the image with padded bbox for bigger fild of view
-                resized_patch, final_padding, padded_dimension, initial_padding_amount = resize_and_pad_image(stoma_patch, initial_padding_ratio=0, target_size=(1024, 1024))  # resized and pad the image to target dimensions
+                resized_patch, final_padding, padded_dimension, initial_padding_amount = resize_and_pad_image(stoma_patch, initial_padding_ratio=0, target_size=resize_to)  # resized and pad the image to target dimensions
                 mmseg_utils_register_all_modules(init_default_scope=True)  # initialize mmmseg scope
                 prediction = mmseg_apis_inference_model(self.segmentor, resized_patch)  # inference on the given image (batch inference is not supported)
                 prediction = prediction.pred_sem_seg.data.cpu().numpy()[0]  # move prediction from GPU to CPU
