@@ -2181,7 +2181,7 @@ class ThathapalliPrakash2021(StomataPyData):
         ├── Plot_mean_values_for_tiller_height__culm_height__and_panicle_emergence_date.xlsx (ignored)
         ├── Stomatal_density_per_field_of_view_of_the_Setaria_abaxial_leaf_surface.xlsx
     ├── Processed
-        ├── S. italica x viridis
+        ├── S. italica
     ├── source.txt
     ├── discard.txt
 
@@ -2196,7 +2196,7 @@ class ThathapalliPrakash2021(StomataPyData):
         self.input_dir = self.thathapalliprakash2021_dir  # directory of Sun2023  # input directory
         self.processed_dir = self.input_dir.replace('Original', 'Processed')  # output directory
         self.source_name = 'Prakash2021'  # source name
-        self.species_name = 'S. italica x viridis'  # to store species name
+        self.species_name = 'S. italica'  # to store species name
         self.species_folder_dir = os.path.join(self.processed_dir, self.species_name)  # get the path of the species folder
         self.samhq_configs = {'points_per_side': (32,), 'min_mask_ratio': 0.0001, 'max_mask_ratio': 0.004}  # SAM-HQ auto label configuration
 
