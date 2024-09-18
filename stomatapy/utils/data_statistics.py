@@ -49,10 +49,10 @@ class DataStatistics:
 
         results = pd.DataFrame()
 
-        category_counts, selected_datasets, selected_jsons = {}, [], {}  # to store the maks counts of each category
-        n_masks, n_autolabel, adjusted_n_stomata = 0, 0, 0  # to count the number of masks
+        category_counts, selected_datasets, selected_jsons, image_modalities = {}, [], {}, []  # to store the maks counts of each category
+        n_masks, n_autolabel, adjusted_n_stomata, n_images = 0, 0, 0, 0  # to count the number of masks
 
-        _, species_folder_dirs = self.get_species_names()  # get the species folders directories
+        species_names, species_folder_dirs = self.get_species_names()  # get the species folders directories
         for species_folder_dir in species_folder_dirs:
             json_paths = get_paths(species_folder_dir, 'json')  # get the paths of ISAT annotation files
             dataset_name = os.path.normpath(species_folder_dir).split(os.sep)[1]  # get the dataset name
@@ -76,9 +76,11 @@ class DataStatistics:
                     if len(categories) == 1:
                         continue
 
+                n_images += 1  # to count the number of images
                 stomata_type, sampling_method, microscopy, image_quality, image_scale = note.split('_')  # note format
                 image_scale = pd.NA if image_scale.strip() == 'NA' else float(image_scale.strip())
                 image_modality = f'{sampling_method}_{microscopy}'  # get the image modality
+                image_modalities.append(image_modality)  # collect the image modalities
 
                 if ensemble_files:
                     if ensemble_by_modality:
@@ -177,7 +179,7 @@ class DataStatistics:
                 results = pd.concat([results, pd.DataFrame([result])], axis=0)  # concatenate all results
                 n_masks += len(data['objects'])
         results.to_excel(os.path.join(self.root_dir, 'Dataset_summary.xlsx'), index=False, na_rep='NA')  # save the results in Excel
+        print(f'Total images: {n_images}, total plant species: {len(set(species_names))}, total_modalities: {len(set(image_modalities))}')
         print(f'Total masks: {n_masks}, {n_autolabel} ({round(n_autolabel / n_masks * 100, 2)} %) out of which is autolabeled')
         print('Category counts:', category_counts)
-        print(f'slected datasets: {selected_datasets}')
         return selected_jsons
