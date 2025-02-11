@@ -26,7 +26,8 @@ class Data4Training:
                  aim: Literal['semantic segmentation', 'object detection', 'instance segmentation'] = 'semantic segmentation',
                  new_width: int = 4352,
                  new_height: int = 1844,
-                 r_train: float = 0.8,
+                 r_train: float = 0.74,
+                 r_test: float = 0.1,
                  crop_padding_ratio: float = 0.2,
                  use_sahi: bool = True,
                  slice_width: int = 1280,
@@ -39,6 +40,7 @@ class Data4Training:
         self.new_width = new_width  # new width after resizing
         self.new_height = new_height  # new height after resizing
         self.r_train = r_train  # ratio of training data
+        self.r_test = r_test  # ratio of test data
         self.crop_padding_ratio = crop_padding_ratio  # to padding value after cropping (for segmentation)
         self.use_sahi = use_sahi  # if use sahi to slice the images and annotations (for detection)
         self.slice_width = slice_width  # the target slice width
@@ -49,6 +51,7 @@ class Data4Training:
 
         valid_aims = ['semantic segmentation', 'object detection', 'instance segmentation']
         assert self.aim in valid_aims, f'Invalid aim value. Must be one of {valid_aims}'
+        assert self.r_train + self.r_test < 1, 'r_train + r_test >= 1'
 
     @staticmethod
     def calculate_optimal_slicing(slice_width: int, slice_height: int, overlap_ratio: float, num_width_slices: int, num_height_slices: int) -> Tuple[int, int]:
@@ -243,8 +246,6 @@ class Data4Training:
             if remove_subgroups:
                 for category in classes2remove:
                     UtilsISAT.select_class(input_copy_dir, category=category, action='remove')  # remove catergoreis that are not 'stomatal complex' or 'pavement cell'
-            if if_resize_isat:
-                UtilsISAT.resize_isat(input_copy_dir, new_width=self.new_width, new_height=self.new_height, if_keep_ratio=True)  # resize images and annotations
             if self.use_sahi:
                 UtilsISAT.shapely_valid_transform(input_copy_dir)  # transform the polygons to be valid as shapely require
 
@@ -259,11 +260,13 @@ class Data4Training:
             output_name = output_rename  # rename the output directory
 
         output_dir = os.path.join(os.path.split(input_copy_dir)[0], output_name)  # COCO json output dir
-        train_dir, val_dir = os.path.join(output_dir, 'train'), os.path.join(output_dir, 'val')  # COCO json train /val directory
-        UtilsISAT.data_split(input_copy_dir, output_dir, r_train=self.r_train)  # split train and val
-        for directory in [train_dir, val_dir]:
+        train_dir, val_dir, test_dir = os.path.join(output_dir, 'train'), os.path.join(output_dir, 'val'), os.path.join(output_dir, 'test')  # COCO json train/val/test directory
+        UtilsISAT.data_split(input_copy_dir, output_dir, r_train=self.r_train, r_test=self.r_test)  # split train, val and test
+        for directory in [train_dir, val_dir, test_dir]:
+            if if_resize_isat and directory != test_dir:
+                UtilsISAT.resize_isat(directory, new_width=self.new_width, new_height=self.new_height, if_keep_ratio=True)  # resize images and annotations
             ISAT2Anything.to_coco(directory, output_dir=os.path.join(directory, 'COCO.json'))  # convert train/val ISAT json files to COCO
-            if self.use_sahi and self.aim != 'semantic segmentation':
+            if self.use_sahi and self.aim != 'semantic segmentation' and directory != test_dir:
                 output_dir = f'{directory}_sahi'  # the output_dir
                 slice_coco(
                     coco_annotation_file_path=os.path.join(directory, 'COCO.json'),

@@ -222,7 +222,7 @@ class OpenMMlab(Data4Training):
             indices_to_remove = []  # to filter out masks that are tiny or uncomplete due to sahi slicing
             for idx, mask in enumerate(valid_prediction['masks']):
                 area = Anything2ISAT().isat_area(mask)  # get the mask area
-                if area < 40:
+                if area < 60:
                     indices_to_remove.append(idx)  # remove tiny masks
             for idx in sorted(indices_to_remove, reverse=True):
                 valid_prediction['category_name'].pop(idx)  # remove the corresponding mask catergory name
@@ -338,7 +338,7 @@ class OpenMMlab(Data4Training):
                         seg_class_region = fill_holes(np.all(seg_mask == self.seg_color_mapping.get(seg_class), axis=-1))  # get the class bool segmentation mask
                         full_mask = np.zeros(image.shape[:2], dtype=bool)  # create a empty full image bool mask
                         full_mask[y_1:y_2, x_1:x_2] = seg_class_region  # map the cropped path segmentation back to the entire image
-                        if np.sum(full_mask) > 3:
+                        if np.sum(full_mask) > 10:
                             obj = {
                                 'category': seg_class,  # assign the segmentation class
                                 'group': data['objects'][idx]['group'],  # same as the patch number

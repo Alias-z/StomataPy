@@ -1396,6 +1396,8 @@ class Li2022(StomataPyData):
             UtilsISAT.quality_check(input_dir)  # check the annotation quality
             UtilsISAT.sort_group(input_dir, if2rgb=False)  # sort categories
             UtilsISAT.shapely_valid_transform(input_dir)  # ensure valid polygons
+            if species_folder == 'N. tabacum':
+                shutil.rmtree(input_dir)  # the resized ground of N. tabacum resutlting in bad annotation, so we remove it
         return None
 
 

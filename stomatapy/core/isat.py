@@ -24,46 +24,50 @@ class UtilsISAT:
 
     # ############################### For model training ################################
     @staticmethod
-    def data_split(images_dir: str, output_dir: str, r_train: float = 0.8, seed: int = 42) -> None:
+    def data_split(images_dir: str, output_dir: str, r_train: float = 0.7, r_test: float = 0.1, seed: int = 42) -> None:
         """
         Split dataset into train and val with defined ratio
 
         Args:
         - images_dir (str): the input directory containing the original dataset (image and JSON files)
         - output_dir (str): the output directory where 'train' and 'val' subdirectories will be created for the split dataset
-        - r_train (float): the ratio of the dataset to be allocated to the training set (default 0.8)
+        - r_train (float): the ratio of the dataset to be allocated to the training set (default 0.7)
+        - r_test (float): the ratio of the dataset to be allocated to the test set (default 0.1)
 
         Returns:
-        - None: Files are copied to 'train' and 'val' subdirectories under 'output_dir'
+        - None: Files are copied to 'train', 'val' and 'test' subdirectories under 'output_dir'
         """
         random.seed(seed); np.random.seed(seed)  # noqa: set seed
         file_names = sorted(os.listdir(images_dir), key=str.casefold)
         file_names = [name for name in file_names if any(name.endswith(file_type) for file_type in image_types)]  # image files only
         train_size = int(len(file_names) * r_train)  # training size
-        validation_size = len(file_names) - train_size  # validation size
+        test_size = int(len(file_names) * r_test)  # test size
+        validation_size = len(file_names) - train_size - test_size  # validation size
         file_names_shuffle = file_names.copy()  # prevent changing in place
         random.shuffle(file_names_shuffle)  # random shuffle file names
         train_names = file_names_shuffle[:train_size]  # file names for training
         val_names = file_names_shuffle[train_size:train_size + validation_size]
-        print(f'train size={train_size}, validation size={validation_size}')
+        test_names = file_names_shuffle[train_size + validation_size:]
+        print(f'train size={train_size}, validation size={validation_size}, test_size={test_size}')
         destination_train = os.path.join(output_dir, 'train'); os.makedirs(destination_train, exist_ok=True)  # noqa
         destination_val = os.path.join(output_dir, 'val'); os.makedirs(destination_val, exist_ok=True)  # noqa
-        for name in train_names:
-            source = os.path.join(images_dir, name)
-            destination = os.path.join(destination_train, name)
-            shutil.copy2(source, destination)  # paste train images
-            name_json = os.path.splitext(name)[0] + '.json'
-            source = os.path.join(images_dir, name_json)
-            destination = os.path.join(destination_train, name_json)
-            shutil.copy2(source, destination)  # paste train jsons
-        for name in val_names:
-            source = os.path.join(images_dir, name)
-            destination = os.path.join(destination_val, name)
-            shutil.copy2(source, destination)  # paste validation images
-            name_json = os.path.splitext(name)[0] + '.json'
-            source = os.path.join(images_dir, name_json)
-            destination = os.path.join(destination_val, name_json)
-            shutil.copy2(source, destination)  # paste validation jsons
+        destination_test = os.path.join(output_dir, 'test'); os.makedirs(destination_test, exist_ok=True)  # noqa
+
+        for _, file_names, destination in [
+            ('train', train_names, destination_train),
+            ('val', val_names, destination_val),
+            ('test', test_names, destination_test)
+        ]:
+            for name in file_names:
+                source_image = os.path.join(images_dir, name)
+                dest_image = os.path.join(destination, name)
+                shutil.copy2(source_image, dest_image)  # copy image
+
+                name_json = os.path.splitext(name)[0] + '.json'
+                source_json = os.path.join(images_dir, name_json)
+                dest_json = os.path.join(destination, name_json)
+                if os.path.exists(source_json):
+                    shutil.copy2(source_json, dest_json)  # copy JSON files if exist
         return None
 
     @staticmethod
@@ -356,13 +360,14 @@ class UtilsISAT:
 
     # ############################### For data engine ################################
     @staticmethod
-    def quality_check(input_dir: str = None) -> None:
+    def quality_check(input_dir: str = None, remove_small: bool = True) -> None:
         """
         Checks JSON files for redundancy in object annotations within the same groups
         Specifically highlighting 'background' classes and multiple instances of non-'epidermal cell' categories within the same group
 
         Args:
         - input_dir (str): the directory containing JSON files to be checked for redundancy; defaults to None
+        - remove_small (bool): if True, removes entire groups containing objects with area < 40; defaults to True
 
         Returns:
         - None: outputs to console potential issues with object categorization within groups
@@ -373,6 +378,7 @@ class UtilsISAT:
                 data = json.load(file)  # load the json data
             objects = data.get('objects', [])  # get the objects information
             grouped_objects = {}  # to store the grouped objects
+            small_groups = set()  # to store groups with small objects
             for obj in objects:
                 area = obj.get('area', None)  # get the area
                 group = obj.get('group', 0)  # get the group of the object, default to 0
@@ -381,6 +387,8 @@ class UtilsISAT:
                 grouped_objects[group].append(obj)  # add group to the group list
                 if area < 40:
                     print(f'object area < 40 in group {group} in {json_path}')  # if small area
+                    if remove_small:
+                        small_groups.add(group)  # collect groups with small objects
 
             for group, objs in grouped_objects.items():
                 categories = set()  # to store the categories
@@ -398,6 +406,11 @@ class UtilsISAT:
                 if group in groups:
                     print(f"Redundant epidermal cell in group {group} in {json_path}")  # ff there is redundant epidermal cells
                 groups.add(group)  # to find redundant epidermal cells
+
+            if remove_small and small_groups:
+                data['objects'] = [obj for obj in objects if obj.get('group', 0) not in small_groups]
+                with open(json_path, 'w', encoding='utf-8') as file:
+                    json.dump(data, file, indent=2)
         return None
 
     @staticmethod
@@ -697,7 +710,7 @@ class UtilsISAT:
             major_axis, minor_axis = ellipse[1]  # get the major axis and minor axis of the ellipse
             if major_axis > minor_axis * 3:
                 return False, 0  # the ellipe is too narrow
-            mask_ellipse, mask_contour = np.zeros(mask_uint8.shape, dtype=np.uint8), np.zeros(mask_uint8.shape, dtype=np.uint8)  # create empty balck masks
+            mask_ellipse, mask_contour = np.zeros(mask_uint8.shape, np.uint8), np.zeros(mask_uint8.shape, np.uint8)  # create empty balck masks
             cv2.drawContours(mask_contour, [largest_contour], -1, 255, -1)  # contour mask
             cv2.ellipse(mask_ellipse, ellipse, 255, -1)  # ellipse mask
             intersection = np.logical_and(mask_contour, mask_ellipse)  # calculate ellipse and contour intersections

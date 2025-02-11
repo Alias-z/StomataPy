@@ -35,7 +35,7 @@ class DataStatistics:
         species_names = list(set(species_names))  # get the unique species names
         return sorted(species_names, key=str.casefold), list(set(species_dirs))
 
-    def select_species_folders(self, pavements_only: bool = False, ensemble_files: bool = False, ensemble_by_modality: bool = True) -> dict:
+    def select_species_folders(self, pavements_only: bool = False, with_subclass: bool = False, ensemble_files: bool = False, ensemble_by_modality: bool = True) -> dict:
         """Retuern the summarized information cross all selected species folders"""
         def check_dataset(cell, dataset):
             datasets = [dataset.strip() for dataset in cell.split(';')]
@@ -57,6 +57,7 @@ class DataStatistics:
             json_paths = get_paths(species_folder_dir, 'json')  # get the paths of ISAT annotation files
             dataset_name = os.path.normpath(species_folder_dir).split(os.sep)[1]  # get the dataset name
             for json_path in json_paths:
+                # print(json_path)
                 with open(json_path, encoding='utf-8') as file:
                     data = json.load(file)  # load the json data
 
@@ -69,11 +70,16 @@ class DataStatistics:
                 if '_' not in note:
                     continue
 
+                categories = set([obj['category'] for obj in data['objects']])  # get all categories
+
                 if pavements_only:
-                    categories = set([obj['category'] for obj in data['objects']])  # get all categories
                     if 'pavement cell' not in categories:
                         continue
                     if len(categories) == 1:
+                        continue
+
+                if with_subclass:
+                    if 'outer ledge' not in categories:
                         continue
 
                 n_images += 1  # to count the number of images
