@@ -179,6 +179,46 @@ class OpenMMlab(Data4Training):
                 image_size=self.slice_width,  # inference input size
                 device=device  # device, "cpu" or "cuda:0"
             )
+
+            def is_straight_edge(p1: tuple, p2: tuple, min_length: int) -> bool:
+                """
+                Check if two adjacent polygon points form a straight edge (horizontal/vertical) longer than specified length
+
+                Args:
+                    p1 (tuple): First point coordinates (x1, y1)
+                    p2 (tuple): Second point coordinates (x2, y2)
+                    min_length (int): Minimum edge length in pixels to consider
+
+                Returns:
+                    bool: True if edge is horizontal/vertical and longer than min_length
+                """
+                dx = abs(p1[0] - p2[0])  # horizontal distance between points
+                dy = abs(p1[1] - p2[1])  # vertical distance between points
+                return (dy == 0 and dx > min_length) or (dx == 0 and dy > min_length)  # check for long straight edges
+
+            def has_straight_line_edges(coco_polygon: list, min_straight_length: int = 50) -> bool:
+                """
+                Check if COCO-format polygon contains any straight edges longer than specified length
+
+                Args:
+                    coco_polygon (list): Polygon in COCO format [x1,y1,x2,y2,...]
+                    min_straight_length (int): Minimum straight edge length to detect (default=50px)
+
+                Returns:
+                    bool: True if polygon contains qualifying straight edges
+                """
+                if len(coco_polygon) < 4:
+                    return False  # need at least 2 points (4 coordinates) to form an edge
+
+                points = list(zip(coco_polygon[0::2], coco_polygon[1::2]))  # convert to [(x1,y1), (x2,y2),...]
+                # Check all consecutive point pairs including last-to-first connection
+                for i in range(len(points)):
+                    p1 = points[i]
+                    p2 = points[(i + 1) % len(points)]  # wrap index for final edge connection
+                    if is_straight_edge(p1, p2, min_straight_length):
+                        return True
+                return False  # no qualifying straight edges found
+
             for idx, image in tqdm(enumerate(images), total=len(images)):
                 result = get_sliced_prediction(
                     image=image,  # location of image or numpy image matrix to slice
@@ -207,7 +247,8 @@ class OpenMMlab(Data4Training):
                     except Exception:
                         pass
 
-                masks = [item['segmentation'] for item in valid_items]  # get the segmentation masks in MSCOCO format
+                masks = [item['segmentation'] for item in valid_items]
+                masks = [m for m in masks if not has_straight_line_edges(m[0])]
                 bboxes = [np.array(item['bbox'], dtype=np.float32) for item in valid_items]  # the bboxes in MSCOCO format
                 result_dict = {
                     'image_path': image_paths[idx],
