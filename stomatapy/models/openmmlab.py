@@ -247,15 +247,25 @@ class OpenMMlab(Data4Training):
                     except Exception:
                         pass
 
-                masks = [item['segmentation'] for item in valid_items]
-                masks = [m for m in masks if not has_straight_line_edges(m[0])]
-                bboxes = [np.array(item['bbox'], dtype=np.float32) for item in valid_items]  # the bboxes in MSCOCO format
+                valid_pairs = []
+                for item in valid_items:
+                    mask = item['segmentation']
+                    if not has_straight_line_edges(mask[0], min_straight_length=20):
+                        valid_pairs.append((
+                            mask,
+                            np.array(item['bbox'], dtype=np.float32),
+                            item['category_id'],
+                            item['category_name']
+                        ))
+
+                masks, bboxes, category_ids, category_names = zip(*valid_pairs) if valid_pairs else ([], [], [], [])
+
                 result_dict = {
                     'image_path': image_paths[idx],
-                    'category_id': np.array([item['category_id'] for item in valid_items], dtype=np.int64),
-                    'category_name': [item['category_name'] for item in valid_items],
+                    'category_id': np.array(category_ids, dtype=np.int64),
+                    'category_name': list(category_names),
                     'bboxes': np.array([UtilsISAT.bbox_convert(bbox, 'COCO2ISAT') for bbox in bboxes], dtype=np.int32) if bboxes else np.array([], dtype=np.int32),
-                    'masks': [UtilsISAT.coco_mask2isat_mask(mask[0]) for mask in masks if mask and len(mask) > 0] if masks else []
+                    'masks': [UtilsISAT.coco_mask2isat_mask(mask[0]) for mask in masks if mask] if masks else []
                 }  # collect prediction metadata
                 valid_predictions.append(result_dict)  # append the bboxes of each image
 
