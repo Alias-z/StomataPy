@@ -1,4 +1,4 @@
-"""Module providing functions autolabeling images with OpenMMlab models"""
+"""module providing functions autolabeling images with openmmlab models"""
 
 # pylint: disable=line-too-long, import-error, multiple-statements, c-extension-no-member, relative-beyond-top-level, no-member, too-many-function-args, wrong-import-position, undefined-loop-variable, unused-import, no-name-in-module
 import os  # interact with the operating system
@@ -6,15 +6,15 @@ import json  # manipulate json files
 import random  # suppress xformers to generate random predictions results
 from typing import List  # to support type hints
 import warnings; warnings.filterwarnings('ignore', message='.*in an upcoming release, it will be required to pass the indexing argument.*'); warnings.filterwarnings('ignore', message='Failed to add*'); warnings.filterwarnings('ignore', message='xFormers is available'); warnings.filterwarnings('ignore', module=r'.*dino_layers.*'); warnings.filterwarnings('ignore', message='The current default scope .* is not .*')  # noqa: supress warning messages
-import numpy as np  # NumPy
-import cv2  # OpenCV for image processing
-from PIL import Image  # Pillow image processing
+import numpy as np  # numpy for numerical operations
+import cv2  # opencv for image processing
+from PIL import Image  # pillow image processing
 from scipy import ndimage as ndi  # for hole filling
 from skimage.measure import label  # for using instance segmentation results as detected objects
-import torch  # PyTorch
+import torch  # pytorch
 from tqdm import tqdm  # progress bar
 from matplotlib import pyplot as plt  # for image visualization
-import matplotlib.patches as patches
+import matplotlib.patches as patches  # for drawing boxes and shapes on plots
 from mmdet.utils import register_all_modules as mmdet_utils_register_all_modules  # register mmdet modules
 from mmdet.apis import init_detector as mmdet_apis_init_detector  # initialize mmdet model
 from mmdet.apis import inference_detector as mmdet_apis_inference_detector  # mmdet inference detector
@@ -24,33 +24,33 @@ from mmseg.utils import register_all_modules as mmseg_utils_register_all_modules
 from mmseg.apis import init_model as mmseg_apis_init_model  # initialize mmseg model
 from mmseg.apis import inference_model as mmseg_apis_inference_model  # mmseg inference segmentor
 from ..core.core import device, Cell_Colors, imread_rgb, imread_rgb_stack, resize_and_pad_image, restore_original_dimensions  # import core elements
-from ..core.isat import UtilsISAT, Anything2ISAT  # to interact with ISAT jason files
+from ..core.isat import UtilsISAT, Anything2ISAT  # to interact with isat jason files
 from ..utils.data4training import Data4Training  # the traning processing pipelines
 from ..utils.focus_stack import focus_stack  # focus stacking
 
 
 def set_seeds(seed: int = 42) -> None:
     """
-    Set the random seeds for reproducibility in Python, NumPy, and PyTorch.
+    set the random seeds for reproducibility in python, numpy, and pytorch.
 
-    Args:
-    - seed (int): the seed value to use. Default is 42.
+    args:
+    - seed (int): the seed value to use. default is 42.
     """
-    random.seed(seed)
-    np.random.seed(seed)
-    torch.manual_seed(seed)
-    if torch.cuda.is_available():
-        torch.cuda.manual_seed(seed)
-        torch.cuda.manual_seed_all(seed)  # if you are using multi-GPU.
-    torch.backends.cudnn.enabled = False
-    torch.backends.cudnn.deterministic = True
-    torch.backends.cudnn.benchmark = False
-    return None
+    random.seed(seed)  # set python random seed
+    np.random.seed(seed)  # set numpy random seed
+    torch.manual_seed(seed)  # set pytorch random seed
+    if torch.cuda.is_available():  # check if cuda is available
+        torch.cuda.manual_seed(seed)  # set cuda random seed
+        torch.cuda.manual_seed_all(seed)  # if you are using multi-gpu, set all gpu seeds
+    torch.backends.cudnn.enabled = False  # disable cudnn
+    torch.backends.cudnn.deterministic = True  # make cudnn deterministic
+    torch.backends.cudnn.benchmark = False  # disable cudnn benchmark
+    return None  # return none
 
 
 class OpenMMlab(Data4Training):
     """
-    Automatic mask generation with mmdet (https://github.com/open-mmlab/mmdetection) and mmsegmentation (https://github.com/open-mmlab/mmsegmentation)
+    automatic mask generation with mmdet (https://github.com/open-mmlab/mmdetection) and mmsegmentation (https://github.com/open-mmlab/mmsegmentation)
     """
     def __init__(self,
                  detector_config_path: str = None,
@@ -59,17 +59,17 @@ class OpenMMlab(Data4Training):
                  segmentor_config_path: str = None,
                  segmentor_weight_path: str = None,
                  seg_onehot_mapping: dict = {cell_color.class_encoding: cell_color.class_name for cell_color in Cell_Colors},
-                 stack_input: bool = False,  # Add parameter for stack input
+                 stack_input: bool = False,  # add parameter for stack input
                  **kwargs):
-        super().__init__(**kwargs)
+        super().__init__(**kwargs)  # initialize parent class
         self.detector_config_path = detector_config_path  # object detection config path
         self.detector_weight_path = detector_weight_path  # object detection weight path
         self.detector_threshold = detector_threshold  # object detection threshold
         self.segmentor_config_path = segmentor_config_path  # semantic segmentation config path
         self.segmentor_weight_path = segmentor_weight_path  # semantic segmentation weight path
         self.seg_onehot_mapping = seg_onehot_mapping  # segmentation one-hot code against class_name
-        self.seg_color_mapping = {cell_color.class_name: cell_color.mask_rgb for cell_color in Cell_Colors}  # mapp the segmentation class names to their colors
-        self.stack_input = stack_input  # Flag for stack image processing
+        self.seg_color_mapping = {cell_color.class_name: cell_color.mask_rgb for cell_color in Cell_Colors}  # map the segmentation class names to their colors
+        self.stack_input = stack_input  # flag for stack image processing
         set_seeds(42); self.segmentor = mmseg_apis_init_model(self.segmentor_config_path, self.segmentor_weight_path, device='cpu')   # noqa: initialize a segmentor from config file
 
     def detect_cell(self,
@@ -80,68 +80,68 @@ class OpenMMlab(Data4Training):
                     if_auto_label: bool = True,
                     if_standard_pred: bool = False) -> List[np.ndarray]:
         """
-        Detect objects in a list of images and return their bounding boxes and masks
-        Each image is processed through an object detection model
+        detect objects in a list of images and return their bounding boxes and masks
+        each image is processed through an object detection model
 
-        Args:
-        - image_paths (List[str]): list of image paths
-        - if_resize_image (bool): if True, resize and pad image to target dimension before predictions
-        - if_keep_ratio (bool): if True, maintains aspect ratio while resizing
-        - if_visualize (bool): if True, visualize the detection results
-        - if_auto_label (bool): if True, convet predictions to ISAT json files as well
+        args:
+        - image_paths (list[str]): list of image paths
+        - if_resize_image (bool): if true, resize and pad image to target dimension before predictions
+        - if_keep_ratio (bool): if true, maintains aspect ratio while resizing
+        - if_visualize (bool): if true, visualize the detection results
+        - if_auto_label (bool): if true, convet predictions to isat json files as well
 
-        Returns:
-        - valid_predictions (List[dict]): a list of dictionaries containing detection results per image with keys 'image_path', 'category_id', 'category_name', 'bboxes', 'masks'
+        returns:
+        - valid_predictions (list[dict]): a list of dictionaries containing detection results per image with keys 'image_path', 'category_id', 'category_name', 'bboxes', 'masks'
         """
-        valid_predictions, focus_optimized_results = [], []  # initialize the list
+        valid_predictions, focus_optimized_results = [], []  # initialize the lists
 
         def visualize_detections(valid_prediction: dict) -> None:
-            """Visualizes detection results on an image using bounding boxes and optional masks
+            """visualizes detection results on an image using bounding boxes and optional masks
 
-            Args:
+            args:
             - valid_prediction (dict): containing 'bboxes' [x_min, y_min, x_max, y_max] and optionally 'masks' [[x1, y1], [x2, y2], ..., [xn, yn]]
 
-            Returns:
-            - None. Just plot the detection results
+            returns:
+            - none. just plot the detection results
             """
             image = imread_rgb(valid_prediction['image_path'])  # load the image
-            _, ax = plt.subplots(1); ax.imshow(image)  # noqa: add the imag to plot
-            if valid_prediction['masks'] is not None:
-                for mask in valid_prediction['masks']:
+            _, ax = plt.subplots(1); ax.imshow(image)  # noqa: add the image to plot
+            if valid_prediction['masks'] is not None:  # check if masks exist
+                for mask in valid_prediction['masks']:  # iterate through masks
                     polygon = plt.Polygon(mask, closed=True, fill=True, color='red', alpha=0.5)  # plot color and transparency
                     ax.add_patch(polygon)  # add masks if they exist
 
-            for bbox in valid_prediction['bboxes']:
+            for bbox in valid_prediction['bboxes']:  # iterate through bounding boxes
                 box = patches.Rectangle((bbox[0], bbox[1]), bbox[2] - bbox[0], bbox[3] - bbox[1], linewidth=1, edgecolor='blue', facecolor='none')  # box color
                 ax.add_patch(box)  # always draw bounding boxes
             ax.set_title(f"{os.path.basename(valid_prediction['image_path'])}")  # add the image file name
             plt.axis('off'); plt.show()  # noqa: show the plot
 
-        # Modified image loading to handle stack images
-        if self.stack_input:
+        # modified image loading to handle stack images
+        if self.stack_input:  # check if processing stack inputs
             images = [imread_rgb_stack(image_path) for image_path in image_paths]  # use the expanded frames list for processing
-        else:
+        else:  # single image processing
             images = [imread_rgb(image_path) for image_path in image_paths]  # single-frame image processing
 
-        # Handle resizing differently for stack vs single images
-        if if_resize_image:
-            if self.stack_input:
-                # Process each stack while maintaining the stack structure
+        # handle resizing differently for stack vs single images
+        if if_resize_image:  # check if resizing is required
+            if self.stack_input:  # handle stack images
+                # process each stack while maintaining the stack structure
                 resized_stacks, resizing_metadata = [], []  # to collect the resized stacks and their metadata
 
-                for stack_idx, stack in enumerate(images):
-                    # Calculate metadata once per stack
+                for stack_idx, stack in enumerate(images):  # iterate through each stack
+                    # calculate metadata once per stack
                     first_frame = stack[0]  # get first frame
-                    first_frame_pil = Image.fromarray(first_frame)  # convert to PIL
+                    first_frame_pil = Image.fromarray(first_frame)  # convert to pil
                     original_width, original_height = first_frame_pil.size  # get dimensions
 
-                    if if_keep_ratio:
+                    if if_keep_ratio:  # maintain aspect ratio
                         ratio = min(self.new_width / original_width, self.new_height / original_height)  # calculate ratio
                         resize_width, resize_height = int(original_width * ratio), int(original_height * ratio)  # apply ratio
-                    else:
+                    else:  # use target dimensions directly
                         resize_width, resize_height = self.new_width, self.new_height  # use target dimensions
 
-                    # Store metadata for this stack
+                    # store metadata for this stack
                     stack_metadata = {
                         'original_stack': stack.copy(),
                         'width_ratio': resize_width / original_width,
@@ -153,26 +153,26 @@ class OpenMMlab(Data4Training):
                     padding_h, padding_v = stack_metadata['padding_horizontal'], stack_metadata['padding_vertical']   # create resized stack with numpy operations
 
                     frames_batch = stack.reshape(-1, stack.shape[1], stack.shape[2], 3)  # reshape to (total_frames, height, width, channels)
-                    resized_batch = np.zeros((frames_batch.shape[0], resize_height, resize_width, 3), dtype=np.uint8)
-                    for idx in range(frames_batch.shape[0]):
-                        resized_batch[idx] = cv2.resize(frames_batch[idx], (resize_width, resize_height), interpolation=cv2.INTER_LANCZOS4)  # Resize all frames at once
-                    resized_stack = np.zeros((stack.shape[0], self.new_height, self.new_width, 3), dtype=np.uint8)  # Create output stack with padding
-                    resized_stack[:, padding_v:padding_v + resize_height, padding_h:padding_h + resize_width, :] = resized_batch  # Add all frames to their padded positions
+                    resized_batch = np.zeros((frames_batch.shape[0], resize_height, resize_width, 3), dtype=np.uint8)  # create an empty array for resized batch
+                    for idx in range(frames_batch.shape[0]):  # iterate through each frame
+                        resized_batch[idx] = cv2.resize(frames_batch[idx], (resize_width, resize_height), interpolation=cv2.INTER_LANCZOS4)  # resize all frames at once
+                    resized_stack = np.zeros((stack.shape[0], self.new_height, self.new_width, 3), dtype=np.uint8)  # create output stack with padding
+                    resized_stack[:, padding_v:padding_v + resize_height, padding_h:padding_h + resize_width, :] = resized_batch  # add all frames to their padded positions
                     resized_stacks.append(resized_stack)  # append the complete resized stack
                     resizing_metadata.append(stack_metadata)  # store metadata for this stack
                 images = resized_stacks  # replace with resized stacks
-            else:
-                # Original single-image resizing logic
+            else:  # handle single images
+                # original single-image resizing logic
                 resized_images, resizing_metadata = [], []  # to collected the resizing information
-                for image in images:
+                for image in images:  # iterate through each image
                     metadata = {}  # to collect the resizing metadata for each image
                     image_pil = Image.fromarray(image)  # np.array to pil image
                     original_width, original_height = image_pil.size  # the original width and height
 
-                    if if_keep_ratio:
+                    if if_keep_ratio:  # maintain aspect ratio
                         ratio = min(self.new_width / original_width, self.new_height / original_height)  # get the closest ratio to destination dimension
                         resize_width, resize_height = int(original_width * ratio), int(original_height * ratio)  # resize width and height according to the ratio
-                    else:
+                    else:  # use target dimensions directly
                         resize_width, resize_height = self.new_width, self.new_height  # resize width and height to destination dimensions
 
                     width_ratio, height_ratio = resize_width / original_width, resize_height / original_height  # the resize ratio
@@ -195,21 +195,21 @@ class OpenMMlab(Data4Training):
         valid_predictions = []  # for predictions whose score > threshold
 
         # TODO: handle stack input case
-        if not self.use_sahi:
+        if not self.use_sahi:  # check if using regular mmdet detection
             mmdet_utils_register_all_modules(init_default_scope=False)  # initialize mmdet scope
             detector = mmdet_apis_init_detector(self.detector_config_path, self.detector_weight_path, device=device)  # initialize a detector from config file
             # print(detector.cfg)
             # print(detector)
             category_names = detector.dataset_meta['classes']  # get the category names
             category_mapping = {str(inx): category_name for inx, category_name in enumerate(category_names)}  # get the catergory mapping
-            for idx, image in tqdm(enumerate(images), total=len(images)):
+            for idx, image in tqdm(enumerate(images), total=len(images)):  # process each image with progress bar
                 prediction = mmdet_apis_inference_detector(detector, image)  # inference image(s) with the detector
                 valid_indices = torch.where(prediction.pred_instances.scores > self.detector_threshold)[0]   # filter based on the detection threshold
-                if valid_indices.numel() == 0:
-                    result_dict = {'category_id': None, 'category_name': None, 'bboxes': None, 'masks': None}  # if no detections exceed the threshold, store None for this image
-                else:
-                    category_id = prediction.pred_instances.labels[valid_indices].cpu().numpy()
-                    masks = prediction.pred_instances.masks[valid_indices].cpu().numpy() if hasattr(prediction.pred_instances, 'masks') else None
+                if valid_indices.numel() == 0:  # check if any valid predictions
+                    result_dict = {'category_id': None, 'category_name': None, 'bboxes': None, 'masks': None}  # if no detections exceed the threshold, store none for this image
+                else:  # process valid predictions
+                    category_id = prediction.pred_instances.labels[valid_indices].cpu().numpy()  # get category ids
+                    masks = prediction.pred_instances.masks[valid_indices].cpu().numpy() if hasattr(prediction.pred_instances, 'masks') else None  # get masks if available
                     result_dict = {
                         'image_path': image_paths[idx],
                         'category_id': category_id,
@@ -217,9 +217,9 @@ class OpenMMlab(Data4Training):
                         'bboxes': np.array(prediction.pred_instances.bboxes[valid_indices].cpu().numpy(), dtype=np.int32),
                         'masks': [UtilsISAT.mask2segmentation(mask) for mask in masks] if masks is not None else None
                     }  # collect prediction metadata
-                    valid_predictions.append(result_dict)
+                    valid_predictions.append(result_dict)  # add result to valid predictions
 
-        elif self.use_sahi:
+        elif self.use_sahi:  # using sahi for detection
             detector = AutoDetectionModel.from_pretrained(
                 model_type='mmdet',  # name of the detection framework
                 model_path=self.detector_weight_path,  # path of the detection model (ex. 'model.pt')
@@ -227,19 +227,19 @@ class OpenMMlab(Data4Training):
                 confidence_threshold=self.detector_threshold,  # all predictions with score < confidence_threshold will be discarded
                 image_size=self.slice_width,  # inference input size
                 device=device  # device, "cpu" or "cuda:0"
-            )
+            )  # initialize the sahi detector
 
             def is_straight_edge(p1: tuple, p2: tuple, min_length: int) -> bool:
                 """
-                Check if two adjacent polygon points form a straight edge (horizontal/vertical) longer than specified length
+                check if two adjacent polygon points form a straight edge (horizontal/vertical) longer than specified length
 
-                Args:
-                    p1 (tuple): First point coordinates (x1, y1)
-                    p2 (tuple): Second point coordinates (x2, y2)
-                    min_length (int): Minimum edge length in pixels to consider
+                args:
+                    p1 (tuple): first point coordinates (x1, y1)
+                    p2 (tuple): second point coordinates (x2, y2)
+                    min_length (int): minimum edge length in pixels to consider
 
-                Returns:
-                    bool: True if edge is horizontal/vertical and longer than min_length
+                returns:
+                    bool: true if edge is horizontal/vertical and longer than min_length
                 """
                 dx = abs(p1[0] - p2[0])  # horizontal distance between points
                 dy = abs(p1[1] - p2[1])  # vertical distance between points
@@ -247,38 +247,36 @@ class OpenMMlab(Data4Training):
 
             def has_straight_line_edges(coco_polygon: list, min_straight_length: int = 50) -> bool:
                 """
-                Check if COCO-format polygon contains any straight edges longer than specified length
+                check if coco-format polygon contains any straight edges longer than specified length
 
-                Args:
-                    coco_polygon (list): Polygon in COCO format [x1,y1,x2,y2,...]
-                    min_straight_length (int): Minimum straight edge length to detect (default=50px)
+                args:
+                    coco_polygon (list): polygon in coco format [x1,y1,x2,y2,...]
+                    min_straight_length (int): minimum straight edge length to detect (default=50px)
 
-                Returns:
-                    bool: True if polygon contains qualifying straight edges
+                returns:
+                    bool: true if polygon contains qualifying straight edges
                 """
-                if len(coco_polygon) < 4:
+                if len(coco_polygon) < 4:  # check if we have enough points
                     return False  # need at least 2 points (4 coordinates) to form an edge
 
                 points = list(zip(coco_polygon[0::2], coco_polygon[1::2]))  # convert to [(x1,y1), (x2,y2),...]
-                # Check all consecutive point pairs including last-to-first connection
-                for i in range(len(points)):
-                    p1 = points[i]
+                # check all consecutive point pairs including last-to-first connection
+                for i in range(len(points)):  # iterate through points
+                    p1 = points[i]  # current point
                     p2 = points[(i + 1) % len(points)]  # wrap index for final edge connection
-                    if is_straight_edge(p1, p2, min_straight_length):
-                        return True
+                    if is_straight_edge(p1, p2, min_straight_length):  # check if this edge is straight
+                        return True  # found a straight edge
                 return False  # no qualifying straight edges found
 
             if self.stack_input:
-                # Create focus-stacked base images for each stack
-                focus_bases = [focus_stack(stack) for stack in images]
+                # create focus-stacked base images for each stack
+                focus_bases = [focus_stack(stack) for stack in images]  # focus stack each image stack
 
-                for stack_idx, stack in tqdm(enumerate(images), total=len(images)):
-                    # Use focus-stacked image for final results
-                    base_image = focus_bases[stack_idx].copy()
-                    all_frame_predictions = []
+                for stack_idx, stack in tqdm(enumerate(images), total=len(images)):  # process each stack with progress bar
+                    base_image = focus_bases[stack_idx].copy()  # copy the focus stack base image
+                    all_frame_predictions = []  # store predictions from all frames
 
-                    # Process each frame in the stack
-                    for frame_idx, frame in enumerate(stack):
+                    for frame_idx, frame in enumerate(stack):  # iterate through each frame
                         result = get_sliced_prediction(
                             image=frame,
                             detection_model=detector,
@@ -296,88 +294,100 @@ class OpenMMlab(Data4Training):
                             auto_slice_resolution=True,
                             slice_export_prefix=None,
                             slice_dir=None,
-                        ).to_coco_annotations()
+                        ).to_coco_annotations()  # get predictions in coco format
 
-                        # Process valid items from this frame
-                        valid_items = []
+                        valid_items = []  # store valid detections
                         for item in result:
-                            try:
-                                UtilsISAT.bbox_convert(np.array(item['bbox'], dtype=np.float32), 'COCO2ISAT')
-                                valid_items.append(item)
-                            except Exception:
-                                pass
+                            if 'segmentation' in item and item['segmentation'] and len(item['segmentation'][0]) >= 4:
+                                seg_points = np.array(item['segmentation'][0])
+                                x_coords = seg_points[0::2]  # all even indices (0, 2, 4, ...)
+                                y_coords = seg_points[1::2]  # all odd indices (1, 3, 5, ...)
+                                # compute bbox from segmentation points using NumPy
+                                if len(x_coords) > 0 and len(y_coords) > 0:
+                                    x_min, x_max = np.min(x_coords), np.max(x_coords)
+                                    y_min, y_max = np.min(y_coords), np.max(y_coords)
+                                    # COCO format: [x_min, y_min, width, height]
+                                    width, height = x_max - x_min, y_max - y_min
+                                    computed_bbox = [float(x_min), float(y_min), float(width), float(height)]
+                                    # update the item's bbox
+                                    item['bbox'] = computed_bbox
+                                    valid_items.append(item)
 
-                        # Filter out items with straight edges
-                        valid_pairs = []
-                        for item in valid_items:
-                            mask = item['segmentation']
-                            if not has_straight_line_edges(mask[0], min_straight_length=20):
-                                valid_pairs.append({
-                                    'frame_idx': frame_idx,
-                                    'mask': mask,
-                                    'bbox': np.array(item['bbox'], dtype=np.float32),
-                                    'score': item['score'],
-                                    'category_id': item['category_id'],
-                                    'category_name': item['category_name'],
-                                    'object_id': None  # will be assigned in grouping step
-                                })
+                        # filter out items with straight edges
+                        valid_pairs = []  # store valid detection pairs
+                        for item in valid_items:  # check each valid item
+                            mask = item['segmentation']  # get segmentation mask
+                            # check if mask is not empty and has expected structure
+                            if mask and len(mask) > 0:  # ensure mask is not empty
+                                if not has_straight_line_edges(mask[0], min_straight_length=20):  # check for straight edges
+                                    valid_pairs.append({
+                                        'frame_idx': frame_idx,
+                                        'mask': mask,
+                                        'bbox': np.array(item['bbox'], dtype=np.float32),
+                                        'score': item['score'],
+                                        'category_id': item['category_id'],
+                                        'category_name': item['category_name'],
+                                        'object_id': None  # will be assigned in grouping step
+                                    })  # add valid pair with frame index
+                            else:
+                                print(f"Skipping item with invalid mask: {mask}")  # print when skipping invalid mask
 
-                        all_frame_predictions.extend(valid_pairs)
+                        all_frame_predictions.extend(valid_pairs)  # add valid pairs to all predictions
 
                     object_id, processed_predictions = 0, []  # group detections that represent the same object across frames
 
-                    while all_frame_predictions:
-                        current = all_frame_predictions.pop(0)
-                        current['object_id'] = object_id
-                        same_object_predictions = [current]
+                    while all_frame_predictions:  # process until no predictions remain
+                        current = all_frame_predictions.pop(0)  # get first prediction
+                        current['object_id'] = object_id  # assign object id
+                        same_object_predictions = [current]  # initialize list with current prediction
 
-                        # Find all detections of the same object across different frames
-                        idx = 0
-                        while idx < len(all_frame_predictions):
-                            candidate = all_frame_predictions[idx]
-                            # Calculate IoU between bboxes
-                            box1 = UtilsISAT.bbox_convert(current['bbox'], 'COCO2ISAT')
-                            box2 = UtilsISAT.bbox_convert(candidate['bbox'], 'COCO2ISAT')
-                            # Calculate intersection coordinates
-                            x1 = max(box1[0], box2[0])
-                            y1 = max(box1[1], box2[1])
-                            x2 = min(box1[2], box2[2])
-                            y2 = min(box1[3], box2[3])
+                        # find all detections of the same object across different frames
+                        idx = 0  # initialize index
+                        while idx < len(all_frame_predictions):  # iterate through remaining predictions
+                            candidate = all_frame_predictions[idx]  # get candidate prediction
+                            # calculate iou between bboxes
+                            box1 = UtilsISAT.bbox_convert(current['bbox'], 'COCO2ISAT')  # convert current bbox to isat format
+                            box2 = UtilsISAT.bbox_convert(candidate['bbox'], 'COCO2ISAT')  # convert candidate bbox to isat format
+                            # calculate intersection coordinates
+                            x1 = max(box1[0], box2[0])  # get maximum left coordinate
+                            y1 = max(box1[1], box2[1])  # get maximum top coordinate
+                            x2 = min(box1[2], box2[2])  # get minimum right coordinate
+                            y2 = min(box1[3], box2[3])  # get minimum bottom coordinate
 
-                            if x2 > x1 and y2 > y1:  # There is overlap
-                                intersection = (x2 - x1) * (y2 - y1)
-                                box1_area = (box1[2] - box1[0]) * (box1[3] - box1[1])
-                                box2_area = (box2[2] - box2[0]) * (box2[3] - box2[1])
-                                union = box1_area + box2_area - intersection
-                                iou = intersection / union
+                            if x2 > x1 and y2 > y1:  # there is overlap
+                                intersection = (x2 - x1) * (y2 - y1)  # calculate intersection area
+                                box1_area = (box1[2] - box1[0]) * (box1[3] - box1[1])  # calculate first box area
+                                box2_area = (box2[2] - box2[0]) * (box2[3] - box2[1])  # calculate second box area
+                                union = box1_area + box2_area - intersection  # calculate union area
+                                iou = intersection / union  # calculate iou
 
                                 if iou > 0.5:  # threshold for same object
-                                    candidate['object_id'] = object_id
-                                    same_object_predictions.append(candidate)
-                                    all_frame_predictions.pop(idx)
-                                    continue
-                            idx += 1
+                                    candidate['object_id'] = object_id  # assign same object id
+                                    same_object_predictions.append(candidate)  # add to same object predictions
+                                    all_frame_predictions.pop(idx)  # remove from remaining predictions
+                                    continue  # skip incrementing index
+                            idx += 1  # increment index
 
-                        # Select best prediction for this object (highest score)
-                        best_pred = max(same_object_predictions, key=lambda x: x['score'])
-                        processed_predictions.append(best_pred)
-                        object_id += 1
+                        # select best prediction for this object (highest score)
+                        best_pred = max(same_object_predictions, key=lambda x: x['score'])  # get prediction with highest score
+                        processed_predictions.append(best_pred)  # add to processed predictions
+                        object_id += 1  # increment object id
 
-                    # Create focus-optimized image by patching best predictions
-                    focus_optimized_image = base_image.copy()
-                    for pred in processed_predictions:
-                        bbox_isat = UtilsISAT.bbox_convert(pred['bbox'], 'COCO2ISAT')
-                        x1, y1, x2, y2 = [int(c) for c in bbox_isat]
-                        # Add padding to bbox for better visual result
-                        pad = int(min(x2 - x1, y2 - y1) * 0.1)
-                        x1_pad = max(0, x1 - pad)
-                        y1_pad = max(0, y1 - pad)
-                        x2_pad = min(focus_optimized_image.shape[1], x2 + pad)
-                        y2_pad = min(focus_optimized_image.shape[0], y2 + pad)
+                    # create focus-optimized image by patching best predictions
+                    focus_optimized_image = base_image.copy()  # copy base image
+                    for pred in processed_predictions:  # process each prediction
+                        bbox_isat = UtilsISAT.bbox_convert(pred['bbox'], 'COCO2ISAT')  # convert bbox to isat format
+                        x1, y1, x2, y2 = [int(c) for c in bbox_isat]  # get bbox coordinates as integers
+                        # add padding to bbox for better visual result
+                        pad = int(min(x2 - x1, y2 - y1) * 0.1)  # calculate padding as 10% of smaller dimension
+                        x1_pad = max(0, x1 - pad)  # ensure left coordinate isn't negative
+                        y1_pad = max(0, y1 - pad)  # ensure top coordinate isn't negative
+                        x2_pad = min(focus_optimized_image.shape[1], x2 + pad)  # ensure right coordinate isn't beyond image width
+                        y2_pad = min(focus_optimized_image.shape[0], y2 + pad)  # ensure bottom coordinate isn't beyond image height
 
-                        # Copy the best detection region from its source frame to the base image
-                        source_frame = stack[pred['frame_idx']]
-                        focus_optimized_image[y1_pad:y2_pad, x1_pad:x2_pad] = source_frame[y1_pad:y2_pad, x1_pad:x2_pad]
+                        # copy the best detection region from its source frame to the base image
+                        source_frame = stack[pred['frame_idx']]  # get source frame
+                        focus_optimized_image[y1_pad:y2_pad, x1_pad:x2_pad] = source_frame[y1_pad:y2_pad, x1_pad:x2_pad]  # copy region from source frame
 
                     base_dir = os.path.dirname(image_paths[stack_idx])  # get base directory from original image path
                     focus_opt_dir = os.path.join(base_dir, "focus_optimized")  # create path for focus_optimized folder
@@ -396,22 +406,22 @@ class OpenMMlab(Data4Training):
                             content_image = focus_optimized_image[  # crop out padding
                                 padding_vertical:height - padding_vertical,
                                 padding_horizontal:width - padding_horizontal
-                            ]
-                        else:
+                            ]  # crop padded region
+                        else:  # no padding
                             content_image = focus_optimized_image  # use full image if no padding
 
                         resized_image = cv2.resize(  # resize image back to original dimensions
                             content_image,
                             (original_width, original_height),
                             interpolation=cv2.INTER_LANCZOS4
-                        )
+                        )  # resize with high quality interpolation
                         cv2.imwrite(output_filename, cv2.cvtColor(resized_image, cv2.COLOR_RGB2BGR))  # save resized image
 
                         adjusted_bboxes = []  # initialize list for adjusted bounding boxes
                         adjusted_masks = []  # initialize list for adjusted masks
 
                         for pred in processed_predictions:  # process each prediction
-                            x1, y1, x2, y2 = UtilsISAT.bbox_convert(pred['bbox'], 'COCO2ISAT')  # convert bbox to ISAT format
+                            x1, y1, x2, y2 = UtilsISAT.bbox_convert(pred['bbox'], 'COCO2ISAT')  # convert bbox to isat format
 
                             # remove padding and apply inverse scaling to bbox coordinates
                             adj_x1 = max(0, int((x1 - padding_horizontal) / stack_metadata['width_ratio']))  # adjust x1
@@ -437,13 +447,13 @@ class OpenMMlab(Data4Training):
                                         adjusted_mask.extend([adj_mx, adj_my])  # add adjusted coordinates to mask
 
                                 adjusted_masks.append([adjusted_mask] if adjusted_mask else [])  # add adjusted mask to list
-                            else:
+                            else:  # no mask
                                 adjusted_masks.append([])  # add empty mask if none exists
 
-                        # convert adjusted coordinates to ISAT format
+                        # convert adjusted coordinates to isat format
                         isat_bboxes = np.array(adjusted_bboxes, dtype=np.int32) if adjusted_bboxes else np.array([], dtype=np.int32)  # convert bboxes to numpy array
-                        isat_masks = [UtilsISAT.coco_mask2isat_mask(mask[0]) for mask in adjusted_masks if mask and mask[0]] if adjusted_masks else []  # convert masks to ISAT format
-                    else:  # if no resizing was applied
+                        isat_masks = [UtilsISAT.coco_mask2isat_mask(mask[0]) for mask in adjusted_masks if mask and mask[0]] if adjusted_masks else []  # convert masks to isat format
+                    else:  # no resizing
                         cv2.imwrite(output_filename, cv2.cvtColor(focus_optimized_image, cv2.COLOR_RGB2BGR))  # save image as is
 
                         # use predictions as-is, just convert format
@@ -457,85 +467,99 @@ class OpenMMlab(Data4Training):
                         'category_name': [pred['category_name'] for pred in processed_predictions],  # category names
                         'bboxes': isat_bboxes,  # adjusted bounding boxes
                         'masks': isat_masks  # adjusted masks
-                    }
+                    }  # create result dictionary
 
-                    focus_optimized_results.append(focus_result)  # add to focus-optimized results for JSON generation
+                    focus_optimized_results.append(focus_result)  # add to focus-optimized results for json generation
 
                     vis_result = focus_result.copy()  # copy result for visualization
                     vis_result['image_path'] = image_paths[stack_idx]  # use original image path for visualization
                     valid_predictions.append(vis_result)  # add to valid predictions
-            else:
-                # Original SAHI code for non-stack images
-                for idx, image in tqdm(enumerate(images), total=len(images)):
+            else:  # original sahi code for non-stack images
+                # original sahi code for non-stack images
+                for idx, image in tqdm(enumerate(images), total=len(images)):  # process each image with progress bar
                     result = get_sliced_prediction(
                         image=image,  # location of image or numpy image matrix to slice
-                        detection_model=detector,  # model.DetectionModel
+                        detection_model=detector,  # model.detectionmodel
                         slice_width=self.slice_width,  # width of each slice
                         slice_height=self.slice_height,  # height of each slice
                         overlap_height_ratio=self.sahi_overlap_ratio,  # fractional overlap in height of each window (e.g. an overlap of 0.2 for a window of size 512 yields an overlap of 102 pixels)
                         overlap_width_ratio=self.sahi_overlap_ratio,  # fractional overlap in width of each window
                         perform_standard_pred=if_standard_pred,  # perform a standard prediction on top of sliced predictions to increase large object detection accuracy
-                        postprocess_type='GREEDYNMM',  # type of the postprocess to be used after sliced inference while merging/eliminating predictions. Options are 'NMM', 'GREEDYNMM' or 'NMS'. Default is 'GREEDYNMM'
-                        postprocess_match_metric='IOU',  # metric to be used during object prediction matching after sliced prediction. 'IOU' for intersection over union, 'IOS' for intersection over smaller area.
+                        postprocess_type='GREEDYNMM',  # type of the postprocess to be used after sliced inference while merging/eliminating predictions. options are 'nmm', 'greedynmm' or 'nms'. default is 'greedynmm'
+                        postprocess_match_metric='IOU',  # metric to be used during object prediction matching after sliced prediction. 'iou' for intersection over union, 'ios' for intersection over smaller area.
                         postprocess_match_threshold=0.1,  # sliced predictions having higher iou than postprocess_match_threshold will be postprocessed after sliced prediction.
-                        postprocess_class_agnostic=False,  # if True, postprocess will ignore category ids.
-                        verbose=0,  # 0: no print; 1: print number of slices (default); 2: print number of slices and slice/prediction durations
-                        merge_buffer_length=None,  # the length of buffer for slices to be used during sliced prediction, which is suitable for low memory
-                        auto_slice_resolution=True,  # if slice parameters (slice_height, slice_width) are not given, it enables automatically calculate these params from image resolution and orientation
-                        slice_export_prefix=None,  # prefix for the exported slices. Defaults to None
-                        slice_dir=None,  # directory to save the slices. Defaults to None
-                    ).to_coco_annotations()  # get the prediction results in MSCOCO format
+                        postprocess_class_agnostic=False,  # if true, postprocess will ignore category ids.
+                        verbose=0
+                    ).to_coco_annotations()  # get the prediction results in mscoco format
 
-                    valid_items = []
+                    valid_items = []  # initialize array for valid items
                     for item in result:
-                        try:
-                            UtilsISAT.bbox_convert(np.array(item['bbox'], dtype=np.float32), 'COCO2ISAT')
-                            valid_items.append(item)  # filter out items with invalid boxes
-                        except Exception:
-                            pass
+                        # Check if item has a valid segmentation
+                        if 'segmentation' in item and item['segmentation'] and len(item['segmentation'][0]) >= 4:
+                            # Get segmentation points in MSCOCO format [x1, y1, x2, y2, ...]
+                            seg_points = np.array(item['segmentation'][0])
+                            
+                            # Extract x and y coordinates using NumPy operations
+                            x_coords = seg_points[0::2]  # All even indices (0, 2, 4, ...)
+                            y_coords = seg_points[1::2]  # All odd indices (1, 3, 5, ...)
+                            
+                            # Compute bbox from segmentation points using NumPy
+                            if len(x_coords) > 0 and len(y_coords) > 0:
+                                x_min = np.min(x_coords)
+                                y_min = np.min(y_coords)
+                                x_max = np.max(x_coords)
+                                y_max = np.max(y_coords)
+                                
+                                # COCO format: [x_min, y_min, width, height]
+                                width = x_max - x_min
+                                height = y_max - y_min
+                                computed_bbox = [float(x_min), float(y_min), float(width), float(height)]
+                                
+                                # Update the item's bbox
+                                item['bbox'] = computed_bbox
+                                valid_items.append(item)
 
-                    # Filter valid items (filter out masks with straight edges)
-                    valid_pairs = []
-                    for item in valid_items:
-                        mask = item['segmentation']
-                        if not mask or not has_straight_line_edges(mask[0], min_straight_length=20):
+                    # filter valid items (filter out masks with straight edges)
+                    valid_pairs = []  # store valid detection pairs
+                    for item in valid_items:  # check each valid item
+                        mask = item['segmentation']  # get segmentation mask
+                        if not mask or not has_straight_line_edges(mask[0], min_straight_length=20):  # check if mask has straight edges
                             valid_pairs.append((
-                                mask,
-                                np.array(item['bbox'], dtype=np.float32),
-                                item['score'],
-                                item['category_id'],
-                                item['category_name']
-                            ))
+                                mask,  # add mask
+                                np.array(item['bbox'], dtype=np.float32),  # add bbox
+                                item['score'],  # add confidence score
+                                item['category_id'],  # add category id
+                                item['category_name']  # add category name
+                            ))  # collect detection tuple
 
-                    # Extract values safely
-                    if valid_pairs:
-                        # Unpack valid_pairs - ensure we have exactly 5 values per item
-                        masks = []
-                        bboxes = []
-                        scores = []
-                        category_ids = []
-                        category_names = []
+                    # extract values safely
+                    if valid_pairs:  # check if we have valid pairs
+                        # unpack valid_pairs - ensure we have exactly 5 values per item
+                        masks = []  # initialize masks list
+                        bboxes = []  # initialize bboxes list
+                        scores = []  # initialize scores list
+                        category_ids = []  # initialize category ids list
+                        category_names = []  # initialize category names list
 
-                        for pair in valid_pairs:
+                        for pair in valid_pairs:  # process each valid pair
                             if len(pair) == 5:  # make sure we have exactly 5 elements
-                                masks.append(pair[0])
-                                bboxes.append(pair[1])
-                                scores.append(pair[2])
-                                category_ids.append(pair[3])
-                                category_names.append(pair[4])
-                    else:
-                        masks = []
-                        bboxes = []
-                        scores = []
-                        category_ids = []
-                        category_names = []
-
+                                masks.append(pair[0])  # add mask
+                                bboxes.append(pair[1])  # add bbox
+                                scores.append(pair[2])  # add score
+                                category_ids.append(pair[3])  # add category id
+                                category_names.append(pair[4])  # add category name
+                    else:  # no valid pairs found
+                        masks = []  # empty masks list
+                        bboxes = []  # empty bboxes list
+                        scores = []  # empty scores list
+                        category_ids = []  # empty category ids list
+                        category_names = []  # empty category names list
                     result_dict = {
-                        'image_path': image_paths[idx],
-                        'category_id': np.array(category_ids, dtype=np.int64),
-                        'category_name': list(category_names),
-                        'bboxes': np.array([UtilsISAT.bbox_convert(bbox, 'COCO2ISAT') for bbox in bboxes], dtype=np.int32) if bboxes else np.array([], dtype=np.int32),
-                        'masks': [UtilsISAT.coco_mask2isat_mask(mask[0]) for mask in masks if mask] if masks else []
+                        'image_path': image_paths[idx],  # store original image path
+                        'category_id': np.array(category_ids, dtype=np.int64),  # store category ids as int64 array
+                        'category_name': list(category_names),  # store category names as list
+                        'bboxes': np.array([UtilsISAT.bbox_convert(bbox, 'COCO2ISAT') for bbox in bboxes], dtype=np.int32) if bboxes else np.array([], dtype=np.int32),  # convert and store bboxes
+                        'masks': [UtilsISAT.coco_mask2isat_mask(mask[0]) for mask in masks if mask] if masks else []  # convert and store masks
                     }  # collect prediction metadata
                     valid_predictions.append(result_dict)  # append the bboxes of each image
 
