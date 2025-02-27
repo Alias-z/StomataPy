@@ -63,6 +63,70 @@ def imread_rgb(image_dir: str) -> np.ndarray:
     return cv2.cvtColor(cv2.imread(image_dir), cv2.COLOR_BGR2RGB)
 
 
+def imread_rgb_stack(stack_path: str) -> np.ndarray:
+    """
+    Read stack images (multi-frame) from video or TIFF files
+
+    Args:
+    - stack_path (str): Path to the stack image file
+
+    Returns:
+    - np.ndarray: 4D array with shape [frames, height, width, 3] in RGB format
+    """
+    file_ext = os.path.splitext(stack_path)[1].lower()  # get file extension in lowercase
+
+    # Handle TIFF files
+    if file_ext in ['.tif', '.tiff']:
+        import tifffile
+        stack = tifffile.imread(stack_path)  # read tiff stack
+
+        # Handle different TIFF dimensions
+        if len(stack.shape) == 2:  # single grayscale image
+            rgb_image = np.stack([stack] * 3, axis=-1)  # convert to rgb
+            return np.expand_dims(rgb_image, 0)  # add frame dimension
+
+        elif len(stack.shape) == 3:
+            if stack.shape[2] == 3:  # single rgb image [height, width, rgb]
+                return np.expand_dims(stack, 0)  # add frame dimension
+            else:  # multiple grayscale frames [frames, height, width]
+                return np.stack([np.stack([frame] * 3, axis=-1) for frame in stack])  # convert each frame to rgb
+
+        elif len(stack.shape) == 4:  # already [frames, height, width, channels]
+            if stack.shape[3] == 3:  # rgb
+                return stack  # already in the right format
+            elif stack.shape[3] == 1:  # grayscale with channel dimension
+                return np.concatenate([stack] * 3, axis=3)  # expand to rgb
+            else:
+                raise ValueError(f"Unsupported TIFF channel count: {stack.shape[3]}")  # unsupported format
+        else:
+            raise ValueError(f"Unsupported TIFF dimensions: {stack.shape}")  # unsupported format
+
+    # Handle video files
+    elif file_ext in ['.avi', '.mp4', '.mov', '.wmv']:
+        frames = []  # to store video frames
+        cap = cv2.VideoCapture(stack_path)  # open video file
+
+        if not cap.isOpened():
+            raise ValueError(f"Failed to open video file: {stack_path}")  # error if video can't be opened
+
+        while True:
+            ret, frame = cap.read()  # read next frame
+            if not ret:
+                break  # end of video
+            frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)  # convert bgr to rgb
+            frames.append(frame_rgb)  # add to frames list
+
+        cap.release()  # release video capture object
+
+        if not frames:
+            raise ValueError(f"No frames found in video: {stack_path}")  # error if no frames found
+
+        return np.array(frames)  # convert list to numpy array
+
+    else:
+        raise ValueError(f"Unsupported stack file format: {file_ext}")  # unsupported file type
+
+
 def unique_color(image: np.ndarray) -> np.ndarray:
     """Find the unique RGB color of a given image"""
     return np.unique(image.reshape(-1, image.shape[-1]), axis=0)
