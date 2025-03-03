@@ -93,7 +93,7 @@ class OpenMMlab(Data4Training):
         returns:
         - valid_predictions (list[dict]): a list of dictionaries containing detection results per image with keys 'image_path', 'category_id', 'category_name', 'bboxes', 'masks'
         """
-        valid_predictions, focus_optimized_results = [], []  # initialize the lists
+        valid_predictions = []  # initialize the list
 
         def visualize_detections(valid_prediction: dict) -> None:
             """visualizes detection results on an image using bounding boxes and optional masks
@@ -269,14 +269,15 @@ class OpenMMlab(Data4Training):
                 return False  # no qualifying straight edges found
 
             if self.stack_input:
-                # create focus-stacked base images for each stack
-                focus_bases = [focus_stack(stack) for stack in images]  # focus stack each image stack
+                focus_bases = [focus_stack(stack) for stack in images]  # create focus-stacked base images for each stack
 
                 for stack_idx, stack in tqdm(enumerate(images), total=len(images)):  # process each stack with progress bar
                     base_image = focus_bases[stack_idx].copy()  # copy the focus stack base image
                     all_frame_predictions = []  # store predictions from all frames
 
                     for frame_idx, frame in enumerate(stack):  # iterate through each frame
+                        # if frame_idx > 2:
+                        #     continue
                         result = get_sliced_prediction(
                             image=frame,
                             detection_model=detector,
@@ -298,7 +299,7 @@ class OpenMMlab(Data4Training):
 
                         valid_items = []  # store valid detections
                         for item in result:
-                            if 'segmentation' in item and item['segmentation'] and len(item['segmentation'][0]) >= 4:
+                            if item['segmentation'] and len(item['segmentation'][0]) > 6:
                                 seg_points = np.array(item['segmentation'][0])
                                 x_coords = seg_points[0::2]  # all even indices (0, 2, 4, ...)
                                 y_coords = seg_points[1::2]  # all odd indices (1, 3, 5, ...)
@@ -329,8 +330,6 @@ class OpenMMlab(Data4Training):
                                         'category_name': item['category_name'],
                                         'object_id': None  # will be assigned in grouping step
                                     })  # add valid pair with frame index
-                            else:
-                                print(f"Skipping item with invalid mask: {mask}")  # print when skipping invalid mask
 
                         all_frame_predictions.extend(valid_pairs)  # add valid pairs to all predictions
 
@@ -455,7 +454,6 @@ class OpenMMlab(Data4Training):
                         isat_masks = [UtilsISAT.coco_mask2isat_mask(mask[0]) for mask in adjusted_masks if mask and mask[0]] if adjusted_masks else []  # convert masks to isat format
                     else:  # no resizing
                         cv2.imwrite(output_filename, cv2.cvtColor(focus_optimized_image, cv2.COLOR_RGB2BGR))  # save image as is
-
                         # use predictions as-is, just convert format
                         isat_bboxes = np.array([UtilsISAT.bbox_convert(pred['bbox'], 'COCO2ISAT') for pred in processed_predictions], dtype=np.int32) if processed_predictions else np.array([], dtype=np.int32)  # convert bboxes
                         isat_masks = [UtilsISAT.coco_mask2isat_mask(pred['mask'][0]) if pred['mask'] else [] for pred in processed_predictions] if processed_predictions else []  # convert masks
@@ -468,12 +466,8 @@ class OpenMMlab(Data4Training):
                         'bboxes': isat_bboxes,  # adjusted bounding boxes
                         'masks': isat_masks  # adjusted masks
                     }  # create result dictionary
+                    valid_predictions.append(focus_result)  # add to valid predictions
 
-                    focus_optimized_results.append(focus_result)  # add to focus-optimized results for json generation
-
-                    vis_result = focus_result.copy()  # copy result for visualization
-                    vis_result['image_path'] = image_paths[stack_idx]  # use original image path for visualization
-                    valid_predictions.append(vis_result)  # add to valid predictions
             else:  # original sahi code for non-stack images
                 # original sahi code for non-stack images
                 for idx, image in tqdm(enumerate(images), total=len(images)):  # process each image with progress bar
@@ -496,25 +490,17 @@ class OpenMMlab(Data4Training):
                     for item in result:
                         # Check if item has a valid segmentation
                         if 'segmentation' in item and item['segmentation'] and len(item['segmentation'][0]) >= 4:
-                            # Get segmentation points in MSCOCO format [x1, y1, x2, y2, ...]
-                            seg_points = np.array(item['segmentation'][0])
-                            
-                            # Extract x and y coordinates using NumPy operations
-                            x_coords = seg_points[0::2]  # All even indices (0, 2, 4, ...)
-                            y_coords = seg_points[1::2]  # All odd indices (1, 3, 5, ...)
-                            
-                            # Compute bbox from segmentation points using NumPy
+                            seg_points = np.array(item['segmentation'][0])  # get segmentation points in MSCOCO format [x1, y1, x2, y2, ...]
+                            x_coords = seg_points[0::2]  # all even indices (0, 2, 4, ...)
+                            y_coords = seg_points[1::2]  # all odd indices (1, 3, 5, ...)
                             if len(x_coords) > 0 and len(y_coords) > 0:
                                 x_min = np.min(x_coords)
                                 y_min = np.min(y_coords)
                                 x_max = np.max(x_coords)
                                 y_max = np.max(y_coords)
-                                
                                 # COCO format: [x_min, y_min, width, height]
-                                width = x_max - x_min
-                                height = y_max - y_min
+                                width, height = x_max - x_min, y_max - y_min
                                 computed_bbox = [float(x_min), float(y_min), float(width), float(height)]
-                                
                                 # Update the item's bbox
                                 item['bbox'] = computed_bbox
                                 valid_items.append(item)
@@ -563,14 +549,8 @@ class OpenMMlab(Data4Training):
                     }  # collect prediction metadata
                     valid_predictions.append(result_dict)  # append the bboxes of each image
 
-        # Process focus-optimized results separately
-        if if_auto_label and focus_optimized_results:
-            # Process focus-optimized images only with the correct paths
-            Anything2ISAT().from_openmmlab(valid_predictions=focus_optimized_results)
-
-        if if_auto_label and not self.stack_input:
-            # Only process non-stack images - will not run when processing stacks
-            Anything2ISAT().from_openmmlab(valid_predictions=valid_predictions)
+        if if_auto_label:
+            Anything2ISAT().from_openmmlab(valid_predictions=valid_predictions)  # convert the predictions to ISAT json files
 
         if if_visualize and len(valid_predictions) > 0:
             for valid_prediction in valid_predictions:

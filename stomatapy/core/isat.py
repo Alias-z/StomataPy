@@ -1162,9 +1162,7 @@ class Anything2ISAT:
         Convert the mmdetection or mmsegmentation results to an ISAT json file
 
         Args:
-        - category (str): the category label for all objects; defaults to 'guard cells'
-        - use_polydp (bool): specifies whether to use polynomial approximation to smooth the segmentation; defaults to False
-        - epsilon_factor (float): a factor used to determine the approximation accuracy when use_polydp is True; defaults to 0.002
+        - valid_predictions (list): a list of dictionaries, each containing a prediction's data including its segmentation and bounding box
 
         Returns:
         - None: updates ISAT formatted JSON files with segmentation data from Cellpose npy files
