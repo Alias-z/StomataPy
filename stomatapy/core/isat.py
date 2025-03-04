@@ -1183,6 +1183,9 @@ class Anything2ISAT:
             image_shape = cv2.imread(valid_prediction['image_path']).shape
             for obj in data['objects']:
                 if UtilsISAT.bbox_intersection(bbox, obj['bbox'], threshold=0.5):
+                    area = int(self.isat_area(segmentation))
+                    if area < 100:
+                        continue
                     group_assigned = True  # assign the same group as the intersect object
                     if obj['category'] == valid_prediction['category_name'][idx]:  # same object: just replace the segmentation
                         obj_ellipse = UtilsISAT.ellipse_filter(UtilsISAT.segmentation2mask(obj['segmentation'], image_shape), 0.5)[1]  # get the ellipse value of original mask
@@ -1190,7 +1193,7 @@ class Anything2ISAT:
                         if obj_ellipse > mask_ellipse:
                             continue
                         obj['segmentation'] = segmentation  # update the segmentation of the existing object
-                        obj['area'] = int(self.isat_area(segmentation))  # update the area based on boolean mask
+                        obj['area'] = area  # update the area based on boolean mask
                         obj['layer'] = max_layer + 1.0  # increase layer by 1.0
                         obj['bbox'] = bbox  # update the bbox
                         obj['note'] = 'Auto'  # add Cellpose tag
@@ -1198,7 +1201,7 @@ class Anything2ISAT:
                         new_object_same_group = {
                             'category': valid_prediction['category_name'][idx],  # category as user input
                             'group': obj['group'],  # assign to the same group
-                            'area': int(self.isat_area(segmentation)),  # get the area based on boolean mask
+                            'area': area,  # get the area based on boolean mask
                             'segmentation': segmentation,  # the ISAT segmentation
                             'layer': max_layer + 1.0,  # increase layer by 1.0
                             'bbox': bbox,  # the ISAT bbox
@@ -1206,16 +1209,18 @@ class Anything2ISAT:
                             'note': 'Auto'}
                         data['objects'].append(new_object_same_group)  # update the objects section
             if not group_assigned:
+                area = int(self.isat_area(segmentation))
                 new_object = {
                     'category': valid_prediction['category_name'][idx],  # category as user input
                     'group': max_group + 1,  # assign to new group
-                    'area': int(self.isat_area(segmentation)),  # get the area based on boolean mask
+                    'area': area,  # get the area based on boolean mask
                     'segmentation': segmentation,  # the ISAT segmentation
                     'layer': max_layer + 1.0,  # increase layer by 1.0
                     'bbox': bbox,  # the ISAT bbox
                     'iscrowd': False,
                     'note': 'Auto'}
-                data['objects'].append(new_object)  # update the objects section
+                if area > 100:
+                    data['objects'].append(new_object)  # update the objects section
             return data
 
         print('Converting predictions to ISAT JSON files...')

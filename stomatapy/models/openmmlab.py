@@ -276,8 +276,6 @@ class OpenMMlab(Data4Training):
                     all_frame_predictions = []  # store predictions from all frames
 
                     for frame_idx, frame in enumerate(stack):  # iterate through each frame
-                        # if frame_idx > 2:
-                        #     continue
                         result = get_sliced_prediction(
                             image=frame,
                             detection_model=detector,
@@ -548,6 +546,31 @@ class OpenMMlab(Data4Training):
                         'masks': [UtilsISAT.coco_mask2isat_mask(mask[0]) for mask in masks if mask] if masks else []  # convert and store masks
                     }  # collect prediction metadata
                     valid_predictions.append(result_dict)  # append the bboxes of each image
+
+                if if_resize_image:
+                    for idx, prediction in enumerate(valid_predictions):
+                        metadata = resizing_metadata[idx]  # get the resizing information for the given image
+                        adjusted_bboxes, adjusted_masks = [], []  # to collect the adjusted bboxes and masks back to orginal image
+                        for bbox in prediction['bboxes']:
+                            x1, y1, x2, y2 = bbox  # load each individual object bbox
+                            adj_x1 = max(0, int((x1 - metadata['padding_horizontal']) / metadata['width_ratio']))  # adjust x1
+                            adj_y1 = max(0, int((y1 - metadata['padding_vertical']) / metadata['height_ratio']))  # adjust y1
+                            adj_x2 = max(0, int((x2 - metadata['padding_horizontal']) / metadata['width_ratio']))  # adjust x2
+                            adj_y2 = max(0, int((y2 - metadata['padding_vertical']) / metadata['height_ratio']))  # adjust y2
+                            adjusted_bboxes.append([adj_x1, adj_y1, adj_x2, adj_y2])  # append the update bbox
+
+                        for mask in prediction['masks']:
+                            if mask is not None:
+                                updated_points = []  # to collect all points
+                                for point in mask:
+                                    point[0] = max(0, (point[0] - metadata['padding_horizontal']) / metadata['width_ratio'])   # update x coordinate
+                                    point[1] = max(0, (point[1] - metadata['padding_vertical']) / metadata['height_ratio'])   # update y coordinate
+                                    updated_points.append([point[0], point[1]])  # collect the updated points
+                                adjusted_masks.append(updated_points)  # append the update mask
+                        valid_predictions[idx]['bboxes'] = np.array(adjusted_bboxes, dtype=np.int32)  # update the all bboxes for the given image
+                        valid_predictions[idx]['masks'] = adjusted_masks if len(adjusted_masks) > 0 else None  # update the all masks for the given image
+
+                    images = [metadata['original_image'] for metadata in resizing_metadata]  # restore original image
 
         if if_auto_label:
             Anything2ISAT().from_openmmlab(valid_predictions=valid_predictions)  # convert the predictions to ISAT json files
