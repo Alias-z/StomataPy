@@ -23,7 +23,7 @@ from sahi.predict import get_sliced_prediction  # sahi sliced prediction
 from mmseg.utils import register_all_modules as mmseg_utils_register_all_modules  # register mmseg modules
 from mmseg.apis import init_model as mmseg_apis_init_model  # initialize mmseg model
 from mmseg.apis import inference_model as mmseg_apis_inference_model  # mmseg inference segmentor
-from ..core.core import device, Cell_Colors, imread_rgb, imread_rgb_stack, resize_and_pad_image, restore_original_dimensions  # import core elements
+from ..core.core import device, video_types, Cell_Colors, imread_rgb, imread_rgb_stack, resize_and_pad_image, restore_original_dimensions  # import core elements
 from ..core.isat import UtilsISAT, Anything2ISAT  # to interact with isat jason files
 from ..utils.data4training import Data4Training  # the traning processing pipelines
 from ..utils.focus_stack import focus_stack  # focus stacking
@@ -261,9 +261,9 @@ class OpenMMlab(Data4Training):
 
                 points = list(zip(coco_polygon[0::2], coco_polygon[1::2]))  # convert to [(x1,y1), (x2,y2),...]
                 # check all consecutive point pairs including last-to-first connection
-                for i in range(len(points)):  # iterate through points
-                    p1 = points[i]  # current point
-                    p2 = points[(i + 1) % len(points)]  # wrap index for final edge connection
+                for idx in range(len(points)):  # iterate through points
+                    p1 = points[idx]  # current point
+                    p2 = points[(idx + 1) % len(points)]  # wrap index for final edge connection
                     if is_straight_edge(p1, p2, min_straight_length):  # check if this edge is straight
                         return True  # found a straight edge
                 return False  # no qualifying straight edges found
@@ -275,7 +275,11 @@ class OpenMMlab(Data4Training):
                     base_image = focus_bases[stack_idx].copy()  # copy the focus stack base image
                     all_frame_predictions = []  # store predictions from all frames
 
-                    for frame_idx, frame in enumerate(stack):  # iterate through each frame
+                    # augmented_stack = [base_image] + stack  # add the focus-stacked base image to the stack for processing
+                    augmented_stack = stack  # do not inference focus-stacked base images
+
+                    for frame_idx, frame in enumerate(augmented_stack):  # iterate through each frame including the base image
+                        # Note: frame_idx 0 now refers to the base image, 1+ refers to the original stack frames
                         result = get_sliced_prediction(
                             image=frame,
                             detection_model=detector,
@@ -383,14 +387,16 @@ class OpenMMlab(Data4Training):
                         y2_pad = min(focus_optimized_image.shape[0], y2 + pad)  # ensure bottom coordinate isn't beyond image height
 
                         # copy the best detection region from its source frame to the base image
-                        source_frame = stack[pred['frame_idx']]  # get source frame
+                        source_frame = augmented_stack[pred['frame_idx']]  # get source frame
                         focus_optimized_image[y1_pad:y2_pad, x1_pad:x2_pad] = source_frame[y1_pad:y2_pad, x1_pad:x2_pad]  # copy region from source frame
 
                     base_dir = os.path.dirname(image_paths[stack_idx])  # get base directory from original image path
-                    focus_opt_dir = os.path.join(base_dir, "focus_optimized")  # create path for focus_optimized folder
+                    focus_opt_dir = os.path.join(base_dir, 'focus_optimized')  # create path for focus_optimized folder
                     os.makedirs(focus_opt_dir, exist_ok=True)  # create focus_optimized directory if it doesn't exist
                     original_filename = os.path.basename(image_paths[stack_idx])  # extract original filename
                     output_filename = os.path.join(focus_opt_dir, original_filename)  # create path for output file
+                    if os.path.splitext(output_filename)[1] in video_types:
+                        output_filename = os.path.splitext(output_filename)[0] + '.png'  # change extension to png for video frames
 
                     if if_resize_image:  # check if resizing was applied
                         stack_metadata = resizing_metadata[stack_idx]  # get metadata for current stack
@@ -407,11 +413,11 @@ class OpenMMlab(Data4Training):
                         else:  # no padding
                             content_image = focus_optimized_image  # use full image if no padding
 
-                        resized_image = cv2.resize(  # resize image back to original dimensions
+                        resized_image = cv2.resize(
                             content_image,
                             (original_width, original_height),
                             interpolation=cv2.INTER_LANCZOS4
-                        )  # resize with high quality interpolation
+                        )  # resize image back to original dimensions
                         cv2.imwrite(output_filename, cv2.cvtColor(resized_image, cv2.COLOR_RGB2BGR))  # save resized image
 
                         adjusted_bboxes = []  # initialize list for adjusted bounding boxes

@@ -17,6 +17,7 @@ from skimage.filters import threshold_isodata, laplace  # for image thresholding
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')  # use GPU if available
 
 image_types = ['.jpg', '.jpeg', '.png', '.tif', '.tiff', '.bmp', '.gif', '.ico', '.jfif', '.webp']  # supported image types
+video_types = ['.avi', '.mp4', '.mov', '.wmv']  # supported video types
 
 
 class SegColors:
@@ -102,7 +103,7 @@ def imread_rgb_stack(stack_path: str) -> np.ndarray:
             raise ValueError(f"Unsupported TIFF dimensions: {stack.shape}")  # unsupported format
 
     # Handle video files
-    elif file_ext in ['.avi', '.mp4', '.mov', '.wmv']:
+    elif file_ext in video_types:
         frames = []  # to store video frames
         cap = cv2.VideoCapture(stack_path)  # open video file
 

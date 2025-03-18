@@ -430,6 +430,11 @@ class UtilsISAT:
         """
         mask_uint8 = mask_bool.astype(np.uint8) * 255  # bool mask to uint8
         contours, _ = cv2.findContours(mask_uint8, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_TC89_L1)  # find mask contours. Optional: using cv2.CHAIN_APPROX_SIMPLE for smoothing
+        
+        # Handle case of no contours found
+        if not contours:
+            return []
+            
         largest_contour = max(contours, key=cv2.contourArea)  # get the largest contour only
         if use_polydp:  # approximates the contour for smoothing effect
             epsilon = epsilon_factor * cv2.arcLength(largest_contour, True)  # samller value leads to a contour closer to the original
@@ -437,6 +442,25 @@ class UtilsISAT:
             coordinates = approx_contour.squeeze().tolist()  # smoothed contour coorinates
         else:
             coordinates = largest_contour.squeeze().tolist()  # contour coorinates
+            
+        # Handle the case when coordinates is a single number (int) or a flat list
+        if isinstance(coordinates, int):
+            return []
+        elif isinstance(coordinates, list):
+            # Check if the coordinates list is flat (just numbers) or nested (coordinate pairs)
+            if coordinates and not isinstance(coordinates[0], list):
+                # If coordinates is a 1D array of shape (n, 2) squeezed to a 1D list
+                if len(coordinates) >= 2:
+                    # Convert flat list [x1, y1, x2, y2, ...] to nested list [[x1, y1], [x2, y2], ...]
+                    segmentation = []
+                    for i in range(0, len(coordinates), 2):
+                        if i + 1 < len(coordinates):
+                            segmentation.append([float(coordinates[i]), float(coordinates[i + 1])])
+                    return segmentation
+                else:
+                    return []
+                    
+        # Process normally when coordinates is already in the expected format
         segmentation = [[float(point[0]), float(point[1])] for point in coordinates]  # get the ISAT format segmentation
         return segmentation
 
