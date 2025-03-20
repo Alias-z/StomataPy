@@ -94,7 +94,7 @@ class UtilsISAT:
         return None
 
     @staticmethod
-    def sort_group(json_dir: str, if2rgb: bool = False) -> None:
+    def sort_group(json_dir: str, if2rgb: bool = False, custom_order: list = ['stomatal complex', 'stoma', 'guard cell', 'outer ledge', 'pore', 'pavement cell']) -> None:
         """
         Sorts and groups objects in JSON files by a predefined category order and group ids.
         Optionally converts associated grayscale images to RGB format.
@@ -102,6 +102,7 @@ class UtilsISAT:
         Args:
         - json_dir (str): the directory containing JSON files to be processed
         - if2rgb (bool): if True, converts associated grayscale images to RGB. Default is False
+        - custom_order (list): the custom category order. Default is ['stomatal complex', 'stoma', 'guard cell', 'outer ledge', 'pore', 'pavement cell']
 
         Returns:
         - None: modifies JSON files in place and optionally updates associated image files
@@ -109,7 +110,6 @@ class UtilsISAT:
         Note:
         - This function updates both the 'objects' array and the 'info' section of each JSON file
         """
-        custom_order = ['stomatal complex', 'stoma', 'guard cell', 'outer ledge', 'pore', 'pavement cell']  # the category order
         order_dict = {category: idx for idx, category in enumerate(custom_order)}  # enumerate the order into a dictionary
 
         def category_sort_order(obj: dict) -> dict:
