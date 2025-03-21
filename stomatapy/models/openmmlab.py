@@ -60,6 +60,8 @@ class OpenMMlab(Data4Training):
                  segmentor_weight_path: str = None,
                  seg_onehot_mapping: dict = {cell_color.class_encoding: cell_color.class_name for cell_color in Cell_Colors},
                  stack_input: bool = False,  # add parameter for stack input
+                 check_straight_edges: bool = True,  # add parameter for checking straight edges in masks
+                 straight_line_threshold: int = 50,  # add parameter for minimum length of straight line to consider
                  **kwargs):
         super().__init__(**kwargs)  # initialize parent class
         self.detector_config_path = detector_config_path  # object detection config path
@@ -70,6 +72,8 @@ class OpenMMlab(Data4Training):
         self.seg_onehot_mapping = seg_onehot_mapping  # segmentation one-hot code against class_name
         self.seg_color_mapping = {cell_color.class_name: cell_color.mask_rgb for cell_color in Cell_Colors}  # map the segmentation class names to their colors
         self.stack_input = stack_input  # flag for stack image processing
+        self.check_straight_edges = check_straight_edges  # flag for checking straight edges in masks
+        self.straight_line_threshold = straight_line_threshold  # minimum length of straight line to consider
         set_seeds(42); self.segmentor = mmseg_apis_init_model(self.segmentor_config_path, self.segmentor_weight_path, device='cpu')   # noqa: initialize a segmentor from config file
 
     def detect_cell(self,
@@ -322,7 +326,7 @@ class OpenMMlab(Data4Training):
                             mask = item['segmentation']  # get segmentation mask
                             # check if mask is not empty and has expected structure
                             if mask and len(mask) > 0:  # ensure mask is not empty
-                                if not has_straight_line_edges(mask[0], min_straight_length=20):  # check for straight edges
+                                if not has_straight_line_edges(mask[0], min_straight_length=self.straight_line_threshold):  # check for straight edges
                                     valid_pairs.append({
                                         'frame_idx': frame_idx,
                                         'mask': mask,
@@ -513,7 +517,9 @@ class OpenMMlab(Data4Training):
                     valid_pairs = []  # store valid detection pairs
                     for item in valid_items:  # check each valid item
                         mask = item['segmentation']  # get segmentation mask
-                        if not mask or not has_straight_line_edges(mask[0], min_straight_length=20):  # check if mask has straight edges
+                        if mask:
+                            if self.check_straight_edges and has_straight_line_edges(mask[0], min_straight_length=self.straight_line_threshold):
+                                continue  # check if mask has straight edges
                             valid_pairs.append((
                                 mask,  # add mask
                                 np.array(item['bbox'], dtype=np.float32),  # add bbox
