@@ -7,10 +7,10 @@ current_dir = os.path.abspath(os.path.dirname(__file__))
 
 # Core dependencies to install first
 pip_dependencies = [
+    'numpy==1.26.4',
     'torch==2.1.1',
     'torchvision==0.16.1',
     'torchaudio==2.1.1',
-    'numpy==1.26.4',
     'openmim==0.3.8',
     'xformers==0.0.23',
     'fairscale',
