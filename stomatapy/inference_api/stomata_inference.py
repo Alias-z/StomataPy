@@ -8,7 +8,7 @@ import numpy as np  # NumPy
 from tqdm import tqdm  # progress bar
 import pandas as pd  # for Excel sheet
 from ..core.core import device, image_types, Cell_Colors, imread_rgb, color_select, binary, lab_logo  # import core functions
-from ..core.stoma_dimension import GetDiameter  # import core functions for stomatal aperture
+from ..utils.stoma_dimension import GetDiameter  # import core functions for stomatal aperture
 from ..core.isat import UtilsISAT  # functions to manipulate ISAT segmentations
 
 from typing import List  # for typing hints
@@ -18,7 +18,7 @@ from ..core.core import get_paths   # import core functions
 class StomataInference:
     """Inference stomata images"""
     def __init__(self,
-                 input_dir: str,
+                 input_dir: str = None,
                  output_name: str = 'Results aperture',
                  batch_size: int = 20,
                  pixels_per_micrometer: float = 8.0,
@@ -56,11 +56,12 @@ class StomataInference:
         edges = [top_edge, bottom_edge, left_edge, right_edge]  # all four edges
         return any(np.any(edge) for edge in edges)
 
-    def json2excel(self):
+    @staticmethod
+    def json2excel(input_dir, output_dir, scale: float = 2.9):
         """Get stomata triats from ISAT json files of input folders, and store the results as an Excel sheet"""
         batch_results = pd.DataFrame()  # to store results into a DataFrame
         json_paths = []  # to store the ISAT json file paths to be inferenced
-        for dir_path, dir_names, file_names in os.walk(self.input_dir):
+        for dir_path, dir_names, file_names in os.walk(input_dir):
             dir_json_names = [name for name in file_names if any(name.lower().endswith(file_type) for file_type in ['.json'])]  # json files only
             dir_json_paths = [os.path.join(dir_path, dir_json_name) for dir_json_name in dir_json_names]  # get the json file paths of the given directory
             json_paths.append(dir_json_paths)
@@ -79,8 +80,8 @@ class StomataInference:
                 overlay_color = np.array([0, 0, 255])
                 mask = obj['segmentation']  # get the ISAT format segmentation mask
                 mask_bool = UtilsISAT.segmentation2mask(mask, image_dimension)  # convert the ISAT mask to a bool mask
-                if not self.if_seg_on_edges(mask_bool):
-                    mask_area = np.sum(mask_bool) * (1 / scale) ** 2 # get the mask area
+                if not StomataInference.if_seg_on_edges(mask_bool):
+                    mask_area = np.sum(mask_bool) * (1 / scale) ** 2  # get the mask area
                     bbox = obj['bbox']  # get the object bbox
                     padding = max((bbox[2] - bbox[0]), (bbox[3] - bbox[1])) // 4  # calculate the padding value of the bbox as max 25% of either dimension
                     mask_filled = np.uint8(np.stack([mask_bool, mask_bool, mask_bool], axis=-1) * 255)  # fill in the bool mask with RGB white color for dimension
@@ -107,5 +108,5 @@ class StomataInference:
                     result = pd.DataFrame(data=[result])  # collect result in a pd dataframe for exporting to an Excel sheet
                     batch_results = pd.concat([batch_results, result], axis=0)  # concatenate all results
                 image[mask_bool] = image[mask_bool] * 0.5 + overlay_color * 0.5  # create starch overlay on the original image
-                cv2.imwrite(os.path.join(subfolder_dir, f'{os.path.splitext(image_name)[0]}_prediction.png'), cv2.cvtColor(image, cv2.COLOR_RGB2BGR))  # export the image
-        batch_results.to_excel(os.path.join(root, 'results.xlsx'), index=False)  # export the summarized results to Excel   
+                cv2.imwrite(os.path.join(output_dir, f'{os.path.splitext(image_name)[0]}_prediction.png'), cv2.cvtColor(image, cv2.COLOR_RGB2BGR))  # export the image
+        batch_results.to_excel(os.path.join(output_dir, 'results.xlsx'), index=False)  # export the summarized results to Excel
