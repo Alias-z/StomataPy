@@ -18,7 +18,7 @@ from mmseg.utils import register_all_modules as mmseg_utils_register_all_modules
 from mmseg.apis import init_model as mmseg_apis_init_model  # initialize mmseg model
 from mmseg.apis import inference_model as mmseg_apis_inference_model  # mmseg inference segmentor
 from ..core.core import device, image_types, GC_Colors, Starch_Colors, imread_rgb, unique_color, color_select, get_contour, lab_logo  # import core functions
-from ..core.stoma_dimension import GetDiameter  # import core functions for stomatal aperature
+from ..utils.stoma_dimension import GetDiameter  # import core functions for stomatal aperature
 
 
 class StarchSeeker:
@@ -130,7 +130,7 @@ class StarchSeeker:
     def starch_seeker(self, images):
         """Semantic segmentation for starch granules"""
         segmentor_results = []  # to collect segmentation results (filled with prediction colors)
-        mmseg_utils_register_all_modules(init_default_scope=False)  # initialize mmseg scope
+        # mmseg_utils_register_all_modules(init_default_scope=False)  # initialize mmseg scope
         segmentor = mmseg_apis_init_model(self.segmentor_config_path, self.segmentor_weight_path, device=device)   # initialize a segmentor from config file
         for image in tqdm(images, total=len(images)):
             prediction = mmseg_apis_inference_model(segmentor, image)  # inference image with the segmentor (batch inference is not supported)
