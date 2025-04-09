@@ -229,7 +229,8 @@ class StarchSeeker:
             black_image[np.all(mask_starch_2 == Starch_Colors[1].mask_rgb, axis=-1)] = GC_Colors[2].mask_rgb  # same for guard cell 2
             starch.append(black_image)  # collect all starch images that each guard cell region filled with different colors
             cv2.imwrite(os.path.join(output_starch_mask, name), cv2.cvtColor(black_image, cv2.COLOR_RGB2BGR))  # export the image
-            stomata_lenghth_pixel, stomata_width_pixel, rgb_mask, _ = GetDiameter(black_image, shrink_ratio=1.2, line_thickness=3).pca()  # calculate the stomata lenghth and width
+            dimension = GetDiameter(black_image, shrink_ratio=1.2, line_thickness=3).pca()  # calculate the stomata lenghth and width
+            stomata_lenghth_pixel, stomata_width_pixel, rgb_mask = dimension['length'], dimension['width'], dimension['visualization']  # get the results
             stomata_traits.append([stomata_lenghth_pixel, stomata_width_pixel])  # collect stomata percentage result
             cv2.imwrite(os.path.join(output_stomata, name), cv2.cvtColor(rgb_mask, cv2.COLOR_RGB2BGR))  # export the image
 
