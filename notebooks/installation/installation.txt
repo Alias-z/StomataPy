@@ -24,8 +24,6 @@ mamba install matplotlib onnxruntime onnx timm -y
 
 
 
-
-
 ######### stomatapy (windows with GPU) #########
 
 mamba create -n stomatapy python=3.10 -y
@@ -35,17 +33,6 @@ mamba install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvi
 mamba install jupyter more-itertools matplotlib openpyxl tqdm pandas scikit-image opencv openmim imgviz mahotas numpy transformers pillow pyqt pyyaml pycocotools onnxruntime onnx timm -y
 mim install mmengine "mmcv>=2.0.0" "mmdet>=3.2.0" "mmsegmentation>=1.2.1"
 mamba install segment-anything-hq cellpose -y
-
-
-
-
-
-
-
-
-
-
-
 
 
 mamba install -c conda-forge albumentations napari
