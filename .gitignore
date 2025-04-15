@@ -5,4 +5,5 @@ Checkpoints/
 Datasets/
 ISAT_with_segment_anything/
 sahi/
+notebooks /
 *.png
