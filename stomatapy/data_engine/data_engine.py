@@ -74,6 +74,7 @@ class StomataPyData:
         self.wangrenninger2023_dir = 'Datasets//WangRenninger2023//Original'  # directory of WangRenninger2023
         self.xie2021_dir = 'Datasets//Xie2021//Original'  # directory of Xie2021
         self.yang2021_dir = 'Datasets//Yang2021//Original'  # directory of Yang2021
+        self.yang2024_dir = 'Datasets//Yang2024//Original'  # directory of Yang2024
         self.yates_dir = 'Datasets//Yates2018//Original'  # directory of Yates2018
         self.zhu2021_dir = 'Datasets//Zhu2021//Original'  # directory of Zhu2021
         self.liang2022_dir = 'Datasets//2022 Liang et al//Original'  # directory of Liang2022
@@ -2856,6 +2857,79 @@ class Yang2021(StomataPyData):
         points_per_side, min_mask_ratio, max_mask_ratio = self.samhq_configs['points_per_side'], self.samhq_configs['min_mask_ratio'], self.samhq_configs['max_mask_ratio']  # get SAN-HQ auto mask configs
         for species_name in self.species_names:
             image_paths = get_paths(os.path.join(self.processed_dir, species_name), '.tif')  # get the image paths under the species folder
+            for image_path in tqdm(image_paths, total=len(image_paths)):
+                image, masks = imread_rgb(image_path), []  # load the image in RGB scale
+                try:
+                    auto_masks = SAMHQ(image_path=image_path, points_per_side=points_per_side, min_mask_ratio=min_mask_ratio, max_mask_ratio=max_mask_ratio).auto_label()  # get the auto labelled masks
+                    masks = SAMHQ.isolate_masks(auto_masks)  # filter redundant masks
+                    if visualize:
+                        visual_masks = [mask['segmentation'] for mask in masks]  # get only bool masks
+                        SAMHQ.show_masks(image, visual_masks, random_color=random_color)  # visualize bool masks
+                    if len(masks) > 0:
+                        Anything2ISAT.from_samhq(masks, image, image_path, catergory=catergory)  # export the ISAT json file
+                except ValueError:
+                    pass
+        return None
+
+
+class Yang2024(StomataPyData):
+    """
+    Yang et al., 2024  https://doi.org/10.1007/s00299-024-03149-3
+    Dataset source: https://github.com/AITAhenu/RotatedStomataNet
+
+    Yang2024
+    ├── Original
+        ├── Arabidopsis-destructively
+            ├── A-1.png
+            ...
+            ├── A-15.png
+        ├── Maize-destructively
+            ├── M-1.png
+            ...
+            ├── M-25.png
+        ├── Maize-nondestructively
+            ├── M-N-1.png
+            ...
+            ├── M-N-10.png
+    ├── Processed
+        ├── A. thaliana
+        ├── Z. mays
+    ├── source.txt
+    ├── discard.txt
+
+    1. Rename images
+    2. Dsicard unwanted images and their annotations
+    3. Generate segmentation masks with SAM-HQ, mannually adjust them
+    4. Check every annotation
+    """
+    def __init__(self):
+        super().__init__()
+        self.input_dir = self.yang2024_dir  # input directory
+        self.processed_dir = self.input_dir.replace('Original', 'Processed')  # output directory
+        self.source_name = 'Yang2024'  # source name
+        self.species_names = ['A. thaliana', 'Z. mays']  # plant species names
+        self.samhq_configs = {'points_per_side': (24,), 'min_mask_ratio': 0.0005, 'max_mask_ratio': 0.005}  # SAM-HQ auto label configuration
+
+    def rename_images(self) -> None:
+        """Copy images to 'Processed' and rename them"""
+        self.ensemble_files(self.input_dir, ['Arabidopsis-destructively', 'Maize-destructively', 'Maize-nondestructively'], self.processed_dir, image_types, folder_rename=True)  # move image files to 'Processed'
+        new_names = []  # to store new names
+        for image_path in get_paths(self.processed_dir, '.png'):
+            if 'Arabidopsis' in image_path:
+                new_names.append(f"{'A. thaliana'} {self.source_name} {os.path.basename(image_path)}")
+            elif 'Maize' in image_path:
+                new_names.append(f"{'Z. mays'} {self.source_name} {os.path.basename(image_path)}")
+        file_names = [os.path.basename(path) for path in get_paths(self.processed_dir, '.png')]  # get file basenames
+        self.batch_rename(self.processed_dir, file_names, new_names)  # rename all images
+        self.create_species_folders(self.processed_dir, set(self.species_names))  # create species folders
+        print(f'Selected {len(new_names)} images!')  # print out the number of selected images
+        return None
+
+    def get_annotations(self, catergory: str = 'stoma', visualize: bool = False, random_color: bool = True) -> None:
+        """Generate ISAT annotations json files"""
+        points_per_side, min_mask_ratio, max_mask_ratio = self.samhq_configs['points_per_side'], self.samhq_configs['min_mask_ratio'], self.samhq_configs['max_mask_ratio']  # get SAN-HQ auto mask configs
+        for species_name in self.species_names:
+            image_paths = get_paths(os.path.join(self.processed_dir, species_name), '.png')  # get the image paths under the species folder
             for image_path in tqdm(image_paths, total=len(image_paths)):
                 image, masks = imread_rgb(image_path), []  # load the image in RGB scale
                 try:
