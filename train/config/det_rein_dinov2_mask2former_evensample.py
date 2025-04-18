@@ -1,7 +1,7 @@
 resume = None
 load_from = None
 dinov2_checkpoint = 'train/checkpoints/dinov2_converted.pth'
-output_dir = 'StomataPy400K_stomatal_complex_21K'
+output_dir = 'StomataPy400K_stomatal_complex_24185'
 
 fp16 = dict(loss_scale='dynamic')
 with_cp = True  # for FSDP: the checkpoint needs to be controlled by the checkpoint_check_fn.
@@ -20,8 +20,8 @@ all_datasets = [
     'Leaf_Brightfield', 'Leaf_Topometry', 'Peels_Brightfield', 'Peels_SEM',
 ]
 
-total_samples_train = 21000 // 2  # total ~ 7000 images x 4 slices/image = 28000 samples
-total_samples_val = 5250 // 2
+total_samples_train = 24185 // len(all_datasets)  # total train 24185
+total_samples_val = 6068 // len(all_datasets)  # total val 6068
 
 work_dir = 'Models//' + output_dir
 wandb_project = 'StomataPy'
@@ -43,7 +43,7 @@ auto_scale_lr = dict(base_batch_size=16, enable=False)
 ReduceOnPlateauLR_patience = 50
 early_stopping_patience = 150
 warmup_epochs = 30
-max_epochs = 60
+max_epochs = 240
 val_interval = max_epochs // 10
 
 # crop_size = (1280, 1024)
