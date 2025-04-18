@@ -1,34 +1,37 @@
 resume = None
-# load_from = 'Models//det_rein_dinov2_mask2former_ep_0904//best_coco_segm_mAP_epoch_216.pth'
 load_from = None
 dinov2_checkpoint = 'train/checkpoints/dinov2_converted.pth'
-output_dir = '2024.10.16_det_rein_dinov2_mask2former_stomatal_ep'
-
-val_interval = 1
-log_processor = dict(type='LogProcessor', window_size=50, by_epoch=True)
+output_dir = 'StomataPy400K_stomatal_complex_21K'
 
 fp16 = dict(loss_scale='dynamic')
 with_cp = True  # for FSDP: the checkpoint needs to be controlled by the checkpoint_check_fn.
 optimizer_config = dict(type='GradientCumulativeOptimizerHook', cumulative_iters=4)
 
-classes = ('stomatal complex', )
-# classes = ('pavement cell', 'stomatal complex')
 num_stuff_classes = 0
+classes = ('stomatal complex', )
 num_things_classes = len(classes)
 num_classes = num_things_classes + num_stuff_classes
 
-dataset_type = 'CocoDataset'
-# data_root = 'train/data/Stomata_detection/'
-data_root = 'train/data/Epidermal_segmentation/'
+dataset_type = 'CocoEevenSamplerDataset'
+data_root = 'StomataPy400K_train/'
+
+all_datasets = [
+    'ClearStain_Brightfield', 'Imprints_Brightfield', 'Imprints_DIC',
+    'Leaf_Brightfield', 'Leaf_Topometry', 'Peels_Brightfield', 'Peels_SEM',
+]
+
+total_samples_train = 21000 // 2  # total ~ 7000 images x 4 slices/image = 28000 samples
+total_samples_val = 5250 // 2
 
 work_dir = 'Models//' + output_dir
 wandb_project = 'StomataPy'
 
-train_ann_file = 'train_sahi/sahi_coco.json'
-val_ann_file = 'val_sahi/sahi_coco.json'
+train_ann_file = 'sahi_coco_train.json'
+val_ann_file = 'sahi_coco_val.json'
+test_ann_file = 'COCO.json'
 
 batch_size = 2
-n_gpus = 4
+n_gpus = 6
 num_workers = 16
 original_batch_size = 16  # 2
 original_lr = 0.0001
@@ -39,9 +42,9 @@ auto_scale_lr = dict(base_batch_size=16, enable=False)
 
 ReduceOnPlateauLR_patience = 50
 early_stopping_patience = 150
-max_epochs = 300
 warmup_epochs = 30
-
+max_epochs = 60
+val_interval = max_epochs // 10
 
 # crop_size = (1280, 1024)
 # crop_size = (1152, 896)
@@ -51,68 +54,12 @@ image_size = (512, 512)
 
 # -------------------------------- Data augmentation --------------------------------
 
-albu_train_transforms = [
-    dict(
-        type='OneOf',
-        transforms=[
-            dict(type='ElasticTransform', alpha=20, sigma=15,
-                 interpolation=4, border_mode=0, mask_value=(0, 0, 0),
-                 approximate=True, same_dxdy=True, p=0.5),
-            dict(type='ElasticTransform', alpha=40, sigma=15,
-                 interpolation=4, border_mode=0, mask_value=(0, 0, 0),
-                 approximate=True, same_dxdy=False, p=0.5),
-        ],
-        p=0.25),
-    dict(type='AdvancedBlur', p=0.05)
-]
-
 load_pipeline = [
     dict(type='LoadImageFromFile', to_float32=True),
     dict(type='LoadAnnotations', with_bbox=True, with_mask=True),
-    # dict(type='RandomFlip', prob=0.5),
-    # dict(type='CutOut', n_holes=5, cutout_ratio=(0.025, 0.05)),
-    # dict(
-    #     type='RandomChoiceResize',
-    #     scales=[int(image_size[1] * x * 0.1) for x in range(9, 11)],
-    #     resize_type="ResizeShortestEdge",
-    #     max_size=image_size[1] * 2,
-    # ),
-    # dict(
-    #     type='RandomCrop',
-    #     crop_type='absolute',
-    #     crop_size=(image_size[0], image_size[1]),
-    #     recompute_bbox=True,
-    #     allow_negative_crop=False,
-    #     bbox_clip_border=True
-    # ),
-    # dict(type='YOLOXHSVRandomAug'),
     dict(type='RandomFlip', prob=0.5),
-    # dict(
-    #     type='FixShapeResize',
-    #     width=2000,
-    #     height=1500,
-    #     pad_val=0,
-    #     keep_ratio=True,
-    #     clip_object_border=True,
-    #     interpolation='lanczos'
-    # ),
-    # dict(type='RandomResize', scale=crop_size, ratio_range=(0.8, 1.6), keep_ratio=True),
-    # dict(type='Pad', size=crop_size, pad_to_square=False, pad_val=0, padding_mode='constant'),
     dict(type='PhotoMetricDistortion'),
     dict(type='GeomTransform', prob=0.5, img_border_value=(0, 0, 0), interpolation='lanczos'),
-    # dict(type='RandomCrop', crop_size=crop_size, crop_type='absolute', recompute_bbox=True, allow_negative_crop=False, bbox_clip_border=True),
-    # dict(
-    #     type='Albu',
-    #     transforms=albu_train_transforms,
-    #     bbox_params=dict(
-    #         type='BboxParams',
-    #         format='pascal_voc',
-    #         label_fields=['gt_ignore_flags', 'gt_bboxes_labels'],
-    #         min_visibility=0.01,
-    #         filter_lost_elements=True),
-    #     keymap={'img': 'image', 'gt_masks': 'masks', 'gt_bboxes': 'bboxes'},
-    #     skip_img_without_anno=True
-    # )
     dict(type='Resize', scale=(crop_size[0], crop_size[1]), keep_ratio=True),  # 'scale_factor
 ]
 
@@ -126,25 +73,35 @@ train_pipeline = [
 ]
 
 
-test_pipeline = [
+test_load_pipeline = [
     dict(type='LoadImageFromFile', to_float32=True),
-    dict(type='LoadAnnotations', with_bbox=True, with_mask=True),
+    dict(type='LoadAnnotations', with_bbox=True, with_mask=True)
+]
+
+
+test_pipeline = [
     dict(type='Resize', scale=(crop_size[0], crop_size[1]), keep_ratio=True),  # 'scale_factor'
     dict(
         type='PackDetInputs',
-        # meta_keys=('img_id', 'img_path', 'ori_shape', 'img_shape', 'scale_factor'))
         meta_keys=('img_id', 'img_path', 'img', 'img_shape', 'ori_shape', 'scale_factor', 'gt_bboxes', 'gt_ignore_flags', 'gt_bboxes_labels', 'gt_masks'))
 ]
+
 
 # -------------------------------- Dataloader --------------------------------
 
 train_dataset = dict(
-    type='MultiImageMixDataset',
+    type='MultiImageMixEvenSamplerDataset',
+    batch_size=batch_size,
+    n_gpus=n_gpus,
+    n_workers=num_workers,
+    mode='train',
     dataset=dict(
         type=dataset_type,
         metainfo=dict(classes=classes),
         data_root=data_root,
         ann_file=train_ann_file,
+        all_datasets=all_datasets,
+        total_samples=total_samples_train,
         data_prefix=dict(img='train_sahi/', seg='annotations/panoptic_train2017/'),
         pipeline=load_pipeline,
         filter_cfg=dict(filter_empty_gt=True, min_size=32),
@@ -159,24 +116,61 @@ train_dataloader = dict(
     batch_sampler=dict(type='AspectRatioBatchSampler'),
     dataset=train_dataset)
 
-val_dataloader = dict(
-    batch_size=batch_size,  # original 2
-    num_workers=num_workers,
-    drop_last=False,
-    persistent_workers=True,
-    sampler=dict(shuffle=False, type='DefaultSampler'),
+
+val_dataset = dict(
+    type='MultiImageMixEvenSamplerDataset',
+    batch_size=batch_size,
+    n_gpus=n_gpus,
+    n_workers=num_workers,
+    mode='val',
     dataset=dict(
         type=dataset_type,
         metainfo=dict(classes=classes),
         data_root=data_root,
         ann_file=val_ann_file,
-        data_prefix=dict(img='val_sahi/', seg='annotations/panoptic_val2017/'),
-        pipeline=test_pipeline,
+        all_datasets=all_datasets,
+        total_samples=total_samples_val,
+        data_prefix=dict(img='val_sahi/', seg='annotations/panoptic_train2017/'),
+        pipeline=test_load_pipeline,
         test_mode=False,
-        backend_args=None)
-)
+        backend_args=None),
+    pipeline=test_pipeline)
 
-test_dataloader = val_dataloader
+val_dataloader = dict(
+    batch_size=batch_size,  # original 2
+    num_workers=num_workers,
+    persistent_workers=True,
+    drop_last=False,
+    sampler=dict(type='DefaultSampler', shuffle=False),
+    batch_sampler=dict(type='AspectRatioBatchSampler'),
+    dataset=val_dataset)
+
+
+test_dataset = dict(
+    type='MultiImageMixEvenSamplerDataset',
+    batch_size=batch_size,
+    mode='val',
+    dataset=dict(
+        type=dataset_type,
+        metainfo=dict(classes=classes),
+        data_root=data_root,
+        ann_file=test_ann_file,
+        all_datasets=all_datasets,
+        total_samples=total_samples_val,
+        data_prefix=dict(img='test/', seg='annotations/panoptic_train2017/'),
+        pipeline=test_load_pipeline,
+        test_mode=False,
+        backend_args=None),
+    pipeline=test_pipeline)
+
+test_dataloader = dict(
+    batch_size=batch_size,  # original 2
+    num_workers=num_workers,
+    persistent_workers=True,
+    drop_last=False,
+    sampler=dict(type='DefaultSampler', shuffle=False),
+    batch_sampler=dict(type='AspectRatioBatchSampler'),
+    dataset=test_dataset)
 
 # -------------------------------- Evaluator --------------------------------
 
@@ -207,12 +201,12 @@ default_hooks = dict(
     param_scheduler=dict(type='ParamSchedulerHook'),
     checkpoint=dict(
         type='CheckpointHook',
-        interval=9999999999,
+        interval=max_epochs // 5,
         by_epoch=True,
-        save_last=False,
+        save_last=True,
         save_best='coco/segm_mAP',
         rule='greater',
-        max_keep_ckpts=1),
+        max_keep_ckpts=5),
     early_stopping=dict(
         type='EarlyStoppingHook',
         monitor='coco/segm_mAP',
@@ -266,7 +260,7 @@ param_scheduler = [
     dict(
         type='CosineAnnealingLR',
         T_max=max_epochs - warmup_epochs,
-        eta_min=lr * 1e-05,
+        eta_min=lr * 1e-03,
         begin=warmup_epochs,
         end=max_epochs,
         by_epoch=True,
@@ -463,6 +457,9 @@ model = dict(
 
 
 # --------------------------------  No need to code below (Runtime) --------------------------------
+
+
+log_processor = dict(type='LogProcessor', window_size=50, by_epoch=True)
 
 default_scope = 'mmdet'
 
