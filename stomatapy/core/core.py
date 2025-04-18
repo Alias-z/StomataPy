@@ -302,4 +302,3 @@ def lab_logo() -> None:
     """
     print(logo)
     return None
-

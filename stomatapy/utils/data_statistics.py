@@ -35,7 +35,7 @@ class DataStatistics:
         species_names = list(set(species_names))  # get the unique species names
         return sorted(species_names, key=str.casefold), list(set(species_dirs))
 
-    def select_species_folders(self, pavements_only: bool = False, with_subclass: bool = False, ensemble_files: bool = False, ensemble_by_modality: bool = True) -> dict:
+    def select_species_folders(self, pavements_only: bool = False, semantic: bool = False, ensemble_files: bool = False, ensemble_by_modality: bool = True) -> dict:
         """Retuern the summarized information cross all selected species folders"""
         def check_dataset(cell, dataset):
             datasets = [dataset.strip() for dataset in cell.split(';')]
@@ -78,7 +78,7 @@ class DataStatistics:
                     if len(categories) == 1:
                         continue
 
-                if with_subclass:
+                if semantic:
                     if 'outer ledge' not in categories:
                         continue
 
@@ -189,3 +189,65 @@ class DataStatistics:
         print(f'Total masks: {n_masks}, {n_autolabel} ({round(n_autolabel / n_masks * 100, 2)} %) out of which is autolabeled')
         print('Category counts:', category_counts)
         return selected_jsons
+
+    @staticmethod
+    def dataset_filter(dataset_root: str = None, pavements_only: bool = False, semantic: bool = False, ensemble_by_modality: bool = True) -> dict:
+        """
+        Filters and copies files from StomataPy400K dataset based on specified criteria.
+
+        Args:
+            dataset_root (str, optional): Root directory of the dataset to filter.
+            pavements_only (bool, default=False): If True, only keep files containing pavement cells.
+            semantic (bool, default=False): If True, only keep files containing outer ledges.
+            ensemble_by_modality (bool, default=True): If True, organize filtered files by modality in separate folders.
+
+        """
+
+        print(f'Filtering dataset: {dataset_root}')
+        destination_root = dataset_root + '_filtered'  # the directory of filtered files
+        os.makedirs(destination_root, exist_ok=True)  # create the destination directory
+
+        # get all subfolder directories under dataset_root
+        subfolder_dirs = []
+        for root, dirs, _ in os.walk(dataset_root):
+            for dir_name in dirs:
+                subfolder_dir = os.path.join(root, dir_name)
+                if os.path.isdir(subfolder_dir):
+                    subfolder_dirs.append(subfolder_dir)
+
+        for subfolder_dir in subfolder_dirs:
+            json_paths = get_paths(subfolder_dir, 'json')  # get the paths of ISAT annotation files
+            if not json_paths:  # skip folders with no JSON files
+                continue
+
+            for json_path in json_paths:
+                # print(json_path)
+                with open(json_path, encoding='utf-8') as file:
+                    data = json.load(file)  # load the json data
+
+                image_name = data['info'].get('name', '')  # get the image name
+                image_path = json_path.replace('.json', os.path.splitext(image_name)[1])  # get the image path info
+
+                note = data['info'].get('note', '')  # get note and convert to lower case
+                if '_' not in note:
+                    continue
+
+                categories = set([obj['category'] for obj in data['objects']])  # get all categories
+
+                if pavements_only:
+                    if 'pavement cell' not in categories:
+                        continue
+
+                if semantic:
+                    if 'outer ledge' not in categories:
+                        continue
+
+                if ensemble_by_modality:
+                    destination_dir = os.path.join(destination_root, os.path.basename(subfolder_dir))
+                    if not os.path.exists(destination_dir):
+                        os.makedirs(destination_dir, exist_ok=True)  # create the modality folder if needed
+                else:
+                    destination_dir = destination_root  # use default directory if not grouping by image modality
+                shutil.copy2(image_path, os.path.join(destination_dir, os.path.basename(image_path)))  # copy the image to the ensembled files directory
+                shutil.copy2(json_path, os.path.join(destination_dir, os.path.basename(json_path)))  # copy the json file to the ensembled files directory
+        return None

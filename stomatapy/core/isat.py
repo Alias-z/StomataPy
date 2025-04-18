@@ -1337,22 +1337,23 @@ class Anything2ISAT:
                 json.dump(data, file)  # save the merged json file
         return None
 
-    @staticmethod
-    def from_legacy_starch_annotation(images_dir: str):
-        """
-        Convert the legacy starch annotation to ISAT format
+    # TODO:
+    # @staticmethod
+    # def from_legacy_starch_annotation(images_dir: str):
+    #     """
+    #     Convert the legacy starch annotation to ISAT format
 
-        Args:
-        - json_dir_1 (str): the directory containing the first set of ISAT JSON files
-        - json_dir_2 (str): the directory containing the second set of ISAT JSON files
-        - json_dir_merged (str): the directory where the merged JSON files will be saved
+    #     Args:
+    #     - json_dir_1 (str): the directory containing the first set of ISAT JSON files
+    #     - json_dir_2 (str): the directory containing the second set of ISAT JSON files
+    #     - json_dir_merged (str): the directory where the merged JSON files will be saved
 
-        Returns:
-        - None: writes the merged ISAT JSON files into the specified output directory
-        """
-        guard_cell_mask_dir = images_dir.replace('images', 'Masks_GC')  # the guard cell mask directory
-        starch_mask_dir = images_dir.replace('images', 'Masks_Starch')  # the starch mask directory
-        return None
+    #     Returns:
+    #     - None: writes the merged ISAT JSON files into the specified output directory
+    #     """
+    #     guard_cell_mask_dir = images_dir.replace('images', 'Masks_GC')  # the guard cell mask directory
+    #     starch_mask_dir = images_dir.replace('images', 'Masks_Starch')  # the starch mask directory
+    #     return None
 
 
 class ISAT2Anything:
