@@ -9,3 +9,6 @@
 [submodule "sam-hq"]
 	path = sam-hq
 	url = https://github.com/Alias-z/sam-hq.git
+[submodule "sahi"]
+	path = sahi
+	url = https://github.com/Alias-z/sahi.git
