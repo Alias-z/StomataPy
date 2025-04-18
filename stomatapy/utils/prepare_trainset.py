@@ -2,7 +2,14 @@
 """Script to prepare training data for stomata models"""
 
 import os
+import sys
 import argparse
+
+# add parent directory to path so we can import data4training without installing stomatapy
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(os.path.dirname(current_dir))
+sys.path.append(parent_dir)
+
 from stomatapy.utils.data4training import Data4Training
 
 
@@ -41,7 +48,7 @@ def main():
 
     args = parser.parse_args()
 
-    # Determine base directory and destination
+    # determine base directory and destination
     base_dir = os.path.dirname(os.getcwd())
     if args.output_dir:
         destination = args.output_dir
@@ -50,10 +57,10 @@ def main():
 
     print(f'Destination directory: {destination}')
 
-    # Walk through the dataset root
+    # walk through the dataset root
     for root, dirs, _ in os.walk(args.dataset_root):
         for dir_name in dirs:
-            # Skip hidden directories
+            # skip hidden directories
             if dir_name.startswith('.'):
                 continue
 
@@ -62,7 +69,7 @@ def main():
                 print(f'Processing {subfolder_dir}')
                 output_rename = os.path.join(destination, os.path.basename(subfolder_dir))
 
-                # Initialize Data4Training with custom parameters
+                # initialize Data4Training with custom parameters
                 data_trainer = Data4Training(
                     input_dir=subfolder_dir,
                     aim=args.aim,
@@ -76,7 +83,7 @@ def main():
                     sahi_overlap_ratio=args.sahi_overlap_ratio
                 )
 
-                # Process the data
+                # process the data
                 data_trainer.data4training(
                     remove_subgroups=args.remove_subgroups,
                     if_resize_isat=args.if_resize_isat,
