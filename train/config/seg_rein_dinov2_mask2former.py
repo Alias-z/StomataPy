@@ -9,14 +9,15 @@ dinov2_checkpoint = 'Checkpoints/DINOv2/dinov2_converted.pth'
 fp16 = dict(loss_scale='dynamic')
 optimizer_config = dict(type='GradientCumulativeOptimizerHook', cumulative_iters=8)
 
-classes = ('background', 'stomatal complex', 'stoma', 'outer ledge', 'pore', 'pavement cell')
+# classes = ('background', 'stomatal complex', 'stoma', 'outer ledge', 'pore', 'pavement cell')
+classes = ('background', 'stomatal complex', 'stoma', 'outer ledge', 'pore')
 num_classes = len(classes)
 class_weight = [1.0] * num_classes + [0.1]
 
 model_crop_size = (512, 512)
 dataset_type = 'StomataDataset'
-data_root = 'Stomata_segmentation//'
-output_dir = 'seg_Li2023_0830'
+data_root = 'StomataPy400K_filtered_train/'
+output_dir = 'StomataPy400K_aperture_anomocytic'
 work_dir = 'Models//' + output_dir
 wandb_project = 'StomataPy'
 

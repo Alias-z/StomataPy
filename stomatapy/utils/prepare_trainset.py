@@ -19,7 +19,10 @@ def main():
     # Required parameters
     parser.add_argument('--dataset_root', type=str, required=True,
                         help='Root directory containing the dataset')
+
     # Optional parameters with defaults
+    parser.add_argument('--ensemble_by_modality', type=bool, required=False, default=False,
+                        help='if ensemble_by_modality or not')
     parser.add_argument('--r_train', type=float, default=0.8,
                         help='Ratio of training data (default: 0.8)')
     parser.add_argument('--r_test', type=float, default=0,
@@ -57,38 +60,65 @@ def main():
 
     print(f'Destination directory: {destination}')
 
-    # walk through the dataset root
-    for root, dirs, _ in os.walk(args.dataset_root):
-        for dir_name in dirs:
-            # skip hidden directories
-            if dir_name.startswith('.'):
-                continue
+    if args.ensemble_by_modality:
+        print('Ensemble by modality is enabled.')
+        # walk through the dataset root
+        for root, dirs, _ in os.walk(args.dataset_root):
+            for dir_name in dirs:
+                # skip hidden directories
+                if dir_name.startswith('.'):
+                    continue
 
-            subfolder_dir = os.path.join(root, dir_name)
-            if os.path.isdir(subfolder_dir):
-                print(f'Processing {subfolder_dir}')
-                output_rename = os.path.join(destination, os.path.basename(subfolder_dir))
+                subfolder_dir = os.path.join(root, dir_name)
+                if os.path.isdir(subfolder_dir):
+                    print(f'Processing {subfolder_dir}')
+                    output_rename = os.path.join(destination, os.path.basename(subfolder_dir))
 
-                # initialize Data4Training with custom parameters
-                data_trainer = Data4Training(
-                    input_dir=subfolder_dir,
-                    aim=args.aim,
-                    r_train=args.r_train,
-                    r_test=args.r_test,
-                    new_width=args.new_width,
-                    new_height=args.new_height,
-                    use_sahi=args.use_sahi,
-                    slice_width=args.slice_width,
-                    slice_height=args.slice_height,
-                    sahi_overlap_ratio=args.sahi_overlap_ratio
-                )
+                    # initialize Data4Training with custom parameters
+                    data_trainer = Data4Training(
+                        input_dir=subfolder_dir,
+                        aim=args.aim,
+                        r_train=args.r_train,
+                        r_test=args.r_test,
+                        new_width=args.new_width,
+                        new_height=args.new_height,
+                        use_sahi=args.use_sahi,
+                        slice_width=args.slice_width,
+                        slice_height=args.slice_height,
+                        sahi_overlap_ratio=args.sahi_overlap_ratio
+                    )
 
-                # process the data
-                data_trainer.data4training(
-                    remove_subgroups=args.remove_subgroups,
-                    if_resize_isat=args.if_resize_isat,
-                    output_rename=output_rename
-                )
+                    # process the data
+                    data_trainer.data4training(
+                        remove_subgroups=args.remove_subgroups,
+                        if_resize_isat=args.if_resize_isat,
+                        output_rename=output_rename
+                    )
+
+    else:
+        # process the main dataset directory
+        print(f'Processing {args.dataset_root}')
+
+        # initialize Data4Training with custom parameters
+        data_trainer = Data4Training(
+            input_dir=args.dataset_root,
+            aim=args.aim,
+            r_train=args.r_train,
+            r_test=args.r_test,
+            new_width=args.new_width,
+            new_height=args.new_height,
+            use_sahi=args.use_sahi,
+            slice_width=args.slice_width,
+            slice_height=args.slice_height,
+            sahi_overlap_ratio=args.sahi_overlap_ratio
+        )
+
+        # process the data
+        data_trainer.data4training(
+            remove_subgroups=args.remove_subgroups,
+            if_resize_isat=args.if_resize_isat,
+            output_rename=destination
+        )
 
 
 if __name__ == "__main__":

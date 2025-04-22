@@ -5,6 +5,7 @@ import os  # interact with the operating system
 import json  # manipulate json files
 import warnings; warnings.filterwarnings(action='ignore', category=FutureWarning, message='The behavior of DataFrame concatenation with empty or all-NA entries is deprecated.')  # noqa: suppress pandas warning
 import shutil  # for copy files
+from typing import Literal  # to support type hints
 import pandas as pd  # for Excel sheet and CSV file
 from ..core.core import get_paths  # import core functions
 
@@ -191,13 +192,17 @@ class DataStatistics:
         return selected_jsons
 
     @staticmethod
-    def dataset_filter(dataset_root: str = None, pavements_only: bool = False, semantic: bool = False, ensemble_by_modality: bool = True) -> dict:
+    def dataset_filter(dataset_root: str = None, pavements_only: bool = False, sc_flag: Literal[1, 2, 3] = 1, semantic: bool = False, ensemble_by_modality: bool = True) -> dict:
         """
         Filters and copies files from StomataPy400K dataset based on specified criteria.
 
         Args:
             dataset_root (str, optional): Root directory of the dataset to filter.
             pavements_only (bool, default=False): If True, only keep files containing pavement cells.
+            sc_flag (Literal[1, 2, 3], default=1): Flag to filter by stomatal complex type.
+                1: Keep all stomatal complex type.
+                2. Anomocytic stomata only.
+                3. Non-Anomocytic only such as Paracytic stomatal complex.
             semantic (bool, default=False): If True, only keep files containing outer ledges.
             ensemble_by_modality (bool, default=True): If True, organize filtered files by modality in separate folders.
 
@@ -231,6 +236,13 @@ class DataStatistics:
                 note = data['info'].get('note', '')  # get note and convert to lower case
                 if '_' not in note:
                     continue
+
+                if sc_flag == 2:
+                    if 'anomocytic' not in note.lower():
+                        continue
+                elif sc_flag == 3:
+                    if 'anomocytic' in note.lower():
+                        continue
 
                 categories = set([obj['category'] for obj in data['objects']])  # get all categories
 
