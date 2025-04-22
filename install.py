@@ -46,7 +46,7 @@ def install():
         subprocess.check_call([sys.executable, '-m', 'mim', 'install', pkg])
 
     # Step 3: Install submodules with absolute paths
-    submodules = ['mmdetection', 'mmsegmentation', 'sam-hq']
+    submodules = ['mmdetection', 'mmsegmentation', 'sam-hq', 'sahi']
     print('\nInstalling submodules...')
 
     for submodule in submodules:
