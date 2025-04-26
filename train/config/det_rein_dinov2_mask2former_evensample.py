@@ -30,7 +30,7 @@ train_ann_file = 'sahi_coco_train.json'
 val_ann_file = 'sahi_coco_val.json'
 test_ann_file = 'COCO.json'
 
-batch_size = 2
+batch_size = 4
 n_gpus = 6
 num_workers = 16
 original_batch_size = 16  # 2
@@ -46,9 +46,9 @@ warmup_epochs = 30
 max_epochs = 240
 val_interval = max_epochs // 10
 
-# crop_size = (1280, 1024)
+crop_size = (1280, 1024)
 # crop_size = (1152, 896)
-crop_size = (1024, 768)
+# crop_size = (1024, 768)
 image_size = (512, 512)
 
 
