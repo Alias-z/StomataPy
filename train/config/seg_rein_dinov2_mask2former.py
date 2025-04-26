@@ -4,13 +4,12 @@ resume = None
 load_from = None
 val_interval = 1
 log_processor = dict(by_epoch=True)
-dinov2_checkpoint = 'Checkpoints/DINOv2/dinov2_converted.pth'
+dinov2_checkpoint = 'train/checkpoints/dinov2_converted.pth'
 
 fp16 = dict(loss_scale='dynamic')
 optimizer_config = dict(type='GradientCumulativeOptimizerHook', cumulative_iters=8)
 
-# classes = ('background', 'stomatal complex', 'stoma', 'outer ledge', 'pore', 'pavement cell')
-classes = ('background', 'stomatal complex', 'stoma', 'outer ledge', 'pore')
+classes = ('background', 'stomatal complex', 'stoma', 'outer ledge', 'pore', 'pavement cell')
 num_classes = len(classes)
 class_weight = [1.0] * num_classes + [0.1]
 
@@ -18,7 +17,7 @@ model_crop_size = (512, 512)
 dataset_type = 'StomataDataset'
 data_root = 'StomataPy400K_filtered_train/'
 output_dir = 'StomataPy400K_aperture_anomocytic'
-work_dir = 'Models//' + output_dir
+work_dir = 'Models/' + output_dir
 wandb_project = 'StomataPy'
 
 batch_size = 8
@@ -36,8 +35,8 @@ max_epochs = 250
 warmup_epochs = 30
 
 
-crop_size = (512, 512)
-# crop_size = (1024, 1024)
+# crop_size = (512, 512)
+crop_size = (1024, 1024)
 
 # -------------------------------- Data augmentation --------------------------------
 
@@ -150,7 +149,8 @@ default_hooks = dict(
         type='CheckpointHook',
         by_epoch=True,
         interval=999999,
-        save_best='mIoU'),
+        save_best='mIoU',
+        save_last=True),
     early_stopping=dict(
         type='EarlyStoppingHook',
         monitor='mIoU',
