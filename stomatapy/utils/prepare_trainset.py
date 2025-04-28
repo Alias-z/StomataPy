@@ -21,8 +21,8 @@ def main():
                         help='Root directory containing the dataset')
 
     # Optional parameters with defaults
-    parser.add_argument('--ensemble_by_modality', type=bool, required=False, default=False,
-                        help='if ensemble_by_modality or not')
+    parser.add_argument('--ensemble_by_modality', action='store_true',
+                        help='Enable ensemble by modality')
     parser.add_argument('--r_train', type=float, default=0.8,
                         help='Ratio of training data (default: 0.8)')
     parser.add_argument('--r_test', type=float, default=0,
