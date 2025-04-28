@@ -18,6 +18,8 @@ from ..core.isat import UtilsISAT, ISAT2Anything  # import functions for ISAT js
 from .feature_clustering import FeatureClustering  # to computer image feature similarity
 from .data_statistics import DataStatistics  # to filter datasets
 
+random.seed(123)  # set random seed for reproducibility
+
 
 class Data4Training:
     """Prapre training data"""
