@@ -16,7 +16,7 @@ class_weight = [1.0] * num_classes + [0.1]
 model_crop_size = (512, 512)
 dataset_type = 'StomataDataset'
 data_root = 'StomataPy400K_filtered_train/'
-output_dir = 'StomataPy400K_aperture_512'
+output_dir = 'StomataPy400K_aperture_1024'
 work_dir = 'Models/' + output_dir
 wandb_project = 'StomataPy'
 
