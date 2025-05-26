@@ -1,0 +1,38 @@
+[project]
+name = "stomatapy"
+version = "0.1.0"
+description = "StomataPy: Enabling Generalized Stomatal Segmentation via Community-Driven Human-in-the-Loop"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+    {name = "Hongyuan Zhang", email = "hongyuan.zhang@usys.ethz.ch"},
+]
+dependencies = [
+    "numpy==1.26.4",
+    "openmim==0.3.8",
+    "xformers==0.0.23",
+    "fairscale",
+    "jupyter",
+    "more-itertools",
+    "openpyxl",
+    "scikit-image",
+    "ftfy",
+    "cellpose",
+    "mmpretrain",
+    "mmengine==0.10.4",
+    "mmcv==2.1.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+dev-dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "black",
+    "flake8",
+]
