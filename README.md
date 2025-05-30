@@ -1,14 +1,21 @@
-# Env config
+# Now in beta-test
 
-```
-mamba create -n stomatapy python=3.10 -y
-mamba activate stomatapy
-mamba install pytorch==2.1.1 torchvision==0.16.1 torchaudio==2.1.1 pytorch-cuda=12.1 -c pytorch -c nvidia -y
-pip install fairscale openmim==0.3.8 xformers==0.0.23 
-mim install mmengine mmdet mmsegmentation mmpretrain
-mamba install jupyter more-itertools openpyxl scikit-image ftfy imgviz mahotas pyqt pyyaml hdbscan nose  -y
-mamba install segment-anything-hq onnxruntime onnx timm transformers sahi -y
-   
-mamba install roifile fastremap llvmlite -y
-pip install cellpose[gui]
-```
+Try the model here: <a target="_blank" href="https://colab.research.google.com/github/Alias-z/StomataPy/blob/master/StomataPy_demo.ipynb">
+  <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+</a>
+
+---
+# Hall of Fame
+We greatly appreciate the following **beta-test participants**:
+
+**Sara Paola Nastasi** and **Alex Costa** from University of Milan, Italy
+**Robert Caine**, **Nitkamon Iamprasertkun**, **Yixiang Shan**, and **Safia El Amiri**, from University of Sheffield, UK
+**Ron Eric Stein** and **Tabea Lara Zwaller**, from Universität Heidelberg, Germany
+**Didier Le Thiec Lab** from INRAE, France
+**Emilio Petrone Mendoza** from University of Naples Federico II, Italy
+**Hana Horak** from University of Tartu, Estonia
+**Mengjie Fan** and **Tracy Lawson**, from University of Essex, UK
+**Pawandeep Singh Kohli** and **Micheal Rasissig** from Uiversity of Bern, Switzerland
+**Nattiwong Pankasem** from University of California San Diego, USA
+**Xiaojuan Wang** from Shanghai Science & Technology Museum, China
+**Xiaoqian Sha** and **Tian Zhang** from Henan University, China
