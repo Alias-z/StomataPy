@@ -6,6 +6,8 @@ import json  # manipulate json files
 import cv2  # OpenCV
 import numpy as np  # NumPy
 import pandas as pd  # for Excel sheet
+from tqdm import tqdm  # progress bar
+from matplotlib import pyplot as plt  # for visualization
 from ..core.core import get_paths, imread_rgb  # import core functions
 from ..utils.stoma_dimension import GetDiameter  # import core functions for stomatal aperture
 from ..core.isat import UtilsISAT  # functions to manipulate ISAT segmentations
@@ -30,7 +32,7 @@ def if_seg_on_edges(seg_mask: np.ndarray, edge_width: int = 3) -> bool:
     return any(np.any(edge) for edge in edges)
 
 
-def json2excel(input_dir, output_dir, scale: float = 2.9):
+def json2excel(input_dir, output_dir, scale: float = 2.9, show_prediction: bool = True):
     """Get stomata triats from ISAT json files of input folders, and store the results as an Excel sheet"""
     batch_results = pd.DataFrame()  # to store results into a DataFrame
     # json_paths = []  # to store the ISAT json file paths to be inferenced
@@ -41,7 +43,7 @@ def json2excel(input_dir, output_dir, scale: float = 2.9):
     os.makedirs(output_dir, exist_ok=True)
     json_paths = get_paths(input_dir, '.json')
 
-    for json_path in json_paths:
+    for json_path in tqdm(json_paths, total=len(json_paths)):
         with open(json_path, 'r', encoding='utf-8') as file:
             data = json.load(file)  # load the json file
         image_name = data['info']['name']  # get the image path stored in the json file
@@ -96,4 +98,7 @@ def json2excel(input_dir, output_dir, scale: float = 2.9):
                 batch_results = pd.concat([batch_results, result], axis=0)  # concatenate all results
             image[mask_bool] = image[mask_bool] * 0.5 + overlay_color * 0.5  # create starch overlay on the original image
             cv2.imwrite(os.path.join(output_dir, f'{os.path.splitext(image_name)[0]}_prediction.png'), cv2.cvtColor(image, cv2.COLOR_RGB2BGR))  # export the image
+            if show_prediction:
+                plt.imshow(image)
+                plt.show()
     batch_results.to_excel(os.path.join(output_dir, 'results.xlsx'), index=False)  # export the summarized results to Excel
