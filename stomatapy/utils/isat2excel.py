@@ -98,7 +98,7 @@ def json2excel(input_dir, output_dir, scale: float = 2.9, show_prediction: bool 
                 batch_results = pd.concat([batch_results, result], axis=0)  # concatenate all results
             image[mask_bool] = image[mask_bool] * 0.5 + overlay_color * 0.5  # create starch overlay on the original image
             cv2.imwrite(os.path.join(output_dir, f'{os.path.splitext(image_name)[0]}_prediction.png'), cv2.cvtColor(image, cv2.COLOR_RGB2BGR))  # export the image
-            if show_prediction:
-                plt.imshow(image)
-                plt.show()
+        if show_prediction:
+            plt.imshow(image)
+            plt.show()
     batch_results.to_excel(os.path.join(output_dir, 'results.xlsx'), index=False)  # export the summarized results to Excel
