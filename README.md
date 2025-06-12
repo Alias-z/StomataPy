@@ -1,11 +1,12 @@
-# StomataPy is a collection of resources
+# StomataPy is a Collection of Resources that Enable Generalized Stomatal Segmentation via Community-Driven Human-in-the-Loop
+**Namely, our resources allow the stomatal community to contribute images together, to iterativly improve open source models**
 - **StomataPy400K**: The largest annotated stomata dataset ever (Opensource soon)
 - **ISAT-SAM**: Interactive Stomata Annotation Tool with Segment Anything Model (Opensourced already)
 - **StomataPy400K models**: a series of models for stomata related segmentations (Opensource soon)
 ---
 
 # StomataPy400K: The largest annotated stomata dataset ever (Opensource soon)
-<img src="asserts/datasets_preview.gif" width="500" height=auto /> </div>
+<img src="asserts/datasets_preview.gif" width="800" height=auto /> </div>
 <br>
 - Total images: 7,838
 - Total plant species: 425
@@ -36,7 +37,7 @@ The dataset will be shared on HuggingFace: [https://huggingface.co/datasets/alia
 
 ---
 # ISAT-SAM: Interactive Stomata Annotation Tool with Segment Anything Model
-<img src="asserts/isat_demo.gif" width="500" height=auto /> </div>
+<img src="asserts/isat_demo.gif" width="800" height=auto /> </div>
 <br>
 Already available on GitHub: [https://github.com/yatengLG/ISAT_with_segment_anything](https://github.com/yatengLG/ISAT_with_segment_anything)
 
