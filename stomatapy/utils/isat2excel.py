@@ -34,6 +34,7 @@ def if_seg_on_edges(seg_mask: np.ndarray, edge_width: int = 3) -> bool:
 
 def json2excel(input_dir, output_dir, scale: float = 2.9, show_prediction: bool = True):
     """Get stomata triats from ISAT json files of input folders, and store the results as an Excel sheet"""
+    scale = float(scale)  # Force convert scale to float to handle string inputs
     batch_results = pd.DataFrame()  # to store results into a DataFrame
     # json_paths = []  # to store the ISAT json file paths to be inferenced
     # for dir_path, dir_names, file_names in os.walk(input_dir):
