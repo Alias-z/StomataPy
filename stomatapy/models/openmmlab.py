@@ -201,7 +201,7 @@ class OpenMMlab(Data4Training):
         # TODO: handle stack input case
         if not self.use_sahi:  # check if using regular mmdet detection
             mmdet_utils_register_all_modules(init_default_scope=False)  # initialize mmdet scope
-            detector = mmdet_apis_init_detector(self.detector_config_path, self.detector_weight_path, device=device)  # initialize a detector from config file
+            detector = mmdet_apis_init_detector(self.detector_config_path, self.detector_weight_path, device='cuda:0')  # initialize a detector from config file
             # print(detector.cfg)
             # print(detector)
             category_names = detector.dataset_meta['classes']  # get the category names
@@ -230,7 +230,7 @@ class OpenMMlab(Data4Training):
                 config_path=self.detector_config_path,  # path of the config file (ex. 'mmdet/configs/cascade_rcnn_r50_fpn_1x.py')
                 confidence_threshold=self.detector_threshold,  # all predictions with score < confidence_threshold will be discarded
                 image_size=self.slice_width,  # inference input size
-                device=device  # device, "cpu" or "cuda:0"
+                device='cuda:0'  # device, "cpu" or "cuda:0"
             )  # initialize the sahi detector
 
             def is_straight_edge(p1: tuple, p2: tuple, min_length: int) -> bool:
@@ -620,7 +620,7 @@ class OpenMMlab(Data4Training):
             largest_mask = labeled_mask == largest_label  # find the largest mask
             return largest_mask
 
-        self.segmentor.to(device)  # move segmentor to device ('cuda')
+        self.segmentor.to('cuda:0')  # move segmentor to device ('cuda')
 
         for json_path in tqdm(json_paths, total=len(json_paths)):
             with open(json_path, 'r', encoding='utf-8') as file:
