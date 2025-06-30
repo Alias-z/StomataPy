@@ -89,7 +89,7 @@ def json2excel(input_dir, output_dir, scale: float = 2.9, show_prediction: bool 
                     'folder': os.path.dirname(json_path),
                     'image_name': image_name,
                     'object_idx': idx,
-                    'object_category': 'stomatal complex',
+                    'object_category': obj['category'],
                     'area  (\u03BCm\N{SUPERSCRIPT TWO})': mask_area,
                     'length (\u03BCm)': length,
                     'width (\u03BCm)': width,
