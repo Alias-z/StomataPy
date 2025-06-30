@@ -32,7 +32,7 @@ def if_seg_on_edges(seg_mask: np.ndarray, edge_width: int = 3) -> bool:
     return any(np.any(edge) for edge in edges)
 
 
-def json2excel(input_dir, output_dir, scale: float = 2.9, show_prediction: bool = True):
+def json2excel(input_dir, output_dir, scale: float = 2.9, ignore_edges: bool = False, show_prediction: bool = True):
     """Get stomata triats from ISAT json files of input folders, and store the results as an Excel sheet"""
     scale = float(scale)  # Force convert scale to float to handle string inputs
     batch_results = pd.DataFrame()  # to store results into a DataFrame
@@ -58,7 +58,7 @@ def json2excel(input_dir, output_dir, scale: float = 2.9, show_prediction: bool 
             overlay_color = np.array([0, 0, 255])
             mask = obj['segmentation']  # get the ISAT format segmentation mask
             mask_bool = UtilsISAT.segmentation2mask(mask, image_dimension)  # convert the ISAT mask to a bool mask
-            if not if_seg_on_edges(mask_bool):
+            if not if_seg_on_edges(mask_bool) and ignore_edges:
                 mask_area = np.sum(mask_bool) * (1 / scale) ** 2  # get the mask area
                 bbox = obj['bbox']  # get the object bbox
                 padding = max((bbox[2] - bbox[0]), (bbox[3] - bbox[1])) // 4  # calculate the padding value of the bbox as max 25% of either dimension
