@@ -51,11 +51,11 @@ class Inferencer:
                 input_dir=input_dir,
                 output_name=output_name,
                 batch_size=self.starch_batch_size,
-                detector_config_path='Applications//Configs//INSTANCE_mask2former_swin-s.py',
-                detector_weight_path='Applications//Weights//INSTANCE_BOTH_mask2former_swin-s_2023.05.26.pth',
+                detector_config_path='/content/drive/MyDrive/Applications/Configs/INSTANCE_mask2former_swin-s.py',
+                detector_weight_path='/content/drive/MyDrive/Applications/Weights/INSTANCE_BOTH_mask2former_swin-s_2023.05.26.pth',
                 detector_threshold=self.detector_threshold,
-                segmentor_config_path='Applications//Configs//SEMANTIC_mask2former_swin-I.py',
-                segmentor_weight_path='Applications//Weights//SEMANTIC_BOTH_mask2former_swin-I_2023.05.27.pth',
+                segmentor_config_path='/content/drive/MyDrive/Applications/Configs/SEMANTIC_mask2former_swin-I.py',
+                segmentor_weight_path='/content/drive/MyDrive/Applications/Weights/SEMANTIC_BOTH_mask2former_swin-I_2023.05.27.pth',
                 concatenate_excels=True).batch_predict()
             return None
 
