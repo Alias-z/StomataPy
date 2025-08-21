@@ -46,7 +46,7 @@ class Inferencer:
         json_paths = [os.path.splitext(image_path)[0] + '.json' for image_path in image_paths]
 
         if aim == 'Starch':
-            output_name = 'Results starch'
+            output_name = '/content/drive/MyDrive/Results starch'
             StarchSeeker(
                 input_dir=input_dir,
                 output_name=output_name,
