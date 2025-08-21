@@ -19,7 +19,8 @@ class Inferencer:
                  check_straight_edges: bool = False,
                  straight_line_threshold: float = 100,
                  detector_threshold: float = 0.5,
-                 starch_batch_size: int = 33
+                 starch_batch_size: int = 33,
+                 show_prediction: bool = True
                  ):
         self.scale = scale
         self.denisty_model = denisty_model
@@ -29,6 +30,7 @@ class Inferencer:
         self.straight_line_threshold = straight_line_threshold
         self.detector_threshold = detector_threshold
         self.starch_batch_size = starch_batch_size
+        self.show_prediction = show_prediction
 
     def infer(self, aim: Literal['Desnity', 'Aperture', 'Starch'] = 'Desnity', input_dir: str = None):
         """
@@ -75,7 +77,7 @@ class Inferencer:
                 _ = models.segment_cell(json_paths, if_visualize=False, if_auto_label=True, resize_to=(2048, 2048))
 
             output_dir = os.path.join(input_dir, 'predictions')
-            _ = json2excel(input_dir, output_dir, scale=self.scale, show_prediction=True)
+            _ = json2excel(input_dir, output_dir, scale=self.scale, show_prediction=self.show_prediction)
         return None
 
 
@@ -87,5 +89,5 @@ if __name__ == '__main__':
     parser.add_argument('--show_prediction', type=bool, default=True)
     args = parser.parse_args()
     print(args)
-    inferencer = Inferencer(aim=args.aim, input_dir=args.input_dir, scale=args.scale, show_prediction=args.show_prediction)
-    inferencer.infer()
+    inferencer = Inferencer(scale=args.scale, show_prediction=args.show_prediction)
+    inferencer.infer(aim=args.aim, input_dir=args.input_dir)
