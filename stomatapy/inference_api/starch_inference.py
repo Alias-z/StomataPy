@@ -74,7 +74,12 @@ class StarchSeeker:
 
     def batch_images(self, subfolder_path):
         """Split images into batches to avoid CUDA out of memory."""
-        output_dir = os.path.join(self.output_name, *os.path.normpath(subfolder_path).split(os.sep)[1:])  # create output dir
+        # Calculate output_dir based on subfolder structure
+        split_folder = subfolder_path.split(os.sep)[1:]  # get the folder name
+        if len(split_folder) > 1:
+            output_dir = os.path.join(self.output_name, os.path.join(*split_folder))  # in case input dir has a relative parent dir
+        else:
+            output_dir = os.path.join(self.output_name, subfolder_path)  # in case input dir has no relative parent dir
         os.makedirs(output_dir, exist_ok=True)  # create the output folder
         file_names, images, image_sizes, image_scales = self.get_images(subfolder_path)  # get the file names, images, sizes, and scales
         batches = []  # to store information of each batch
@@ -289,7 +294,7 @@ class StarchSeeker:
             results.to_excel(os.path.join(output_dir, 'starch area.xlsx'), index=False)  # export results to Excel
             results.insert(0, 'folder name', os.path.basename(folder)); dataframes.append(results)  # noqa: for summarizing results
             print('\n \x1b[31m 7. creating starch overlay on original images \n')
-            result_folder = folder.replace(os.path.normpath(self.input_dir).split(os.sep)[0], self.output_name)  # root of predicted results
+            result_folder = output_dir  # root of predicted results
             mask_folder = os.path.join(result_folder, 'Starch Masks')  # where masks stored
             visualize_folder = os.path.join(result_folder, 'Starch Overlay'); os.makedirs(visualize_folder, exist_ok=True)  # noqa: to store mask overlay
             file_names = sorted(os.listdir(mask_folder), key=str.casefold)  # noqa: sort file names
