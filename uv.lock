@@ -893,6 +893,18 @@ wheels = [
 ]
 
 [[package]]
+name = "importlib-metadata"
+version = "8.7.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "zipp" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/76/66/650a33bd90f786193e4de4b3ad86ea60b53c89b669a5c7be931fac31cdb0/importlib_metadata-8.7.0.tar.gz", hash = "sha256:d13b81ad223b890aa16c5471f2ac3056cf76c5f10f82d6f9292f0b415f389000", size = 56641, upload-time = "2025-04-27T15:29:01.736Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/20/b0/36bd937216ec521246249be3bf9855081de4c5e06a0c9b4219dbeda50373/importlib_metadata-8.7.0-py3-none-any.whl", hash = "sha256:e5dd1551894c77868a30651cef00984d50e1002d06942a7101d34870c5f02afd", size = 27656, upload-time = "2025-04-27T15:29:00.214Z" },
+]
+
+[[package]]
 name = "ipykernel"
 version = "6.30.1"
 source = { registry = "https://pypi.org/simple" }
@@ -3201,6 +3213,7 @@ dependencies = [
     { name = "hatchling" },
     { name = "hdbscan" },
     { name = "huggingface" },
+    { name = "importlib-metadata" },
     { name = "jupyter" },
     { name = "matplotlib" },
     { name = "more-itertools" },
@@ -3227,6 +3240,7 @@ requires-dist = [
     { name = "hatchling", specifier = ">=1.27.0" },
     { name = "hdbscan", specifier = ">=0.8.40" },
     { name = "huggingface", specifier = ">=0.0.1" },
+    { name = "importlib-metadata", specifier = ">=8.7.0" },
     { name = "jupyter", specifier = ">=1.1.1" },
     { name = "matplotlib", specifier = ">=3.10.5" },
     { name = "more-itertools", specifier = ">=10.7.0" },
@@ -3699,4 +3713,13 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/92/f2/b04f4fb3da97bf16ba8cb06a8a40961aad29317353f5563efb17f0472f82/xformers-0.0.23-cp310-cp310-win_amd64.whl", hash = "sha256:518d866cc48fe91d055b5e89d86b4d2bec716d15f8a4babec8b2808bb4afb44a", size = 201122125, upload-time = "2023-12-06T17:59:24.276Z" },
     { url = "https://files.pythonhosted.org/packages/10/e7/5a4a46e5e9ea52dfe92bfe816546700d759ffe61e29b62c875465ae82861/xformers-0.0.23-cp311-cp311-manylinux2014_x86_64.whl", hash = "sha256:8c3463def8f115239b60114693a54d50a8f78a09f475428ea22d034bf3587985", size = 213013346, upload-time = "2023-12-06T17:59:34.795Z" },
     { url = "https://files.pythonhosted.org/packages/bc/c3/945ccb420bc48f0975586c9a42649759a56b67b0ae55af08d0d3389455d0/xformers-0.0.23-cp311-cp311-win_amd64.whl", hash = "sha256:32203f4450470f5f16e719dac542f6b665f7111105dd543badf4ae5492de415e", size = 201123521, upload-time = "2023-12-06T17:59:45.188Z" },
+]
+
+[[package]]
+name = "zipp"
+version = "3.23.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/e3/02/0f2892c661036d50ede074e376733dca2ae7c6eb617489437771209d4180/zipp-3.23.0.tar.gz", hash = "sha256:a07157588a12518c9d4034df3fbbee09c814741a33ff63c05fa29d26a2404166", size = 25547, upload-time = "2025-06-08T17:06:39.4Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/2e/54/647ade08bf0db230bfea292f893923872fd20be6ac6f53b2b936ba839d75/zipp-3.23.0-py3-none-any.whl", hash = "sha256:071652d6115ed432f5ce1d34c336c0adfd6a884660d1e9712a256d3d3bd4b14e", size = 10276, upload-time = "2025-06-08T17:06:38.034Z" },
 ]
