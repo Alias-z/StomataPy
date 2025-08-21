@@ -3226,10 +3226,7 @@ dependencies = [
     { name = "sahi" },
     { name = "scikit-image" },
     { name = "setuptools" },
-    { name = "torch" },
-    { name = "torchvision" },
     { name = "transformers" },
-    { name = "xformers" },
 ]
 
 [package.metadata]
@@ -3253,10 +3250,7 @@ requires-dist = [
     { name = "sahi", specifier = ">=0.11.32" },
     { name = "scikit-image", specifier = ">=0.25.2" },
     { name = "setuptools", specifier = ">=80.9.0" },
-    { name = "torch", specifier = "==2.1.1" },
-    { name = "torchvision", specifier = "==0.16.1" },
     { name = "transformers", specifier = "==4.41.2" },
-    { name = "xformers", specifier = "==0.0.23" },
 ]
 
 [[package]]
@@ -3505,29 +3499,6 @@ wheels = [
 ]
 
 [[package]]
-name = "torchvision"
-version = "0.16.1"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "numpy" },
-    { name = "pillow" },
-    { name = "requests" },
-    { name = "torch" },
-]
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/4b/f6/7049c63eb322c7a705610edf4e93c9d6435f861ec94e5639b1a0016ba678/torchvision-0.16.1-cp310-cp310-macosx_10_13_x86_64.whl", hash = "sha256:987132795e5c037cb74e7be35a693999fdb2f603152266ee15b80206e83a5b0c", size = 1586645, upload-time = "2023-11-15T16:46:30.204Z" },
-    { url = "https://files.pythonhosted.org/packages/02/b6/a540edc7ebcd510d42611e4344bbaa9c73e0c262750652e276866b43e33e/torchvision-0.16.1-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:25da6a7b22ea0348f62c45ec0daf157731096babcae65d222404081af96e085c", size = 1498013, upload-time = "2023-11-15T16:46:25.226Z" },
-    { url = "https://files.pythonhosted.org/packages/a3/73/1aa7a38ec9b20ebc55bd6ac70c6c134333933c3be4572e4885d609cd1625/torchvision-0.16.1-cp310-cp310-manylinux1_x86_64.whl", hash = "sha256:c82e291e674a18b67f92ddb476ae18498fb46d7032ae914f3fda90c955e7d86f", size = 6796033, upload-time = "2023-11-15T16:46:20.5Z" },
-    { url = "https://files.pythonhosted.org/packages/14/e0/542fd0594d49ea8320951f924af0ded2543d3af8498d6ed10e12173214b7/torchvision-0.16.1-cp310-cp310-manylinux2014_aarch64.whl", hash = "sha256:632887b22e67ce32a3ede806b868bba4057601e46d680de14b32a391eac1b483", size = 13959237, upload-time = "2023-11-15T16:45:54.361Z" },
-    { url = "https://files.pythonhosted.org/packages/14/0f/9c650b3d20fd8bf24d61dc2f59d734b64f3ab4473b8699dacf44a8a41140/torchvision-0.16.1-cp310-cp310-win_amd64.whl", hash = "sha256:92c76a5092b4033efdb183b11fa4854a7630e23c46f4a1c3ffd70c30cb5be4fc", size = 1137891, upload-time = "2023-11-15T16:46:23.267Z" },
-    { url = "https://files.pythonhosted.org/packages/3b/45/e2390cdb86ee9e2b40385373d8c24bcb7b608f47549605d34a878abe8bfe/torchvision-0.16.1-cp311-cp311-macosx_10_13_x86_64.whl", hash = "sha256:4aea5cf491c6c21b1cbdbb1bf2a3838a59d4db93ad5f49019a6564d3ca7127c7", size = 1586658, upload-time = "2023-11-15T16:46:26.852Z" },
-    { url = "https://files.pythonhosted.org/packages/47/23/dea81d5d93b3a4254ffedd095f6bca3cf70d544a3650678249faf1d20257/torchvision-0.16.1-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:3391757167637ace3ef33a67c9d5ef86b1f8cbd93eaa5bad45eebcf266ea6089", size = 1498009, upload-time = "2023-11-15T16:46:28.476Z" },
-    { url = "https://files.pythonhosted.org/packages/36/3b/a1d0a681ec3abb1bb8ff92c303ed73c0437050d9ac2b210273dc26f3fd8f/torchvision-0.16.1-cp311-cp311-manylinux1_x86_64.whl", hash = "sha256:4f9d5b192b336982e6dbe32c070b05606f0b53e87d722ae332a02909fbf988ed", size = 6796375, upload-time = "2023-11-15T16:46:10.022Z" },
-    { url = "https://files.pythonhosted.org/packages/7c/f3/c1edac2cea1573a38816f7949b942894765a8aafeb395f9febf0cd9b07c6/torchvision-0.16.1-cp311-cp311-manylinux2014_aarch64.whl", hash = "sha256:3d34601614958c4e30f53ec0eb7bf3f282ee72bb747734be2d75422831a43384", size = 13959242, upload-time = "2023-11-15T16:46:07.657Z" },
-    { url = "https://files.pythonhosted.org/packages/13/24/23cdf7e7dc33e5c01588c315f8424d31afa9edb05a80168f3d44f7178ff7/torchvision-0.16.1-cp311-cp311-win_amd64.whl", hash = "sha256:e11af530585574eb5ca837b8f151bcdd57c10e35c3af56c76a10f3281d2a2f2c", size = 1137911, upload-time = "2023-11-15T16:46:18.847Z" },
-]
-
-[[package]]
 name = "tornado"
 version = "6.5.2"
 source = { registry = "https://pypi.org/simple" }
@@ -3697,22 +3668,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/41/53/2e0253c5efd69c9656b1843892052a31c36d37ad42812b5da45c62191f7e/widgetsnbextension-4.0.14.tar.gz", hash = "sha256:a3629b04e3edb893212df862038c7232f62973373869db5084aed739b437b5af", size = 1097428, upload-time = "2025-04-10T13:01:25.628Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/ca/51/5447876806d1088a0f8f71e16542bf350918128d0a69437df26047c8e46f/widgetsnbextension-4.0.14-py3-none-any.whl", hash = "sha256:4875a9eaf72fbf5079dc372a51a9f268fc38d46f767cbf85c43a36da5cb9b575", size = 2196503, upload-time = "2025-04-10T13:01:23.086Z" },
-]
-
-[[package]]
-name = "xformers"
-version = "0.0.23"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "numpy" },
-    { name = "torch" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/66/fe/0954087306dcbc8cbffb6141748b3f1e4c6fd2203386783ee8d61cf995bb/xformers-0.0.23.tar.gz", hash = "sha256:9dbc9a4a2a426e6e006417e762c54e3eb32265dde1091419d13fa683ab70559b", size = 3847346, upload-time = "2023-12-06T18:00:35.199Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/57/57/de9ff0120454c7b58bde37640d711e6a5cf396281f22ff837346038cdd9c/xformers-0.0.23-cp310-cp310-manylinux2014_x86_64.whl", hash = "sha256:f739814d5279ff81c7955b1aa6dae2f462799f663f1d5785ed965acc833ed258", size = 212981094, upload-time = "2023-12-06T17:59:11.001Z" },
-    { url = "https://files.pythonhosted.org/packages/92/f2/b04f4fb3da97bf16ba8cb06a8a40961aad29317353f5563efb17f0472f82/xformers-0.0.23-cp310-cp310-win_amd64.whl", hash = "sha256:518d866cc48fe91d055b5e89d86b4d2bec716d15f8a4babec8b2808bb4afb44a", size = 201122125, upload-time = "2023-12-06T17:59:24.276Z" },
-    { url = "https://files.pythonhosted.org/packages/10/e7/5a4a46e5e9ea52dfe92bfe816546700d759ffe61e29b62c875465ae82861/xformers-0.0.23-cp311-cp311-manylinux2014_x86_64.whl", hash = "sha256:8c3463def8f115239b60114693a54d50a8f78a09f475428ea22d034bf3587985", size = 213013346, upload-time = "2023-12-06T17:59:34.795Z" },
-    { url = "https://files.pythonhosted.org/packages/bc/c3/945ccb420bc48f0975586c9a42649759a56b67b0ae55af08d0d3389455d0/xformers-0.0.23-cp311-cp311-win_amd64.whl", hash = "sha256:32203f4450470f5f16e719dac542f6b665f7111105dd543badf4ae5492de415e", size = 201123521, upload-time = "2023-12-06T17:59:45.188Z" },
 ]
 
 [[package]]
