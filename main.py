@@ -87,18 +87,20 @@ if __name__ == '__main__':
     parser.add_argument('--input_dir', type=str, default='')
     parser.add_argument('--scale', type=float, default=4.3)
     parser.add_argument('--denisty_model', type=str, default='StomataPy400K_density_betatest_n387')
-    parser.add_argument('--use_sahi', action='store_true', default=False)
-    parser.add_argument('--stack_input', action='store_true', default=False)
-    parser.add_argument('--check_straight_edges', action='store_true', default=False)
+    parser.add_argument('--use_sahi', type=str, choices=['True', 'False'], default='False')
+    parser.add_argument('--stack_input', type=str, choices=['True', 'False'], default='False')
+    parser.add_argument('--check_straight_edges', type=str, choices=['True', 'False'], default='False')
+    parser.add_argument('--show_prediction', type=str, choices=['True', 'False'], default='False')
     parser.add_argument('--straight_line_threshold', type=float, default=100)
     args = parser.parse_args()
     print(args)
     inferencer = Inferencer(
         scale=args.scale,
         denisty_model=args.denisty_model,
-        use_sahi=args.use_sahi,
-        stack_input=args.stack_input,
-        check_straight_edges=args.check_straight_edges,
-        straight_line_threshold=args.straight_line_threshold
+        use_sahi=args.use_sahi == 'True',
+        stack_input=args.stack_input == 'True',
+        check_straight_edges=args.check_straight_edges == 'True',
+        straight_line_threshold=args.straight_line_threshold,
+        show_prediction=args.show_prediction == 'True'
     )
     inferencer.infer(aim=args.aim, input_dir=args.input_dir)
