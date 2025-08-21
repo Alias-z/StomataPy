@@ -80,7 +80,12 @@ class StarchSeeker:
             output_dir = os.path.join(self.output_name, os.path.join(*split_folder))  # in case input dir has a relative parent dir
         else:
             output_dir = os.path.join(self.output_name, subfolder_path)  # in case input dir has no relative parent dir
+        
+        if '/content/drive/MyDrive/' in output_dir:
+            output_dir = output_dir.replace('/content/drive/MyDrive/', '', 1)
+        
         os.makedirs(output_dir, exist_ok=True)  # create the output folder
+        
         file_names, images, image_sizes, image_scales = self.get_images(subfolder_path)  # get the file names, images, sizes, and scales
         batches = []  # to store information of each batch
         for i in range(0, len(file_names), self.batch_size):
@@ -283,7 +288,13 @@ class StarchSeeker:
                 output_dir = os.path.join(self.output_name, os.path.join(*split_folder))  # in case input dir has a relative parent dir
             else:
                 output_dir = os.path.join(self.output_name, folder)  # in case input dir has no relative parent dir
+            
+            # Remove the first occurrence of "/content/drive/MyDrive/" from output_dir if present
+            if '/content/drive/MyDrive/' in output_dir:
+                output_dir = output_dir.replace('/content/drive/MyDrive/', '', 1)
+
             os.makedirs(output_dir, exist_ok=True)  # create the output folder
+
             batches = self.batch_images(folder)  # get subfolder image batches
             for idx, batch in enumerate(batches):
                 print(f'\n \033[34m batch {idx + 1} out of {len(batches)} \n')
