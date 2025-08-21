@@ -1,38 +1,25 @@
 [project]
 name = "stomatapy"
 version = "0.1.0"
-description = "StomataPy: Enabling Generalized Stomatal Segmentation via Community-Driven Human-in-the-Loop"
+description = "StomataPy: Datasets and Generalized Models for Leaf Epidermal Segmentation"
 readme = "README.md"
 requires-python = ">=3.10"
-authors = [
-    {name = "Hongyuan Zhang", email = "hongyuan.zhang@usys.ethz.ch"},
-]
 dependencies = [
+    "fairscale>=0.4.13",
+    "ftfy>=6.3.1",
+    "hdbscan>=0.8.40",
+    "jupyter>=1.1.1",
+    "more-itertools>=10.7.0",
     "numpy==1.26.4",
     "openmim==0.3.8",
+    "openpyxl>=3.1.5",
+    "pycocotools>=2.0.10",
+    "regex>=2025.7.34",
+    "sahi>=0.11.32",
+    "scikit-image>=0.25.2",
+    "torch==2.1.1",
+    "torchvision==0.16.1",
+    "transformers==4.41.2",
     "xformers==0.0.23",
-    "fairscale",
-    "jupyter",
-    "more-itertools",
-    "openpyxl",
-    "scikit-image",
-    "ftfy",
-    "cellpose",
-    "mmpretrain",
-    "mmengine==0.10.4",
-    "mmcv==2.1.0",
 ]
 
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
-
-[tool.uv]
-dev-dependencies = []
-
-[project.optional-dependencies]
-dev = [
-    "pytest",
-    "black",
-    "flake8",
-]
