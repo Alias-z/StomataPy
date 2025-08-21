@@ -61,7 +61,7 @@ class Inferencer:
 
         else:
             models = OpenMMlab(
-                detector_config_path='StomataPy/train/config/det_rein_dinov2_mask2former.py',
+                detector_config_path='train/config/det_rein_dinov2_mask2former.py',
                 detector_weight_path=f'Checkpoints/{self.denisty_model}/dinov2_detector.pth',
                 detector_threshold=self.detector_threshold,
                 segmentor_config_path='Checkpoints/StomataPy400K_aperture_512/seg_rein_dinov2_mask2former.py',
