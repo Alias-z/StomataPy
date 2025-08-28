@@ -1,4 +1,7 @@
 # StomataPy is a Collection of Resources that Enable Generalized Stomatal Segmentation via Community-Driven Human-in-the-Loop
+
+[![Documentation](https://img.shields.io/badge/📖%20Documentation-blue?style=flat-square&logo=readthedocs&logoColor=white)](https://stomatapy.readthedocs.io/en/latest/)
+
 **Namely, our resources allow the stomatal community to contribute images together, to iterativly improve open source models**
 - **StomataPy400K**: The largest annotated stomata dataset ever (Opensource soon)
 - **ISAT-SAM**: Interactive Stomata Annotation Tool with Segment Anything Model (Opensourced already)
