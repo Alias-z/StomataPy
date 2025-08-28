@@ -12,7 +12,7 @@ sys.setrecursionlimit(2000)
 
 
 project = 'StomataPy'
-copyright = '2025, Mol. Physiologie der Pflanzen, ETH Zurich'
+copyright = '2025, Plant Molecular Physiology Group, ETH Zurich'
 author = 'Hongyuan Zhang'
 
 # -- General configuration ---------------------------------------------------
