@@ -20,7 +20,8 @@ class Inferencer:
                  straight_line_threshold: float = 100,
                  detector_threshold: float = 0.5,
                  starch_batch_size: int = 33,
-                 show_prediction: bool = False
+                 show_prediction: bool = False,
+                 output_dir: str = 'Results'
                  ):
         self.scale = scale
         self.denisty_model = denisty_model
@@ -31,6 +32,7 @@ class Inferencer:
         self.detector_threshold = detector_threshold
         self.starch_batch_size = starch_batch_size
         self.show_prediction = show_prediction
+        self.output_dir = output_dir
 
     def infer(self, aim: Literal['Desnity', 'Aperture', 'Starch'] = 'Desnity', input_dir: str = None):
         """
@@ -46,10 +48,9 @@ class Inferencer:
         json_paths = [os.path.splitext(image_path)[0] + '.json' for image_path in image_paths]
 
         if aim == 'Starch':
-            output_name = '/content/drive/MyDrive/Results starch'
             StarchSeeker(
                 input_dir=input_dir,
-                output_name=output_name,
+                output_dir=self.output_dir,
                 batch_size=self.starch_batch_size,
                 detector_config_path='/content/drive/MyDrive/Applications/Configs/INSTANCE_mask2former_swin-s.py',
                 detector_weight_path='/content/drive/MyDrive/Applications/Weights/INSTANCE_BOTH_mask2former_swin-s_2023.05.26.pth',
@@ -85,6 +86,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--aim', type=str, default='Desnity')
     parser.add_argument('--input_dir', type=str, default='')
+    parser.add_argument('--output_dir', type=str, default='Results')
     parser.add_argument('--scale', type=float, default=4.3)
     parser.add_argument('--denisty_model', type=str, default='StomataPy400K_density_betatest_n387')
     parser.add_argument('--use_sahi', type=str, choices=['True', 'False'], default='False')
@@ -101,6 +103,7 @@ if __name__ == '__main__':
         stack_input=args.stack_input == 'True',
         check_straight_edges=args.check_straight_edges == 'True',
         straight_line_threshold=args.straight_line_threshold,
-        show_prediction=args.show_prediction == 'True'
+        show_prediction=args.show_prediction == 'True',
+        output_dir=args.output_dir
     )
     inferencer.infer(aim=args.aim, input_dir=args.input_dir)

@@ -25,7 +25,7 @@ class StarchSeeker:
     """Inference starch images"""
     def __init__(self,
                  input_dir: str,
-                 output_name: str = 'Results',
+                 output_dir: str,
                  batch_size: int = 100,
                  detector_config_path: str = None,
                  detector_weight_path: str = None,
@@ -37,7 +37,7 @@ class StarchSeeker:
                                                                        'guard cell area (\u03BCm\N{SUPERSCRIPT TWO})', 'starch area (\u03BCm\N{SUPERSCRIPT TWO})', 'starch guard cell area ratio (%)'])
                  ):
         self.input_dir = os.path.normpath(input_dir)  # input directory
-        self.output_name = output_name  # output folder name
+        self.output_dir = os.path.normpath(output_dir)  # output directory
         self.batch_size = batch_size  # inference batch size
         self.detector_config_path = detector_config_path  # instance segmentation config path
         self.detector_weight_path = detector_weight_path  # instance segmentation weight path
@@ -74,16 +74,9 @@ class StarchSeeker:
 
     def batch_images(self, subfolder_path):
         """Split images into batches to avoid CUDA out of memory."""
-        # Calculate output_dir based on subfolder structure
-        split_folder = subfolder_path.split(os.sep)[1:]  # get the folder name
-        if len(split_folder) > 1:
-            output_dir = os.path.join(self.output_name, os.path.join(*split_folder))  # in case input dir has a relative parent dir
-        else:
-            output_dir = os.path.join(self.output_name, subfolder_path)  # in case input dir has no relative parent dir
-
-        if '/content/drive/MyDrive/' in output_dir:
-            output_dir = output_dir.replace('/content/drive/MyDrive/', '', 1)
-
+        # Create output directory using folder basename
+        folder_name = os.path.basename(subfolder_path)
+        output_dir = os.path.join(self.output_dir, folder_name)
         os.makedirs(output_dir, exist_ok=True)  # create the output folder
 
         file_names, images, image_sizes, image_scales = self.get_images(subfolder_path)  # get the file names, images, sizes, and scales
@@ -283,16 +276,10 @@ class StarchSeeker:
         for folder in folders:
             print(f'\n \033[34m processing {folder} \n')
             results = copy.deepcopy(self.empty_dataframe)  # to store values as a dataframe
-            split_folder = folder.split(os.sep)[1:]  # get the folder name
-            if len(split_folder) > 1:
-                output_dir = os.path.join(self.output_name, os.path.join(*split_folder))  # in case input dir has a relative parent dir
-            else:
-                output_dir = os.path.join(self.output_name, folder)  # in case input dir has no relative parent dir
 
-            # Remove the first occurrence of "/content/drive/MyDrive/" from output_dir if present
-            if '/content/drive/MyDrive/' in output_dir:
-                output_dir = output_dir.replace('/content/drive/MyDrive/', '', 1)
-
+            # Create output directory using folder basename
+            folder_name = os.path.basename(folder)
+            output_dir = os.path.join(self.output_dir, folder_name)
             os.makedirs(output_dir, exist_ok=True)  # create the output folder
 
             batches = self.batch_images(folder)  # get subfolder image batches
@@ -323,12 +310,9 @@ class StarchSeeker:
             print('\n \x1b[31m 8. concatenating all Excel sheets \n')
             dataframes = pd.concat(dataframes, axis=0)  # concatenate all the DataFrames
             dataframes.rename(columns={dataframes .columns[0]: 'folder name'}, inplace=True)  # rename the first column
-            # Fix path construction to avoid duplicating Google Drive path
-            summary_output_dir = os.path.join(self.output_name, os.path.join(*self.input_dir.split(os.sep)[1:]))
-            if '/content/drive/MyDrive/' in summary_output_dir:
-                summary_output_dir = summary_output_dir.replace('/content/drive/MyDrive/', '', 1)
-            os.makedirs(summary_output_dir, exist_ok=True)  # ensure directory exists
-            dataframes.to_excel(os.path.join(summary_output_dir, 'starch area summary.xlsx'), index=False)  # export the summarized results to Excel
+            # Save summary file directly in the output directory
+            os.makedirs(self.output_dir, exist_ok=True)  # ensure output directory exists
+            dataframes.to_excel(os.path.join(self.output_dir, 'starch area summary.xlsx'), index=False)  # export the summarized results to Excel
         end = time.time()  # stop the timer
         print('\n \033[34m Done! \n')
         print(f'\033[34m processed {images_num} images in {(end-start)/60} min')
