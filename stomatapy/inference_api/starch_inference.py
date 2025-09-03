@@ -80,12 +80,12 @@ class StarchSeeker:
             output_dir = os.path.join(self.output_name, os.path.join(*split_folder))  # in case input dir has a relative parent dir
         else:
             output_dir = os.path.join(self.output_name, subfolder_path)  # in case input dir has no relative parent dir
-        
+
         if '/content/drive/MyDrive/' in output_dir:
             output_dir = output_dir.replace('/content/drive/MyDrive/', '', 1)
-        
+
         os.makedirs(output_dir, exist_ok=True)  # create the output folder
-        
+
         file_names, images, image_sizes, image_scales = self.get_images(subfolder_path)  # get the file names, images, sizes, and scales
         batches = []  # to store information of each batch
         for i in range(0, len(file_names), self.batch_size):
@@ -288,7 +288,7 @@ class StarchSeeker:
                 output_dir = os.path.join(self.output_name, os.path.join(*split_folder))  # in case input dir has a relative parent dir
             else:
                 output_dir = os.path.join(self.output_name, folder)  # in case input dir has no relative parent dir
-            
+
             # Remove the first occurrence of "/content/drive/MyDrive/" from output_dir if present
             if '/content/drive/MyDrive/' in output_dir:
                 output_dir = output_dir.replace('/content/drive/MyDrive/', '', 1)
@@ -323,7 +323,12 @@ class StarchSeeker:
             print('\n \x1b[31m 8. concatenating all Excel sheets \n')
             dataframes = pd.concat(dataframes, axis=0)  # concatenate all the DataFrames
             dataframes.rename(columns={dataframes .columns[0]: 'folder name'}, inplace=True)  # rename the first column
-            dataframes.to_excel(os.path.join(self.output_name, os.path.join(*self.input_dir.split(os.sep)[1:]), 'starch area summary.xlsx'), index=False)  # export the summarized results to Excel
+            # Fix path construction to avoid duplicating Google Drive path
+            summary_output_dir = os.path.join(self.output_name, os.path.join(*self.input_dir.split(os.sep)[1:]))
+            if '/content/drive/MyDrive/' in summary_output_dir:
+                summary_output_dir = summary_output_dir.replace('/content/drive/MyDrive/', '', 1)
+            os.makedirs(summary_output_dir, exist_ok=True)  # ensure directory exists
+            dataframes.to_excel(os.path.join(summary_output_dir, 'starch area summary.xlsx'), index=False)  # export the summarized results to Excel
         end = time.time()  # stop the timer
         print('\n \033[34m Done! \n')
         print(f'\033[34m processed {images_num} images in {(end-start)/60} min')
