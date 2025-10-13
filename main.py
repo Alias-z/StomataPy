@@ -34,11 +34,11 @@ class Inferencer:
         self.show_prediction = show_prediction
         self.output_dir = output_dir
 
-    def infer(self, aim: Literal['Desnity', 'Aperture', 'Starch', 'To_Excel'] = 'Desnity', input_dir: str = None):
+    def infer(self, aim: Literal['Density', 'Aperture', 'Starch', 'To_Excel'] = 'Density', input_dir: str = None):
         """
         Infer images and return the result
         Args:
-            aim: Literal['Desnity', 'Aperture', 'Starch', 'To_Excel'] = 'Desnity'
+            aim: Literal['Density', 'Aperture', 'Starch', 'To_Excel'] = 'Density'
             input_dir: str = None
         Returns:
             None
@@ -72,7 +72,7 @@ class Inferencer:
                 check_straight_edges=self.check_straight_edges,
                 straight_line_threshold=self.straight_line_threshold
             )
-            if aim == 'Desnity':
+            if aim == 'Density':
                 _ = models.detect_cell(image_paths, if_visualize=False, if_auto_label=True)
             elif aim == 'Aperture':
                 _ = models.segment_cell(json_paths, if_visualize=False, if_auto_label=True, resize_to=(2048, 2048))
@@ -84,7 +84,7 @@ class Inferencer:
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--aim', type=str, default='Desnity')
+    parser.add_argument('--aim', type=str, default='Density')
     parser.add_argument('--input_dir', type=str, default='')
     parser.add_argument('--output_dir', type=str, default='Results')
     parser.add_argument('--scale', type=float, default=4.3)
