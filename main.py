@@ -34,11 +34,11 @@ class Inferencer:
         self.show_prediction = show_prediction
         self.output_dir = output_dir
 
-    def infer(self, aim: Literal['Desnity', 'Aperture', 'Starch'] = 'Desnity', input_dir: str = None):
+    def infer(self, aim: Literal['Desnity', 'Aperture', 'Starch', 'To_Excel'] = 'Desnity', input_dir: str = None):
         """
         Infer images and return the result
         Args:
-            aim: Literal['Desnity', 'Aperture', 'Starch'] = 'Desnity'
+            aim: Literal['Desnity', 'Aperture', 'Starch', 'To_Excel'] = 'Desnity'
             input_dir: str = None
         Returns:
             None
@@ -76,9 +76,9 @@ class Inferencer:
                 _ = models.detect_cell(image_paths, if_visualize=False, if_auto_label=True)
             elif aim == 'Aperture':
                 _ = models.segment_cell(json_paths, if_visualize=False, if_auto_label=True, resize_to=(2048, 2048))
-
-            output_dir = os.path.join(input_dir, 'predictions')
-            _ = json2excel(input_dir, output_dir, scale=self.scale, show_prediction=self.show_prediction)
+            elif aim == 'To_Excel':
+                output_dir = os.path.join(input_dir, 'predictions')
+                _ = json2excel(input_dir, output_dir, scale=self.scale, show_prediction=self.show_prediction)
         return None
 
 
