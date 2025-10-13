@@ -13,7 +13,7 @@ video_types = ['.avi', '.mp4', '.mov', '.wmv']
 class Inferencer:
     def __init__(self,
                  scale: float = 4.3,
-                 denisty_model: str = 'StomataPy400K_density_betatest_n387',
+                 density_model: str = 'StomataPy400K_density_betatest_n387',
                  use_sahi: bool = True,
                  stack_input: bool = False,
                  check_straight_edges: bool = False,
@@ -24,7 +24,7 @@ class Inferencer:
                  output_dir: str = 'Results'
                  ):
         self.scale = scale
-        self.denisty_model = denisty_model
+        self.density_model = density_model
         self.use_sahi = use_sahi
         self.stack_input = stack_input
         self.check_straight_edges = check_straight_edges
@@ -63,7 +63,7 @@ class Inferencer:
         else:
             models = OpenMMlab(
                 detector_config_path='train/config/det_rein_dinov2_mask2former.py',
-                detector_weight_path=f'Checkpoints/{self.denisty_model}/dinov2_detector.pth',
+                detector_weight_path=f'Checkpoints/{self.density_model}/dinov2_detector.pth',
                 detector_threshold=self.detector_threshold,
                 segmentor_config_path='Checkpoints/StomataPy400K_aperture_512/seg_rein_dinov2_mask2former.py',
                 segmentor_weight_path='Checkpoints/StomataPy400K_aperture_512/dinov2_segmentor.pth',
@@ -88,7 +88,7 @@ if __name__ == '__main__':
     parser.add_argument('--input_dir', type=str, default='')
     parser.add_argument('--output_dir', type=str, default='Results')
     parser.add_argument('--scale', type=float, default=4.3)
-    parser.add_argument('--denisty_model', type=str, default='StomataPy400K_density_betatest_n387')
+    parser.add_argument('--density_model', type=str, default='StomataPy400K_density_betatest_n387')
     parser.add_argument('--use_sahi', type=str, choices=['True', 'False'], default='False')
     parser.add_argument('--stack_input', type=str, choices=['True', 'False'], default='False')
     parser.add_argument('--check_straight_edges', type=str, choices=['True', 'False'], default='False')
@@ -98,7 +98,7 @@ if __name__ == '__main__':
     print(args)
     inferencer = Inferencer(
         scale=args.scale,
-        denisty_model=args.denisty_model,
+        density_model=args.density_model,
         use_sahi=args.use_sahi == 'True',
         stack_input=args.stack_input == 'True',
         check_straight_edges=args.check_straight_edges == 'True',
